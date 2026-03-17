@@ -59,8 +59,8 @@ body.light nav{background:rgba(250,249,247,0.93)}
 .nav-cta:hover{background:var(--accent);color:#fff}
 
 /* ─── HERO ─── */
-.hero{display:flex;align-items:center;padding:4rem 3rem 3.5rem;max-width:1400px;margin:0 auto}
-.hero-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:3rem;align-items:start;width:100%}
+.hero{display:flex;align-items:center;padding:6rem 3rem 5rem;max-width:1400px;margin:0 auto;min-height:calc(100vh - 52px)}
+.hero-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:3rem;align-items:center;width:100%}
 .hero-tag{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--teal);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem}
 .hero-tag::before{content:'';display:inline-block;width:24px;height:1px;background:var(--teal)}
 h1{font-family:'Spectral',serif;font-size:clamp(2.4rem,4.5vw,3.6rem);font-weight:300;line-height:1.08;letter-spacing:-0.02em;color:var(--text);margin-bottom:1.2rem}
@@ -188,9 +188,11 @@ body.light .proj-icon.v4{background:rgba(224,92,138,0.07);color:#c0426e;border-c
 .contact-link-icon{font-family:'DM Mono',monospace;font-size:0.7rem;width:30px;height:30px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .icon-mail{background:rgba(124,108,250,0.1);color:var(--accent2);border:1px solid rgba(124,108,250,0.2)}
 .icon-phone,.icon-li{background:rgba(45,212,168,0.1);color:var(--teal);border:1px solid rgba(45,212,168,0.2)}
+.icon-wa{background:rgba(37,211,102,0.1);color:#25d366;border:1px solid rgba(37,211,102,0.2)}
 .icon-port{background:rgba(240,168,39,0.1);color:var(--amber);border:1px solid rgba(240,168,39,0.2)}
 body.light .icon-mail{background:rgba(69,53,212,0.07);color:var(--accent);border-color:rgba(69,53,212,0.15)}
 body.light .icon-phone,body.light .icon-li{background:rgba(10,122,92,0.07);color:var(--teal);border-color:rgba(10,122,92,0.15)}
+body.light .icon-wa{background:rgba(37,211,102,0.07);color:#1a9e4a;border-color:rgba(37,211,102,0.15)}
 body.light .icon-port{background:rgba(160,98,0,0.07);color:var(--amber);border-color:rgba(160,98,0,0.15)}
 .contact-link-text{flex:1}
 .contact-link-label{font-size:0.67rem;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:0.06em;text-transform:uppercase}
@@ -297,10 +299,10 @@ footer{border-top:1px solid var(--border);padding:1.5rem;text-align:center;font-
       <h1>Implementation <em>lead</em> who builds what he deploys</h1>
       <p class="hero-desc">20 enterprise SaaS rollouts across the UK, US, and Middle East. 9+ years bridging business requirements and technical execution — on-site and remote. Now building AI-native tools that solve the problems I've lived through.</p>
       <div class="hero-badges">
-        <span class="badge badge-impl">Implementation</span>
+        <span class="badge badge-impl">Implementation Lead</span>
+        <span class="badge badge-ba">Business Analyst</span>
+        <span class="badge badge-am">Account Manager</span>
         <span class="badge badge-cs">Customer Success</span>
-        <span class="badge badge-ba">Business Analysis</span>
-        <span class="badge badge-am">Account Management</span>
       </div>
       <div class="hero-actions">
         <a href="https://calendly.com/inbarajb91/30min" target="_blank" class="btn-primary">Book a call</a>
@@ -565,8 +567,15 @@ footer{border-top:1px solid var(--border);padding:1.5rem;text-align:center;font-
       <a href="tel:+917200108575" class="contact-link">
         <div class="contact-link-icon icon-phone">☎</div>
         <div class="contact-link-text">
-          <div class="contact-link-label">Phone / WhatsApp</div>
+          <div class="contact-link-label">Phone</div>
           <div class="contact-link-value">+91 7200108575</div>
+        </div>
+      </a>
+      <a href="https://wa.me/917200108575" class="contact-link" target="_blank">
+        <div class="contact-link-icon icon-wa">💬</div>
+        <div class="contact-link-text">
+          <div class="contact-link-label">WhatsApp</div>
+          <div class="contact-link-value">Chat on WhatsApp</div>
         </div>
       </a>
       <a href="https://www.linkedin.com/in/inbarajb91/" class="contact-link" target="_blank">
