@@ -4,152 +4,176 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inbaraj B — Implementation Lead & Builder</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#0a0a0b;--bg2:#111113;--bg3:#18181c;
-  --border:#2a2a30;--border2:#38383f;
-  --text:#e8e8ec;--text2:#9090a0;--text3:#5a5a6a;
-  --accent:#7c6cfa;--accent2:#a89cf7;
-  --teal:#2dd4a8;--teal2:#1aab86;--amber:#f0a827;
-  --banner-bg:#1a1a3a;--banner-text:#c8c0ff;
+  --bg:#0a0a0b;
+  --bg2:#111113;
+  --bg3:#18181c;
+  --border:#2a2a30;
+  --border2:#38383f;
+  --text:#e8e8ec;
+  --text2:#9090a0;
+  --text3:#5a5a6a;
+  --accent:#7c6cfa;
+  --accent2:#a89cf7;
+  --teal:#2dd4a8;
+  --amber:#f0a827;
+  --banner-bg:#111113;
+  --banner-text:#6a6a7a;
 }
-html[data-theme="light"]{
-  --bg:#f8f7f4;--bg2:#ffffff;--bg3:#f0eeea;
-  --border:#e0ddd8;--border2:#ccc9c2;
-  --text:#1a1a1f;--text2:#5a5a6a;--text3:#9090a0;
-  --accent:#5b4de0;--accent2:#7c6cfa;
-  --teal:#0d9e78;--teal2:#0b8065;--amber:#c47f0a;
-  --banner-bg:#ede9ff;--banner-text:#4a3ab5;
+body.light{
+  --bg:#faf9f7;
+  --bg2:#ffffff;
+  --bg3:#f2f1ef;
+  --border:#dedad4;
+  --border2:#c8c4bc;
+  --text:#1c1a18;
+  --text2:#4a4844;
+  --text3:#8a8884;
+  --accent:#4535d4;
+  --accent2:#5546e8;
+  --teal:#0a7a5c;
+  --amber:#a06200;
+  --banner-bg:#edecea;
+  --banner-text:#5a5856;
 }
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.6;transition:background 0.3s,color 0.3s}
 a{color:inherit;text-decoration:none}
 
-.call-banner{background:var(--banner-bg);padding:0.55rem 2rem;display:flex;align-items:center;justify-content:center;gap:1rem;position:sticky;top:0;z-index:200;border-bottom:1px solid rgba(124,108,250,0.2)}
-.call-banner-text{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--banner-text);letter-spacing:0.06em}
-.call-banner a{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--accent2);letter-spacing:0.06em;font-weight:500;border-bottom:1px solid rgba(124,108,250,0.3);padding-bottom:1px;transition:color 0.2s}
-.call-banner a:hover{color:var(--accent)}
-.call-banner-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;flex-shrink:0}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
-
-nav{position:sticky;top:42px;z-index:100;padding:0.9rem 2rem;display:flex;justify-content:space-between;align-items:center;background:rgba(10,10,11,0.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
-html[data-theme="light"] nav{background:rgba(248,247,244,0.92)}
-.nav-brand{font-family:'Fraunces',serif;font-size:1.1rem;letter-spacing:-0.02em;color:var(--text)}
-.nav-brand span{color:var(--accent2)}
+nav{position:sticky;top:0;z-index:100;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(14px);border-bottom:1px solid var(--border);transition:background 0.3s,border-color 0.3s}
+body:not(.light) nav{background:rgba(10,10,11,0.88)}
+body.light nav{background:rgba(250,249,247,0.93)}
+.nav-brand{font-family:'Spectral',serif;font-size:1.15rem;font-weight:300;letter-spacing:-0.02em;color:var(--text)}
+.nav-brand span{font-style:italic;color:var(--accent2)}
 .nav-links{display:flex;gap:2rem;list-style:none}
-.nav-links a{font-size:0.78rem;color:var(--text2);letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s}
+.nav-links a{font-size:0.75rem;color:var(--text2);letter-spacing:0.08em;text-transform:uppercase;font-family:'DM Mono',monospace;transition:color 0.2s}
 .nav-links a:hover{color:var(--text)}
-.nav-right{display:flex;align-items:center;gap:0.8rem}
-.theme-toggle{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:0.3rem 0.9rem;cursor:pointer;font-size:0.72rem;color:var(--text2);font-family:'DM Mono',monospace;transition:all 0.2s}
-.theme-toggle:hover{border-color:var(--accent2);color:var(--accent2)}
-.nav-cta{font-size:0.78rem;letter-spacing:0.06em;padding:0.45rem 1.1rem;border:1px solid var(--accent);color:var(--accent2);border-radius:4px;transition:all 0.2s;font-family:'DM Mono',monospace}
+.nav-right{display:flex;align-items:center;gap:0.75rem}
+.theme-toggle{background:transparent;border:1px solid var(--border2);border-radius:4px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all 0.2s;color:var(--text2)}
+.theme-toggle:hover{border-color:var(--text);color:var(--text)}
+.nav-cta{font-size:0.75rem;letter-spacing:0.06em;padding:0.45rem 1.1rem;border:1px solid var(--accent);color:var(--accent2);border-radius:4px;transition:all 0.2s;font-family:'DM Mono',monospace}
 .nav-cta:hover{background:var(--accent);color:#fff}
 
-.hero{min-height:100vh;display:flex;align-items:center;padding:4rem 2rem;max-width:1100px;margin:0 auto}
+.hero{min-height:100vh;display:flex;align-items:center;padding:6rem 2rem 4rem;max-width:1100px;margin:0 auto}
 .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;width:100%}
 .hero-tag{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--teal);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1.2rem;display:flex;align-items:center;gap:0.6rem}
 .hero-tag::before{content:'';display:inline-block;width:24px;height:1px;background:var(--teal)}
-h1{font-family:'Fraunces',serif;font-size:clamp(2.8rem,5vw,4.2rem);font-weight:300;line-height:1.05;letter-spacing:-0.03em;color:var(--text);margin-bottom:1.4rem}
+h1{font-family:'Spectral',serif;font-size:clamp(2.6rem,5vw,4rem);font-weight:300;line-height:1.08;letter-spacing:-0.02em;color:var(--text);margin-bottom:1.4rem}
 h1 em{font-style:italic;color:var(--accent2)}
 .hero-desc{font-size:1rem;color:var(--text2);line-height:1.75;margin-bottom:2rem;max-width:420px}
 .hero-badges{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:2.4rem}
-.badge{font-family:'DM Mono',monospace;font-size:0.68rem;padding:0.3rem 0.75rem;border-radius:2px;letter-spacing:0.06em}
+.badge{font-family:'DM Mono',monospace;font-size:0.67rem;padding:0.3rem 0.75rem;border-radius:2px;letter-spacing:0.05em}
 .badge-impl{background:rgba(124,108,250,0.12);color:var(--accent2);border:1px solid rgba(124,108,250,0.25)}
 .badge-ba{background:rgba(45,212,168,0.1);color:var(--teal);border:1px solid rgba(45,212,168,0.2)}
 .badge-am{background:rgba(240,168,39,0.1);color:var(--amber);border:1px solid rgba(240,168,39,0.2)}
+body.light .badge-impl{background:rgba(69,53,212,0.07);color:var(--accent);border-color:rgba(69,53,212,0.18)}
+body.light .badge-ba{background:rgba(10,122,92,0.07);color:var(--teal);border-color:rgba(10,122,92,0.18)}
+body.light .badge-am{background:rgba(160,98,0,0.07);color:var(--amber);border-color:rgba(160,98,0,0.18)}
 .hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
-.btn-primary{padding:0.7rem 1.6rem;background:var(--accent);color:#fff;border-radius:4px;font-size:0.85rem;font-weight:400;transition:all 0.2s;border:none;cursor:pointer;display:inline-block}
-.btn-primary:hover{background:var(--accent2);transform:translateY(-1px)}
-.btn-ghost{padding:0.7rem 1.6rem;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:4px;font-size:0.85rem;transition:all 0.2s;cursor:pointer;display:inline-block}
-.btn-ghost:hover{border-color:var(--text2);color:var(--text);transform:translateY(-1px)}
+.btn-primary{padding:0.7rem 1.6rem;background:var(--accent);color:#fff;border-radius:4px;font-size:0.85rem;font-weight:400;transition:all 0.2s;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem}
+.btn-primary:hover{opacity:0.85;transform:translateY(-1px)}
+.btn-ghost{padding:0.7rem 1.6rem;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:4px;font-size:0.85rem;transition:all 0.2s;cursor:pointer}
+.btn-ghost:hover{border-color:var(--text);color:var(--text);transform:translateY(-1px)}
 
 .hero-right{display:flex;flex-direction:column;gap:1rem}
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.4rem 1.6rem;position:relative;overflow:hidden}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.4rem 1.6rem;position:relative;overflow:hidden;transition:background 0.3s,border-color 0.3s}
 .stat-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
 .stat-card.purple::before{background:var(--accent)}
 .stat-card.teal::before{background:var(--teal)}
 .stat-card.amber::before{background:var(--amber)}
-.stat-num{font-family:'Fraunces',serif;font-size:2.4rem;font-weight:600;line-height:1;margin-bottom:0.3rem}
+.stat-num{font-family:'Spectral',serif;font-size:2.4rem;font-weight:600;line-height:1;margin-bottom:0.3rem}
 .stat-num.purple{color:var(--accent2)}
 .stat-num.teal{color:var(--teal)}
 .stat-num.amber{color:var(--amber)}
-.stat-label{font-size:0.78rem;color:var(--text2);letter-spacing:0.04em}
-.stat-sub{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--text3);margin-top:0.4rem}
+.stat-label{font-size:0.78rem;color:var(--text2)}
+.stat-sub{font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--text3);margin-top:0.4rem}
 
 section{padding:5rem 2rem;max-width:1100px;margin:0 auto}
 .section-label{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--teal);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.8rem;display:flex;align-items:center;gap:0.6rem}
 .section-label::before{content:'';display:inline-block;width:20px;height:1px;background:var(--teal)}
-h2{font-family:'Fraunces',serif;font-size:clamp(1.8rem,3vw,2.4rem);font-weight:300;letter-spacing:-0.02em;color:var(--text);margin-bottom:3rem}
+h2{font-family:'Spectral',serif;font-size:clamp(1.8rem,3vw,2.4rem);font-weight:300;letter-spacing:-0.02em;color:var(--text);margin-bottom:3rem}
 h2 em{font-style:italic;color:var(--accent2)}
-.section-divider{border:none;border-top:1px solid var(--border);max-width:1100px;margin:0 auto}
+.section-divider{border:none;border-top:1px solid var(--border);max-width:1100px;margin:0 auto;transition:border-color 0.3s}
 
 .exp-item{display:grid;grid-template-columns:180px 1fr;gap:3rem;margin-bottom:3.5rem;padding-bottom:3.5rem;border-bottom:1px solid var(--border)}
 .exp-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.exp-meta{padding-top:0.2rem}
 .exp-period{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--teal);margin-bottom:0.4rem;letter-spacing:0.04em}
 .exp-company{font-size:0.85rem;color:var(--text2);margin-bottom:0.6rem}
 .exp-co-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border:1px solid var(--border2);border-radius:2px;color:var(--text3)}
-.exp-title{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:300;letter-spacing:-0.01em;color:var(--text);margin-bottom:1rem}
+.exp-title{font-family:'Spectral',serif;font-size:1.3rem;font-weight:300;color:var(--text);margin-bottom:1rem}
 .exp-bullets{list-style:none;display:flex;flex-direction:column;gap:0.75rem}
 .exp-bullets li{font-size:0.88rem;color:var(--text2);line-height:1.65;padding-left:1.2rem;position:relative}
 .exp-bullets li::before{content:'—';position:absolute;left:0;color:var(--text3);font-size:0.75rem}
-.exp-highlight{background:rgba(124,108,250,0.08);border:1px solid rgba(124,108,250,0.15);border-radius:6px;padding:1rem 1.2rem;margin-top:1.2rem}
-.exp-highlight-label{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--accent2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.4rem}
+.exp-highlight{border-radius:6px;padding:1rem 1.2rem;margin-top:1.2rem}
+.exp-highlight.purple{background:rgba(124,108,250,0.07);border:1px solid rgba(124,108,250,0.15)}
+.exp-highlight.green{background:rgba(45,212,168,0.05);border:1px solid rgba(45,212,168,0.15)}
+body.light .exp-highlight.purple{background:rgba(69,53,212,0.05);border-color:rgba(69,53,212,0.12)}
+body.light .exp-highlight.green{background:rgba(10,122,92,0.05);border-color:rgba(10,122,92,0.12)}
+.exp-highlight-label{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.4rem}
+.exp-highlight.purple .exp-highlight-label{color:var(--accent2)}
+.exp-highlight.green .exp-highlight-label{color:var(--teal)}
 .exp-highlight p{font-size:0.82rem;color:var(--text2);line-height:1.6}
 
 .projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
-.project-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.8rem;transition:all 0.25s;position:relative;overflow:hidden}
+.project-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.8rem;transition:all 0.25s;position:relative;overflow:hidden;cursor:pointer}
 .project-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;transition:opacity 0.25s;opacity:0}
-.project-card.v1::after{background:linear-gradient(90deg,var(--accent),var(--accent2))}
-.project-card.v2::after{background:linear-gradient(90deg,var(--teal),#1ad4c0)}
-.project-card.v3::after{background:linear-gradient(90deg,var(--amber),#f7c948)}
+.project-card.v1::after{background:var(--accent)}
+.project-card.v2::after{background:var(--teal)}
+.project-card.v3::after{background:var(--amber)}
 .project-card:hover{border-color:var(--border2);transform:translateY(-3px)}
 .project-card:hover::after{opacity:1}
 .proj-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.2rem}
-.proj-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:500;flex-shrink:0}
-.proj-icon.v1{background:rgba(124,108,250,0.15);color:var(--accent2);border:1px solid rgba(124,108,250,0.2)}
-.proj-icon.v2{background:rgba(45,212,168,0.12);color:var(--teal);border:1px solid rgba(45,212,168,0.2)}
-.proj-icon.v3{background:rgba(240,168,39,0.12);color:var(--amber);border:1px solid rgba(240,168,39,0.2)}
-.proj-link-btn{font-family:'DM Mono',monospace;font-size:0.62rem;padding:0.25rem 0.65rem;border-radius:3px;letter-spacing:0.05em;transition:all 0.2s;border:1px solid var(--border2);color:var(--text3);white-space:nowrap}
-.proj-link-btn:hover{color:var(--accent2);border-color:var(--accent2)}
-.proj-link-btn.teal:hover{color:var(--teal);border-color:var(--teal)}
-.proj-name{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:300;color:var(--text);margin-bottom:0.3rem;letter-spacing:-0.01em}
-.proj-type{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.9rem}
+.proj-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:0.82rem;font-weight:500;flex-shrink:0}
+.proj-icon.v1{background:rgba(124,108,250,0.12);color:var(--accent2);border:1px solid rgba(124,108,250,0.2)}
+.proj-icon.v2{background:rgba(45,212,168,0.1);color:var(--teal);border:1px solid rgba(45,212,168,0.18)}
+.proj-icon.v3{background:rgba(240,168,39,0.1);color:var(--amber);border:1px solid rgba(240,168,39,0.18)}
+body.light .proj-icon.v1{background:rgba(69,53,212,0.07);color:var(--accent);border-color:rgba(69,53,212,0.15)}
+body.light .proj-icon.v2{background:rgba(10,122,92,0.07);color:var(--teal);border-color:rgba(10,122,92,0.15)}
+body.light .proj-icon.v3{background:rgba(160,98,0,0.07);color:var(--amber);border-color:rgba(160,98,0,0.15)}
+.proj-link-btn{font-family:'DM Mono',monospace;font-size:0.6rem;padding:0.25rem 0.6rem;border:1px solid var(--border2);border-radius:3px;color:var(--text3);transition:all 0.2s}
+.proj-link-btn:hover{border-color:var(--teal);color:var(--teal)}
+.proj-name{font-family:'Spectral',serif;font-size:1.15rem;font-weight:300;color:var(--text);margin-bottom:0.25rem}
+.proj-type{font-family:'DM Mono',monospace;font-size:0.61rem;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.9rem}
 .proj-desc{font-size:0.83rem;color:var(--text2);line-height:1.65;margin-bottom:1.2rem}
 .proj-tags{display:flex;flex-wrap:wrap;gap:0.4rem}
-.proj-tag{font-family:'DM Mono',monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border:1px solid var(--border2);border-radius:2px;color:var(--text3)}
+.proj-tag{font-family:'DM Mono',monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border:1px solid var(--border);border-radius:2px;color:var(--text3)}
 
 .skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
-.skill-group{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.4rem}
-.skill-group-title{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border)}
+.skill-group{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.4rem;transition:background 0.3s,border-color 0.3s}
+.skill-group-title{font-family:'DM Mono',monospace;font-size:0.64rem;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border)}
 .skill-list{display:flex;flex-direction:column;gap:0.5rem}
 .skill-item{font-size:0.82rem;color:var(--text2);display:flex;align-items:center;gap:0.5rem}
 .skill-dot{width:4px;height:4px;border-radius:50%;background:var(--accent2);flex-shrink:0}
-.edu-block{margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
-.edu-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.edu-course{font-size:0.82rem;color:var(--text2);display:flex;align-items:center;gap:0.5rem;margin-bottom:0.2rem}
-.edu-uni{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--text3);padding-left:0.75rem}
+.edu-entry{display:flex;flex-direction:column;gap:0.2rem;padding:0.65rem 0;border-bottom:1px solid var(--border)}
+.edu-entry:last-child{border-bottom:none;padding-bottom:0}
+.edu-entry:first-child{padding-top:0}
+.edu-degree{font-size:0.83rem;color:var(--text);font-weight:400}
+.edu-uni{font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--text3)}
 
-.contact-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:3rem;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
-.contact-left h3{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:300;letter-spacing:-0.02em;margin-bottom:0.8rem}
+.contact-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:3rem;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;transition:background 0.3s,border-color 0.3s}
+.contact-left h3{font-family:'Spectral',serif;font-size:1.8rem;font-weight:300;margin-bottom:0.8rem}
 .contact-left h3 em{font-style:italic;color:var(--accent2)}
 .contact-left p{font-size:0.88rem;color:var(--text2);line-height:1.7}
 .contact-links{display:flex;flex-direction:column;gap:0.9rem}
 .contact-link{display:flex;align-items:center;gap:0.9rem;padding:0.9rem 1.1rem;border:1px solid var(--border);border-radius:6px;transition:all 0.2s;background:var(--bg3)}
 .contact-link:hover{border-color:var(--border2);transform:translateX(4px)}
-.contact-link-icon{font-family:'DM Mono',monospace;font-size:0.65rem;width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.contact-link-icon.mail{background:rgba(124,108,250,0.12);color:var(--accent2);border:1px solid rgba(124,108,250,0.2)}
-.contact-link-icon.ph{background:rgba(45,212,168,0.1);color:var(--teal);border:1px solid rgba(45,212,168,0.2)}
-.contact-link-icon.li{background:rgba(45,212,168,0.1);color:var(--teal);border:1px solid rgba(45,212,168,0.2)}
-.contact-link-icon.port{background:rgba(240,168,39,0.1);color:var(--amber);border:1px solid rgba(240,168,39,0.2)}
+.contact-link-icon{font-family:'DM Mono',monospace;font-size:0.7rem;width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.icon-mail{background:rgba(124,108,250,0.1);color:var(--accent2);border:1px solid rgba(124,108,250,0.2)}
+.icon-phone,.icon-li{background:rgba(45,212,168,0.1);color:var(--teal);border:1px solid rgba(45,212,168,0.2)}
+.icon-port{background:rgba(240,168,39,0.1);color:var(--amber);border:1px solid rgba(240,168,39,0.2)}
+body.light .icon-mail{background:rgba(69,53,212,0.07);color:var(--accent);border-color:rgba(69,53,212,0.15)}
+body.light .icon-phone,body.light .icon-li{background:rgba(10,122,92,0.07);color:var(--teal);border-color:rgba(10,122,92,0.15)}
+body.light .icon-port{background:rgba(160,98,0,0.07);color:var(--amber);border-color:rgba(160,98,0,0.15)}
 .contact-link-text{flex:1}
-.contact-link-label{font-size:0.7rem;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:0.06em;text-transform:uppercase}
+.contact-link-label{font-size:0.68rem;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:0.06em;text-transform:uppercase}
 .contact-link-value{font-size:0.84rem;color:var(--text)}
 
-footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--text3);letter-spacing:0.06em}
-.reveal{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease,transform 0.6s ease}
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-family:'DM Mono',monospace;font-size:0.64rem;color:var(--text3);letter-spacing:0.06em;transition:border-color 0.3s}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity 0.6s ease,transform 0.6s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
 
 @media(max-width:768px){
@@ -158,18 +182,10 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
   .skills-grid{grid-template-columns:1fr}
   .contact-wrap{grid-template-columns:1fr}
   .nav-links{display:none}
-  .call-banner{flex-wrap:wrap;gap:0.4rem}
 }
 </style>
 </head>
 <body>
-
-<div class="call-banner">
-  <span class="call-banner-dot"></span>
-  <span class="call-banner-text">Available for new opportunities ·</span>
-  <a href="tel:+917200108575">+91 72001 08575</a>
-  <span class="call-banner-text">· Chennai, India</span>
-</div>
 
 <nav>
   <div class="nav-brand">Inbaraj <span>B</span></div>
@@ -180,7 +196,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
     <li><a href="#contact">Contact</a></li>
   </ul>
   <div class="nav-right">
-    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">☀ Light</button>
+    <button class="theme-toggle" id="themeToggle" title="Toggle light/dark">☀</button>
     <a href="mailto:inbarajb91@gmail.com" class="nav-cta">Get in touch</a>
   </div>
 </nav>
@@ -197,7 +213,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
         <span class="badge badge-am">Account Manager</span>
       </div>
       <div class="hero-actions">
-        <a href="mailto:inbarajb91@gmail.com" class="btn-primary">Let's connect</a>
+        <a href="https://calendar.google.com/calendar/u/0/r" target="_blank" class="btn-primary">Book a call</a>
         <a href="#experience" class="btn-ghost">View experience</a>
       </div>
     </div>
@@ -226,9 +242,8 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
 <section id="experience">
   <div class="section-label">Work history</div>
   <h2>Where I've <em>delivered</em></h2>
-
   <div class="exp-item reveal">
-    <div class="exp-meta">
+    <div>
       <div class="exp-period">Nov 2021 — Present</div>
       <div class="exp-company">Facilio</div>
       <span class="exp-co-badge">CMMS · SaaS</span>
@@ -241,19 +256,18 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
         <li>Engineered and tested SaaS configurations tailored to each client, driving adoption and smooth maintenance operations.</li>
         <li>Acted as the internal voice of the customer — bridging clients with product, engineering, and design to drive continuous improvements.</li>
       </ul>
-      <div class="exp-highlight">
+      <div class="exp-highlight purple">
         <div class="exp-highlight-label">Key initiative</div>
         <p>Conceptualized a use-case-driven implementation framework with complexity scoring and effort models — enabling pre-sales to scope accurately, auto-calculate timelines, and cut BRD/UAT ambiguity. Standardised delivery through reusable SOPs.</p>
       </div>
-      <div class="exp-highlight" style="margin-top:0.8rem;border-color:rgba(45,212,168,0.15);background:rgba(45,212,168,0.05)">
-        <div class="exp-highlight-label" style="color:var(--teal)">Revenue impact</div>
+      <div class="exp-highlight green" style="margin-top:0.8rem">
+        <div class="exp-highlight-label">Revenue impact</div>
         <p>Identified unaccounted scope-change efforts and built a tracking mechanism. Collaborated with Sales to introduce pre-purchased Professional Services credits — converting informal changes into billable units and reducing revenue leakage.</p>
       </div>
     </div>
   </div>
-
   <div class="exp-item reveal">
-    <div class="exp-meta">
+    <div>
       <div class="exp-period">May 2016 — Oct 2021</div>
       <div class="exp-company">Amazon</div>
       <span class="exp-co-badge">E-Commerce · Ops</span>
@@ -275,50 +289,37 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
   <div class="section-label">Projects</div>
   <h2>Things I've <em>built</em></h2>
   <div class="projects-grid">
-    <div class="project-card v1 reveal">
+    <div class="project-card v1 reveal" onclick="window.open('https://codeat32-7.github.io/FM-Engine-Summary/','_blank')">
       <div class="proj-header">
         <div class="proj-icon v1">FM</div>
-        <a href="https://codeat32-7.github.io/FM-Engine-Summary/" target="_blank" class="proj-link-btn">View project →</a>
+        <a href="https://codeat32-7.github.io/FM-Engine-Summary/" target="_blank" class="proj-link-btn" onclick="event.stopPropagation()">↗ View</a>
       </div>
       <div class="proj-name">FM Engine</div>
       <div class="proj-type">WhatsApp-First CMMS</div>
-      <p class="proj-desc">Zero-training facility management platform. Residents report maintenance issues via WhatsApp — informal chat messages are triaged into structured professional service requests. Multi-tenant, scalable architecture.</p>
+      <p class="proj-desc">Zero-training facility management platform. Residents report maintenance issues via WhatsApp — informal chat messages triaged into structured professional service requests. Multi-tenant architecture.</p>
       <div class="proj-tags">
-        <span class="proj-tag">React 19</span>
-        <span class="proj-tag">Supabase</span>
-        <span class="proj-tag">Gemini Flash</span>
-        <span class="proj-tag">Twilio</span>
-        <span class="proj-tag">Vercel Edge</span>
+        <span class="proj-tag">React 19</span><span class="proj-tag">Supabase</span><span class="proj-tag">Gemini Flash</span><span class="proj-tag">Twilio</span><span class="proj-tag">Vercel Edge</span>
       </div>
     </div>
-    <div class="project-card v2 reveal" style="transition-delay:0.1s">
+    <div class="project-card v2 reveal" style="transition-delay:0.1s" onclick="window.open('https://www.parabls.com/','_blank')">
       <div class="proj-header">
         <div class="proj-icon v2">PB</div>
-        <a href="https://www.parabls.com/" target="_blank" class="proj-link-btn teal">View project →</a>
+        <a href="https://www.parabls.com/" target="_blank" class="proj-link-btn" onclick="event.stopPropagation()">↗ View</a>
       </div>
       <div class="proj-name">Parabls</div>
       <div class="proj-type">Conversational AI Job Platform</div>
       <p class="proj-desc">AI-driven "conversation-first" job search. Zero-form onboarding via AI chat generates profiles and ATS-optimised resumes. Narrative-based fit scores and transparent application tracking.</p>
       <div class="proj-tags">
-        <span class="proj-tag">React</span>
-        <span class="proj-tag">Node.js</span>
-        <span class="proj-tag">OpenAI</span>
-        <span class="proj-tag">Adzuna API</span>
-        <span class="proj-tag">TypeScript</span>
+        <span class="proj-tag">React</span><span class="proj-tag">Node.js</span><span class="proj-tag">OpenAI</span><span class="proj-tag">Adzuna API</span><span class="proj-tag">TypeScript</span>
       </div>
     </div>
     <div class="project-card v3 reveal" style="transition-delay:0.2s">
-      <div class="proj-header">
-        <div class="proj-icon v3">AI</div>
-      </div>
+      <div class="proj-header"><div class="proj-icon v3">AI</div></div>
       <div class="proj-name">AI Config Assistant</div>
       <div class="proj-type">Enterprise Support Tool</div>
-      <p class="proj-desc">AI-powered assistant that lets support teams query enterprise platform configurations in natural language. Exports config as XML and retrieves relevant data via internal retrieval tools — eliminating dependency on implementation engineers.</p>
+      <p class="proj-desc">AI-powered assistant that lets support teams query enterprise platform configurations in natural language — eliminating dependency on implementation engineers post go-live.</p>
       <div class="proj-tags">
-        <span class="proj-tag">XML</span>
-        <span class="proj-tag">RAG</span>
-        <span class="proj-tag">NLP</span>
-        <span class="proj-tag">Internal tooling</span>
+        <span class="proj-tag">XML</span><span class="proj-tag">RAG</span><span class="proj-tag">NLP</span><span class="proj-tag">Internal tooling</span>
       </div>
     </div>
   </div>
@@ -376,19 +377,19 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
         <div class="skill-item"><span class="skill-dot" style="background:var(--teal)"></span>Notion / Jira / project tracking</div>
         <div class="skill-item"><span class="skill-dot" style="background:var(--teal)"></span>Vercel · GitHub · CLI tools</div>
         <div class="skill-item"><span class="skill-dot" style="background:var(--teal)"></span>AI-enhanced documentation workflows</div>
-        <div class="skill-item"><span class="skill-dot" style="background:var(--teal)"></span>XML · RAG pipelines · LLM tooling</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--teal)"></span>System integration & API tooling</div>
       </div>
     </div>
     <div class="skill-group reveal" style="transition-delay:0.2s">
       <div class="skill-group-title">Education</div>
-      <div class="skill-list">
-        <div class="edu-block">
-          <div class="edu-course"><span class="skill-dot" style="background:var(--amber)"></span>M.Tech — Embedded Systems</div>
-          <div class="edu-uni">Hindustan University, Chennai</div>
+      <div class="skill-list" style="gap:0">
+        <div class="edu-entry">
+          <span class="edu-degree">M.Tech — Embedded Systems</span>
+          <span class="edu-uni">Hindustan University, Chennai</span>
         </div>
-        <div class="edu-block">
-          <div class="edu-course"><span class="skill-dot" style="background:var(--amber)"></span>B.E — Electronics & Communication</div>
-          <div class="edu-uni">Balaji Institute of Engg & Tech</div>
+        <div class="edu-entry">
+          <span class="edu-degree">B.E — Electronics & Communication</span>
+          <span class="edu-uni">Balaji Institute of Engineering & Technology</span>
         </div>
       </div>
     </div>
@@ -408,28 +409,28 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
     </div>
     <div class="contact-links">
       <a href="mailto:inbarajb91@gmail.com" class="contact-link">
-        <div class="contact-link-icon mail">@</div>
+        <div class="contact-link-icon icon-mail">@</div>
         <div class="contact-link-text">
           <div class="contact-link-label">Email</div>
           <div class="contact-link-value">inbarajb91@gmail.com</div>
         </div>
       </a>
       <a href="tel:+917200108575" class="contact-link">
-        <div class="contact-link-icon ph">#</div>
+        <div class="contact-link-icon icon-phone">☎</div>
         <div class="contact-link-text">
-          <div class="contact-link-label">Phone</div>
-          <div class="contact-link-value">+91 72001 08575</div>
+          <div class="contact-link-label">Phone / WhatsApp</div>
+          <div class="contact-link-value">+91 7200108575</div>
         </div>
       </a>
       <a href="https://www.linkedin.com/in/inbarajb91/" class="contact-link" target="_blank">
-        <div class="contact-link-icon li">in</div>
+        <div class="contact-link-icon icon-li">in</div>
         <div class="contact-link-text">
           <div class="contact-link-label">LinkedIn</div>
           <div class="contact-link-value">linkedin.com/in/inbarajb91</div>
         </div>
       </a>
       <a href="https://www.parabls.com/r/inbaraj" class="contact-link" target="_blank">
-        <div class="contact-link-icon port">▶</div>
+        <div class="contact-link-icon icon-port">▶</div>
         <div class="contact-link-text">
           <div class="contact-link-label">Portfolio / Resume</div>
           <div class="contact-link-value">parabls.com/r/inbaraj</div>
@@ -439,25 +440,16 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
   </div>
 </section>
 
-<footer>
-  Inbaraj B · Chennai, India · inbarajb91@gmail.com · +91 72001 08575
-</footer>
+<footer>Inbaraj B · Chennai, India · inbarajb91@gmail.com · +91 7200108575</footer>
 
 <script>
 const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}})},{threshold:0.12});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
-
-function toggleTheme(){
-  const html=document.documentElement;
-  const btn=document.getElementById('themeBtn');
-  if(html.getAttribute('data-theme')==='light'){
-    html.removeAttribute('data-theme');
-    btn.textContent='☀ Light';
-  } else {
-    html.setAttribute('data-theme','light');
-    btn.textContent='◑ Dark';
-  }
-}
+const toggle=document.getElementById('themeToggle');
+toggle.addEventListener('click',()=>{
+  document.body.classList.toggle('light');
+  toggle.textContent=document.body.classList.contains('light')?'🌙':'☀';
+});
 </script>
 </body>
 </html>
