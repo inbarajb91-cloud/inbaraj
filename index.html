@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inbaraj B — Implementation Lead & Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0b;
+  --bg2:#111113;
+  --bg3:#18181c;
+  --border:#2a2a30;
+  --border2:#38383f;
+  --text:#e8e8ec;
+  --text2:#9090a0;
+  --text3:#5a5a6a;
+  --accent:#7c6cfa;
+  --accent2:#a89cf7;
+  --teal:#2dd4a8;
+  --teal2:#1aab86;
+  --amber:#f0a827;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.6}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;background:rgba(10,10,11,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-brand{font-family:'Fraunces',serif;font-size:1.1rem;letter-spacing:-0.02em;color:var(--text)}
+.nav-brand span{color:var(--accent2)}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{font-size:0.8rem;color:var(--text2);letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{font-size:0.78rem;letter-spacing:0.06em;padding:0.45rem 1.1rem;border:1px solid var(--accent);color:var(--accent2);border-radius:4px;transition:all 0.2s;font-family:'DM Mono',monospace}
+.nav-cta:hover{background:var(--accent);color:#fff}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding:6rem 2rem 4rem;max-width:1100px;margin:0 auto;position:relative}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;width:100%}
+.hero-tag{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--teal);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1.2rem;display:flex;align-items:center;gap:0.6rem}
+.hero-tag::before{content:'';display:inline-block;width:24px;height:1px;background:var(--teal)}
+h1{font-family:'Fraunces',serif;font-size:clamp(2.8rem,5vw,4.2rem);font-weight:300;line-height:1.05;letter-spacing:-0.03em;color:var(--text);margin-bottom:1.4rem}
+h1 em{font-style:italic;color:var(--accent2)}
+.hero-desc{font-size:1rem;color:var(--text2);line-height:1.75;margin-bottom:2rem;max-width:420px}
+.hero-badges{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:2.4rem}
+.badge{font-family:'DM Mono',monospace;font-size:0.68rem;padding:0.3rem 0.75rem;border-radius:2px;letter-spacing:0.06em}
+.badge-impl{background:rgba(124,108,250,0.12);color:var(--accent2);border:1px solid rgba(124,108,250,0.25)}
+.badge-ba{background:rgba(45,212,168,0.1);color:var(--teal);border:1px solid rgba(45,212,168,0.2)}
+.badge-am{background:rgba(240,168,39,0.1);color:var(--amber);border:1px solid rgba(240,168,39,0.2)}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-primary{padding:0.7rem 1.6rem;background:var(--accent);color:#fff;border-radius:4px;font-size:0.85rem;font-weight:400;transition:all 0.2s;border:none;cursor:pointer}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-1px)}
+.btn-ghost{padding:0.7rem 1.6rem;background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:4px;font-size:0.85rem;transition:all 0.2s;cursor:pointer}
+.btn-ghost:hover{border-color:var(--text2);color:var(--text);transform:translateY(-1px)}
+
+/* STATS SIDE */
+.hero-right{display:flex;flex-direction:column;gap:1rem}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.4rem 1.6rem;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
+.stat-card.purple::before{background:var(--accent)}
+.stat-card.teal::before{background:var(--teal)}
+.stat-card.amber::before{background:var(--amber)}
+.stat-num{font-family:'Fraunces',serif;font-size:2.4rem;font-weight:600;line-height:1;margin-bottom:0.3rem}
+.stat-num.purple{color:var(--accent2)}
+.stat-num.teal{color:var(--teal)}
+.stat-num.amber{color:var(--amber)}
+.stat-label{font-size:0.78rem;color:var(--text2);letter-spacing:0.04em}
+.stat-sub{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--text3);margin-top:0.4rem}
+
+/* SECTIONS */
+section{padding:5rem 2rem;max-width:1100px;margin:0 auto}
+.section-label{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--teal);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.8rem;display:flex;align-items:center;gap:0.6rem}
+.section-label::before{content:'';display:inline-block;width:20px;height:1px;background:var(--teal)}
+h2{font-family:'Fraunces',serif;font-size:clamp(1.8rem,3vw,2.4rem);font-weight:300;letter-spacing:-0.02em;color:var(--text);margin-bottom:3rem}
+h2 em{font-style:italic;color:var(--accent2)}
+
+/* DIVIDER */
+.section-divider{border:none;border-top:1px solid var(--border);max-width:1100px;margin:0 auto}
+
+/* EXPERIENCE */
+.exp-item{display:grid;grid-template-columns:180px 1fr;gap:3rem;margin-bottom:3.5rem;padding-bottom:3.5rem;border-bottom:1px solid var(--border)}
+.exp-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.exp-meta{padding-top:0.2rem}
+.exp-period{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--teal);margin-bottom:0.4rem;letter-spacing:0.04em}
+.exp-company{font-size:0.85rem;color:var(--text2);margin-bottom:0.6rem}
+.exp-co-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border:1px solid var(--border2);border-radius:2px;color:var(--text3)}
+.exp-title{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:300;letter-spacing:-0.01em;color:var(--text);margin-bottom:1rem}
+.exp-bullets{list-style:none;display:flex;flex-direction:column;gap:0.75rem}
+.exp-bullets li{font-size:0.88rem;color:var(--text2);line-height:1.65;padding-left:1.2rem;position:relative}
+.exp-bullets li::before{content:'—';position:absolute;left:0;color:var(--text3);font-size:0.75rem}
+.exp-highlight{background:rgba(124,108,250,0.08);border:1px solid rgba(124,108,250,0.15);border-radius:6px;padding:1rem 1.2rem;margin-top:1.2rem}
+.exp-highlight-label{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--accent2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.4rem}
+.exp-highlight p{font-size:0.82rem;color:var(--text2);line-height:1.6}
+
+/* PROJECTS */
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
+.project-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.8rem;transition:all 0.25s;position:relative;overflow:hidden;cursor:pointer}
+.project-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;transition:opacity 0.25s;opacity:0}
+.project-card.v1::after{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.project-card.v2::after{background:linear-gradient(90deg,var(--teal),#1ad4c0)}
+.project-card.v3::after{background:linear-gradient(90deg,var(--amber),#f7c948)}
+.project-card:hover{border-color:var(--border2);transform:translateY(-3px)}
+.project-card:hover::after{opacity:1}
+.proj-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem;font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:500}
+.proj-icon.v1{background:rgba(124,108,250,0.15);color:var(--accent2);border:1px solid rgba(124,108,250,0.2)}
+.proj-icon.v2{background:rgba(45,212,168,0.12);color:var(--teal);border:1px solid rgba(45,212,168,0.2)}
+.proj-icon.v3{background:rgba(240,168,39,0.12);color:var(--amber);border:1px solid rgba(240,168,39,0.2)}
+.proj-name{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:300;color:var(--text);margin-bottom:0.3rem;letter-spacing:-0.01em}
+.proj-type{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.9rem}
+.proj-desc{font-size:0.83rem;color:var(--text2);line-height:1.65;margin-bottom:1.2rem}
+.proj-tags{display:flex;flex-wrap:wrap;gap:0.4rem}
+.proj-tag{font-family:'DM Mono',monospace;font-size:0.6rem;padding:0.2rem 0.5rem;border:1px solid var(--border2);border-radius:2px;color:var(--text3)}
+
+/* SKILLS */
+.skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.skill-group{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.4rem}
+.skill-group-title{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border)}
+.skill-list{display:flex;flex-direction:column;gap:0.5rem}
+.skill-item{font-size:0.82rem;color:var(--text2);display:flex;align-items:center;gap:0.5rem}
+.skill-dot{width:4px;height:4px;border-radius:50%;background:var(--accent2);flex-shrink:0}
+
+/* CONTACT */
+.contact-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:3rem;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.contact-left h3{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:300;letter-spacing:-0.02em;margin-bottom:0.8rem}
+.contact-left h3 em{font-style:italic;color:var(--accent2)}
+.contact-left p{font-size:0.88rem;color:var(--text2);line-height:1.7}
+.contact-links{display:flex;flex-direction:column;gap:0.9rem}
+.contact-link{display:flex;align-items:center;gap:0.9rem;padding:0.9rem 1.1rem;border:1px solid var(--border);border-radius:6px;transition:all 0.2s;background:var(--bg3)}
+.contact-link:hover{border-color:var(--border2);transform:translateX(4px)}
+.contact-link-icon{font-family:'DM Mono',monospace;font-size:0.65rem;width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.contact-link-icon.mail{background:rgba(124,108,250,0.12);color:var(--accent2);border:1px solid rgba(124,108,250,0.2)}
+.contact-link-icon.li{background:rgba(45,212,168,0.1);color:var(--teal);border:1px solid rgba(45,212,168,0.2)}
+.contact-link-icon.port{background:rgba(240,168,39,0.1);color:var(--amber);border:1px solid rgba(240,168,39,0.2)}
+.contact-link-text{flex:1}
+.contact-link-label{font-size:0.7rem;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:0.06em;text-transform:uppercase}
+.contact-link-value{font-size:0.84rem;color:var(--text)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--text3);letter-spacing:0.06em}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease,transform 0.6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:768px){
+  .hero-grid{grid-template-columns:1fr}
+  .exp-item{grid-template-columns:1fr;gap:0.5rem}
+  .skills-grid{grid-template-columns:1fr}
+  .contact-wrap{grid-template-columns:1fr}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Inbaraj <span>B</span></div>
+  <ul class="nav-links">
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="mailto:inbarajb91@gmail.com" class="nav-cta">Get in touch</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-tag">Open to opportunities · Chennai, India</div>
+      <h1>Implementation <em>lead</em> who builds what he deploys</h1>
+      <p class="hero-desc">17 enterprise SaaS rollouts. 9+ years bridging business requirements and technical execution. Now building AI-native tools that solve the problems I've lived through.</p>
+      <div class="hero-badges">
+        <span class="badge badge-impl">Implementation Lead</span>
+        <span class="badge badge-ba">Business Analyst</span>
+        <span class="badge badge-am">Account Manager</span>
+      </div>
+      <div class="hero-actions">
+        <a href="#contact" class="btn-primary">Let's connect</a>
+        <a href="#experience" class="btn-ghost">View experience</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="stat-card purple reveal">
+        <div class="stat-num purple">17</div>
+        <div class="stat-label">Enterprise implementations delivered</div>
+        <div class="stat-sub">End-to-end · Scoping → Go-live</div>
+      </div>
+      <div class="stat-card teal reveal" style="transition-delay:0.1s">
+        <div class="stat-num teal">$230K</div>
+        <div class="stat-label">Monthly savings from defect prioritization framework</div>
+        <div class="stat-sub">At Amazon · Catalog operations</div>
+      </div>
+      <div class="stat-card amber reveal" style="transition-delay:0.2s">
+        <div class="stat-num amber">3</div>
+        <div class="stat-label">AI-powered products built & shipped</div>
+        <div class="stat-sub">FM Engine · Parabls · AI Config Assistant</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-label">Work history</div>
+  <h2>Where I've <em>delivered</em></h2>
+
+  <div class="exp-item reveal">
+    <div class="exp-meta">
+      <div class="exp-period">Nov 2021 — Present</div>
+      <div class="exp-company">Facilio</div>
+      <span class="exp-co-badge">CMMS · SaaS</span>
+    </div>
+    <div>
+      <div class="exp-title">Lead, Product Implementation</div>
+      <ul class="exp-bullets">
+        <li>Spearheaded 17 end-to-end enterprise CMMS/SaaS rollouts for mid-to-large clients — full lifecycle ownership from scoping through post-go-live support.</li>
+        <li>Facilitated client workshops with executives and operational teams; translated requirements into BRDs, solution designs, and WBS-based project plans.</li>
+        <li>Engineered and tested SaaS configurations tailored to each client, driving adoption and smooth maintenance operations.</li>
+        <li>Acted as the internal voice of the customer — bridging clients with product, engineering, and design to drive continuous improvements.</li>
+      </ul>
+      <div class="exp-highlight">
+        <div class="exp-highlight-label">Key initiative</div>
+        <p>Conceptualized a use-case-driven implementation framework with complexity scoring and effort models — enabling pre-sales to scope accurately, auto-calculate timelines, and cut BRD/UAT ambiguity. Standardised delivery through reusable SOPs.</p>
+      </div>
+      <div class="exp-highlight" style="margin-top:0.8rem;border-color:rgba(45,212,168,0.15);background:rgba(45,212,168,0.05)">
+        <div class="exp-highlight-label" style="color:var(--teal)">Revenue impact</div>
+        <p>Identified unaccounted scope-change efforts and built a tracking mechanism. Collaborated with Sales to introduce pre-purchased Professional Services credits — converting informal changes into billable units and reducing revenue leakage.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="exp-item reveal">
+    <div class="exp-meta">
+      <div class="exp-period">May 2016 — Oct 2021</div>
+      <div class="exp-company">Amazon</div>
+      <span class="exp-co-badge">E-Commerce · Ops</span>
+    </div>
+    <div>
+      <div class="exp-title">Senior Catalog Specialist</div>
+      <ul class="exp-bullets">
+        <li>Managed and resolved catalog and procurement defects for Amazon Fresh, Amazon Pantry, and Prime Now — directly improving operational efficiency.</li>
+        <li>Designed a defect prioritisation framework using product forecasts, inventory value, and glance views — yielding an estimated $230K in monthly savings.</li>
+        <li>Streamlined defect reduction by identifying SOP gaps, reducing invalid case assignments between support teams by ~50 per day.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-label">Side projects</div>
+  <h2>Things I've <em>built</em></h2>
+  <div class="projects-grid">
+    <div class="project-card v1 reveal">
+      <div class="proj-icon v1">FM</div>
+      <div class="proj-name">FM Engine</div>
+      <div class="proj-type">WhatsApp-First CMMS</div>
+      <p class="proj-desc">Zero-training facility management platform. Residents report maintenance issues via WhatsApp — informal chat messages are triaged into structured professional service requests. Multi-tenant, scalable architecture.</p>
+      <div class="proj-tags">
+        <span class="proj-tag">React 19</span>
+        <span class="proj-tag">Supabase</span>
+        <span class="proj-tag">Gemini Flash</span>
+        <span class="proj-tag">Twilio</span>
+        <span class="proj-tag">Vercel Edge</span>
+      </div>
+    </div>
+    <div class="project-card v2 reveal" style="transition-delay:0.1s">
+      <div class="proj-icon v2">PB</div>
+      <div class="proj-name">Parabls</div>
+      <div class="proj-type">Conversational AI Job Platform</div>
+      <p class="proj-desc">AI-driven "conversation-first" job search. Zero-form onboarding via AI chat generates profiles and ATS-optimised resumes. Narrative-based fit scores and transparent application tracking.</p>
+      <div class="proj-tags">
+        <span class="proj-tag">React</span>
+        <span class="proj-tag">Node.js</span>
+        <span class="proj-tag">OpenAI</span>
+        <span class="proj-tag">Adzuna API</span>
+        <span class="proj-tag">TypeScript</span>
+      </div>
+    </div>
+    <div class="project-card v3 reveal" style="transition-delay:0.2s">
+      <div class="proj-icon v3">AI</div>
+      <div class="proj-name">AI Config Assistant</div>
+      <div class="proj-type">Enterprise Support Tool</div>
+      <p class="proj-desc">AI-powered assistant that lets support teams query enterprise platform configurations in natural language. Exports config as XML and retrieves relevant data via internal retrieval tools — eliminating dependency on implementation engineers.</p>
+      <div class="proj-tags">
+        <span class="proj-tag">XML</span>
+        <span class="proj-tag">RAG</span>
+        <span class="proj-tag">NLP</span>
+        <span class="proj-tag">Internal tooling</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">Capabilities</div>
+  <h2>What I <em>bring</em></h2>
+  <div class="skills-grid">
+    <div class="skill-group reveal">
+      <div class="skill-group-title">Implementation & Delivery</div>
+      <div class="skill-list">
+        <div class="skill-item"><span class="skill-dot"></span>End-to-end SaaS implementation</div>
+        <div class="skill-item"><span class="skill-dot"></span>Project planning & WBS</div>
+        <div class="skill-item"><span class="skill-dot"></span>UAT design & go-live support</div>
+        <div class="skill-item"><span class="skill-dot"></span>SOP development & standardisation</div>
+        <div class="skill-item"><span class="skill-dot"></span>CMMS / facility tech expertise</div>
+      </div>
+    </div>
+    <div class="skill-group reveal" style="transition-delay:0.1s">
+      <div class="skill-group-title">Business Analysis</div>
+      <div class="skill-list">
+        <div class="skill-item"><span class="skill-dot" style="background:var(--teal)"></span>Requirements gathering (BRD)</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--teal)"></span>Solution design & scoping</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--teal)"></span>Stakeholder workshop facilitation</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--teal)"></span>Complexity scoring & effort models</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--teal)"></span>Process improvement & gap analysis</div>
+      </div>
+    </div>
+    <div class="skill-group reveal" style="transition-delay:0.2s">
+      <div class="skill-group-title">Client & Account Management</div>
+      <div class="skill-list">
+        <div class="skill-item"><span class="skill-dot" style="background:var(--amber)"></span>Executive stakeholder engagement</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--amber)"></span>Cross-functional team leadership</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--amber)"></span>Change management & adoption</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--amber)"></span>Revenue tracking & PS billing</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--amber)"></span>Post-go-live relationship management</div>
+      </div>
+    </div>
+    <div class="skill-group reveal">
+      <div class="skill-group-title">Technical</div>
+      <div class="skill-list">
+        <div class="skill-item"><span class="skill-dot"></span>SaaS configuration & system integration</div>
+        <div class="skill-item"><span class="skill-dot"></span>JavaScript-like UI scripting</div>
+        <div class="skill-item"><span class="skill-dot"></span>API integrations</div>
+        <div class="skill-item"><span class="skill-dot"></span>Supabase · React · Tailwind</div>
+        <div class="skill-item"><span class="skill-dot"></span>Prompt engineering & LLM tooling</div>
+      </div>
+    </div>
+    <div class="skill-group reveal" style="transition-delay:0.1s">
+      <div class="skill-group-title">Tools & Workflow</div>
+      <div class="skill-list">
+        <div class="skill-item"><span class="skill-dot" style="background:var(--teal)"></span>Loom → Claude → Google Docs pipeline</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--teal)"></span>Notion / Jira / project tracking</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--teal)"></span>AI-enhanced documentation workflows</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--teal)"></span>Vercel · GitHub · CLI tools</div>
+      </div>
+    </div>
+    <div class="skill-group reveal" style="transition-delay:0.2s">
+      <div class="skill-group-title">Education</div>
+      <div class="skill-list">
+        <div class="skill-item"><span class="skill-dot" style="background:var(--amber)"></span>M.Tech — Embedded Systems</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--amber)"></span>Hindustan University, Chennai</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--amber)"></span>B.E — Electronics & Communication</div>
+        <div class="skill-item"><span class="skill-dot" style="background:var(--amber)"></span>Balaji Institute of Engg & Tech</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label">Let's talk</div>
+  <h2>Open to the right <em>opportunity</em></h2>
+  <div class="contact-wrap reveal">
+    <div class="contact-left">
+      <h3>I'm looking for my <em>next challenge</em></h3>
+      <p style="margin-bottom:1rem">Targeting roles in implementation leadership, business analysis, or account management — ideally at a company where enterprise depth meets product thinking.</p>
+      <p>Based in Chennai. Available for hybrid or remote roles.</p>
+    </div>
+    <div class="contact-links">
+      <a href="mailto:inbarajb91@gmail.com" class="contact-link">
+        <div class="contact-link-icon mail">@</div>
+        <div class="contact-link-text">
+          <div class="contact-link-label">Email</div>
+          <div class="contact-link-value">inbarajb91@gmail.com</div>
+        </div>
+      </a>
+      <a href="https://www.linkedin.com/in/inbarajb91/" class="contact-link" target="_blank">
+        <div class="contact-link-icon li">in</div>
+        <div class="contact-link-text">
+          <div class="contact-link-label">LinkedIn</div>
+          <div class="contact-link-value">linkedin.com/in/inbarajb91</div>
+        </div>
+      </a>
+      <a href="https://www.parabls.com/r/inbaraj" class="contact-link" target="_blank">
+        <div class="contact-link-icon port">▶</div>
+        <div class="contact-link-text">
+          <div class="contact-link-label">Portfolio / Resume</div>
+          <div class="contact-link-value">parabls.com/r/inbaraj</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Inbaraj B · Chennai, India · inbarajb91@gmail.com · Built with intention
+</footer>
+
+<script>
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}})},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
