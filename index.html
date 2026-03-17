@@ -40,7 +40,7 @@ body.light{
   --banner-text:#5a5856;
 }
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.6;transition:background 0.3s,color 0.3s}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.6;transition:background 0.3s,color 0.3s;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 
 nav{position:sticky;top:0;z-index:100;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(14px);border-bottom:1px solid var(--border);transition:background 0.3s,border-color 0.3s}
@@ -69,9 +69,11 @@ h1 em{font-style:italic;color:var(--accent2)}
 .badge-impl{background:rgba(124,108,250,0.12);color:var(--accent2);border:1px solid rgba(124,108,250,0.25)}
 .badge-ba{background:rgba(45,212,168,0.1);color:var(--teal);border:1px solid rgba(45,212,168,0.2)}
 .badge-am{background:rgba(240,168,39,0.1);color:var(--amber);border:1px solid rgba(240,168,39,0.2)}
+.badge-cs{background:rgba(224,92,138,0.1);color:#e05c8a;border:1px solid rgba(224,92,138,0.2)}
 body.light .badge-impl{background:rgba(69,53,212,0.07);color:var(--accent);border-color:rgba(69,53,212,0.18)}
 body.light .badge-ba{background:rgba(10,122,92,0.07);color:var(--teal);border-color:rgba(10,122,92,0.18)}
 body.light .badge-am{background:rgba(160,98,0,0.07);color:var(--amber);border-color:rgba(160,98,0,0.18)}
+body.light .badge-cs{background:rgba(192,66,110,0.07);color:#c0426e;border-color:rgba(192,66,110,0.18)}
 .hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
 .btn-primary{padding:0.7rem 1.6rem;background:var(--accent);color:#fff;border-radius:4px;font-size:0.85rem;font-weight:400;transition:all 0.2s;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem}
 .btn-primary:hover{opacity:0.85;transform:translateY(-1px)}
@@ -117,12 +119,13 @@ body.light .exp-highlight.green{background:rgba(10,122,92,0.05);border-color:rgb
 .exp-highlight.green .exp-highlight-label{color:var(--teal)}
 .exp-highlight p{font-size:0.82rem;color:var(--text2);line-height:1.6}
 
-.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem}
 .project-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.8rem;transition:all 0.25s;position:relative;overflow:hidden;cursor:pointer}
 .project-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;transition:opacity 0.25s;opacity:0}
 .project-card.v1::after{background:var(--accent)}
 .project-card.v2::after{background:var(--teal)}
 .project-card.v3::after{background:var(--amber)}
+.project-card.v4::after{background:#e05c8a}
 .project-card:hover{border-color:var(--border2);transform:translateY(-3px)}
 .project-card:hover::after{opacity:1}
 .proj-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.2rem}
@@ -130,9 +133,11 @@ body.light .exp-highlight.green{background:rgba(10,122,92,0.05);border-color:rgb
 .proj-icon.v1{background:rgba(124,108,250,0.12);color:var(--accent2);border:1px solid rgba(124,108,250,0.2)}
 .proj-icon.v2{background:rgba(45,212,168,0.1);color:var(--teal);border:1px solid rgba(45,212,168,0.18)}
 .proj-icon.v3{background:rgba(240,168,39,0.1);color:var(--amber);border:1px solid rgba(240,168,39,0.18)}
+.proj-icon.v4{background:rgba(224,92,138,0.1);color:#e05c8a;border:1px solid rgba(224,92,138,0.18)}
 body.light .proj-icon.v1{background:rgba(69,53,212,0.07);color:var(--accent);border-color:rgba(69,53,212,0.15)}
 body.light .proj-icon.v2{background:rgba(10,122,92,0.07);color:var(--teal);border-color:rgba(10,122,92,0.15)}
 body.light .proj-icon.v3{background:rgba(160,98,0,0.07);color:var(--amber);border-color:rgba(160,98,0,0.15)}
+body.light .proj-icon.v4{background:rgba(224,92,138,0.07);color:#c0426e;border-color:rgba(224,92,138,0.15)}
 .proj-link-btn{font-family:'DM Mono',monospace;font-size:0.6rem;padding:0.25rem 0.6rem;border:1px solid var(--border2);border-radius:3px;color:var(--text3);transition:all 0.2s}
 .proj-link-btn:hover{border-color:var(--teal);color:var(--teal)}
 .proj-name{font-family:'Spectral',serif;font-size:1.15rem;font-weight:300;color:var(--text);margin-bottom:0.25rem}
@@ -152,6 +157,14 @@ body.light .proj-icon.v3{background:rgba(160,98,0,0.07);color:var(--amber);borde
 .edu-entry:first-child{padding-top:0}
 .edu-degree{font-size:0.83rem;color:var(--text);font-weight:400}
 .edu-uni{font-family:'DM Mono',monospace;font-size:0.63rem;color:var(--text3)}
+
+.booking-wrap{display:grid;grid-template-columns:1fr 1.4fr;gap:3rem;align-items:start}
+.booking-tagline{font-family:'Spectral',serif;font-size:1.3rem;font-weight:300;font-style:italic;color:var(--text);margin-bottom:0.75rem}
+.booking-sub{font-size:0.88rem;color:var(--text2);line-height:1.7;margin-bottom:1.5rem}
+.booking-details{display:flex;flex-direction:column;gap:0.65rem}
+.booking-detail-item{display:flex;align-items:center;gap:0.7rem;font-size:0.82rem;color:var(--text2)}
+.booking-detail-icon{color:var(--teal);font-size:0.9rem;width:16px;text-align:center;flex-shrink:0}
+.booking-embed{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:background 0.3s,border-color 0.3s}
 
 .contact-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:3rem;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;transition:background 0.3s,border-color 0.3s}
 .contact-left h3{font-family:'Spectral',serif;font-size:1.8rem;font-weight:300;margin-bottom:0.8rem}
@@ -176,12 +189,66 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
 .reveal{opacity:0;transform:translateY(18px);transition:opacity 0.6s ease,transform 0.6s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
 
+/* TABLET */
+@media(max-width:1024px){
+  .hero-grid{gap:2.5rem}
+  .skills-grid{grid-template-columns:repeat(2,1fr)}
+  .exp-item{grid-template-columns:150px 1fr;gap:2rem}
+  .contact-wrap{padding:2rem;gap:2rem}
+  .booking-wrap{gap:2rem}
+}
+/* MOBILE */
 @media(max-width:768px){
-  .hero-grid{grid-template-columns:1fr}
-  .exp-item{grid-template-columns:1fr;gap:0.5rem}
-  .skills-grid{grid-template-columns:1fr}
-  .contact-wrap{grid-template-columns:1fr}
+  nav{padding:0.85rem 1.2rem}
   .nav-links{display:none}
+  .nav-brand{font-size:1rem}
+  .nav-cta{font-size:0.7rem;padding:0.38rem 0.85rem}
+
+  .hero{min-height:auto;padding:5rem 1.2rem 3rem}
+  .hero-grid{grid-template-columns:1fr;gap:2.5rem}
+  h1{font-size:clamp(2rem,8vw,2.8rem)}
+  .hero-desc{font-size:0.93rem;max-width:100%}
+  .hero-badges{gap:0.4rem}
+  .badge{font-size:0.62rem;padding:0.25rem 0.6rem}
+  .btn-primary,.btn-ghost{padding:0.6rem 1.2rem;font-size:0.8rem}
+
+  .hero-right{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
+  .stat-card{padding:1rem 1.1rem}
+  .stat-num{font-size:1.8rem}
+  .stat-label{font-size:0.72rem}
+  .stat-sub{font-size:0.6rem}
+
+  section{padding:3rem 1.2rem}
+  h2{font-size:clamp(1.5rem,6vw,2rem);margin-bottom:2rem}
+  .section-label{font-size:0.62rem}
+
+  .exp-item{grid-template-columns:1fr;gap:0.5rem;margin-bottom:2.5rem;padding-bottom:2.5rem}
+  .exp-period{margin-top:0.5rem}
+  .exp-title{font-size:1.1rem}
+  .exp-bullets li{font-size:0.83rem}
+  .exp-highlight p{font-size:0.78rem}
+
+  .projects-grid{grid-template-columns:1fr;gap:1rem}
+  .proj-desc{font-size:0.8rem}
+
+  .skills-grid{grid-template-columns:1fr;gap:1rem}
+
+  .booking-wrap{grid-template-columns:1fr}
+  .booking-embed iframe{height:420px}
+  .contact-wrap{grid-template-columns:1fr;padding:1.5rem;gap:1.5rem}
+  .contact-left h3{font-size:1.4rem}
+  .contact-left p{font-size:0.83rem}
+  .contact-link{padding:0.75rem 0.9rem}
+  .contact-link-value{font-size:0.78rem}
+
+  footer{font-size:0.58rem;padding:1.5rem 1rem}
+}
+/* SMALL MOBILE */
+@media(max-width:420px){
+  .hero-right{grid-template-columns:1fr}
+  .hero-actions{flex-direction:column}
+  .btn-primary,.btn-ghost{width:100%;justify-content:center;text-align:center}
+  .nav-cta{display:none}
 }
 </style>
 </head>
@@ -193,6 +260,7 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
     <li><a href="#experience">Experience</a></li>
     <li><a href="#projects">Projects</a></li>
     <li><a href="#skills">Skills</a></li>
+    <li><a href="#booking">Book a call</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
   <div class="nav-right">
@@ -206,14 +274,15 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
     <div>
       <div class="hero-tag">Open to opportunities · Chennai, India</div>
       <h1>Implementation <em>lead</em> who builds what he deploys</h1>
-      <p class="hero-desc">20 enterprise SaaS rollouts. 9+ years bridging business requirements and technical execution. Now building AI-native tools that solve the problems I've lived through.</p>
+      <p class="hero-desc">20 enterprise SaaS rollouts across the UK, US, and Middle East. 9+ years bridging business requirements and technical execution — on-site and remote. Now building AI-native tools that solve the problems I've lived through.</p>
       <div class="hero-badges">
         <span class="badge badge-impl">Implementation Lead</span>
         <span class="badge badge-ba">Business Analyst</span>
         <span class="badge badge-am">Account Manager</span>
+        <span class="badge badge-cs">Customer Success</span>
       </div>
       <div class="hero-actions">
-        <a href="https://calendar.google.com/calendar/u/0/r" target="_blank" class="btn-primary">Book a call</a>
+        <a href="https://calendly.com/inbarajb91/30min" target="_blank" class="btn-primary">Book a call</a>
         <a href="#experience" class="btn-ghost">View experience</a>
       </div>
     </div>
@@ -229,9 +298,14 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
         <div class="stat-sub">At Amazon · Catalog operations</div>
       </div>
       <div class="stat-card amber reveal" style="transition-delay:0.2s">
-        <div class="stat-num amber">3</div>
+        <div class="stat-num amber">4</div>
         <div class="stat-label">AI-powered products built & shipped</div>
-        <div class="stat-sub">FM Engine · Parabls · AI Config Assistant</div>
+        <div class="stat-sub">FM Engine · Parabls · AI Config Assistant · FAAX</div>
+      </div>
+      <div class="stat-card teal reveal" style="transition-delay:0.3s">
+        <div class="stat-num teal">3</div>
+        <div class="stat-label">Regions delivered across</div>
+        <div class="stat-sub">UK · US · Middle East · On-site & remote</div>
       </div>
     </div>
   </div>
@@ -263,6 +337,14 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
       <div class="exp-highlight green" style="margin-top:0.8rem">
         <div class="exp-highlight-label">Revenue impact</div>
         <p>Identified unaccounted scope-change efforts and built a tracking mechanism. Collaborated with Sales to introduce pre-purchased Professional Services credits — converting informal changes into billable units and reducing revenue leakage.</p>
+      </div>
+      <div class="exp-highlight purple" style="margin-top:0.8rem">
+        <div class="exp-highlight-label">Global delivery</div>
+        <p>Travelled on-site to Saudi Arabia for a half-million dollar engagement and to the UK for the MHA project — conducting field requirement gathering, stakeholder workshops, and go-live training across the UK, US, and Middle East.</p>
+      </div>
+      <div class="exp-highlight green" style="margin-top:0.8rem">
+        <div class="exp-highlight-label">Pilot → Enterprise conversions</div>
+        <p>4 of 5 pilots converted to full-scale enterprise rollouts — through structured discovery, early value demonstration, and deep stakeholder alignment during the pilot phase. Each conversion represented a significant expansion in scope, contract value, and long-term engagement.</p>
       </div>
     </div>
   </div>
@@ -320,6 +402,15 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
       <p class="proj-desc">AI-powered assistant that lets support teams query enterprise platform configurations in natural language — eliminating dependency on implementation engineers post go-live.</p>
       <div class="proj-tags">
         <span class="proj-tag">XML</span><span class="proj-tag">RAG</span><span class="proj-tag">NLP</span><span class="proj-tag">Internal tooling</span>
+      </div>
+    </div>
+    <div class="project-card v4 reveal" style="transition-delay:0.3s">
+      <div class="proj-header"><div class="proj-icon v4">FX</div></div>
+      <div class="proj-name">FAAX</div>
+      <div class="proj-type">AI-Assisted Options Trading Platform</div>
+      <p class="proj-desc">Bridges the gap between raw trading interfaces and disciplined strategy-driven execution. Users define structured trading blueprints upfront — AI monitors market conditions, generates setups, constructs orders, and drafts trades for human approval before execution.</p>
+      <div class="proj-tags">
+        <span class="proj-tag">Strategy blueprinting</span><span class="proj-tag">Real-time AI</span><span class="proj-tag">Risk management</span><span class="proj-tag">Human-in-loop</span>
       </div>
     </div>
   </div>
@@ -392,6 +483,39 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-fa
           <span class="edu-uni">Balaji Institute of Engineering & Technology</span>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<section id="booking">
+  <div class="section-label">Book a call</div>
+  <h2>Let's <em>talk</em></h2>
+  <div class="booking-wrap reveal">
+    <div class="booking-left">
+      <p class="booking-tagline">30 minutes. No agenda needed.</p>
+      <p class="booking-sub">Whether you're hiring, evaluating, or just want to understand how I work — pick a slot and let's have a conversation.</p>
+      <div class="booking-details">
+        <div class="booking-detail-item">
+          <span class="booking-detail-icon">◷</span>
+          <span>30 minutes</span>
+        </div>
+        <div class="booking-detail-item">
+          <span class="booking-detail-icon">◎</span>
+          <span>Google Meet / Phone</span>
+        </div>
+        <div class="booking-detail-item">
+          <span class="booking-detail-icon">◈</span>
+          <span>Roles: Implementation · BA · Account Management</span>
+        </div>
+      </div>
+      <a href="https://calendly.com/inbarajb91/30min" target="_blank" class="btn-primary" style="margin-top:1.8rem;display:inline-flex">Open booking page ↗</a>
+    </div>
+    <div class="booking-embed">
+      <iframe src="https://calendly.com/inbarajb91/30min?embed_domain=inbarajb91.github.io&embed_type=Inline&hide_event_type_details=1&hide_gdpr_banner=1" 
+        width="100%" height="520" frameborder="0" scrolling="no"
+        style="border-radius:8px;min-width:280px"></iframe>
     </div>
   </div>
 </section>
