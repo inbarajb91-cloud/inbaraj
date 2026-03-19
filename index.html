@@ -86,13 +86,15 @@ body.light .badge-cs{background:rgba(192,66,110,0.07);color:#c0426e;border-color
 .hero-right{display:flex;flex-direction:column;gap:0.6rem}
 .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1.2rem;position:relative;overflow:hidden;transition:background 0.3s,border-color 0.3s}
 .stat-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
-.stat-card.purple::before{background:var(--accent)}
+.stat-card.purple::before{background:var(--accent2)}
 .stat-card.teal::before{background:var(--teal)}
 .stat-card.amber::before{background:var(--amber)}
+.stat-card.cs::before{background:#e05c8a}
 .stat-num{font-family:'Spectral',serif;font-size:1.85rem;font-weight:600;line-height:1;margin-bottom:0.2rem}
 .stat-num.purple{color:var(--accent2)}
 .stat-num.teal{color:var(--teal)}
 .stat-num.amber{color:var(--amber)}
+.stat-num.cs{color:#e05c8a}
 .stat-label{font-size:0.82rem;color:var(--text2);line-height:1.45}
 .stat-sub{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text3);margin-top:0.3rem;line-height:1.35}
 
@@ -318,8 +320,8 @@ footer{border-top:1px solid var(--border);padding:1.5rem;text-align:center;font-
         <div class="stat-label">Total contract value delivered</div>
         <div class="stat-sub">UK · US · Middle East</div>
       </div>
-      <div class="stat-card teal reveal" style="transition-delay:0.1s">
-        <div class="stat-num teal">Nearly $1M</div>
+      <div class="stat-card cs reveal" style="transition-delay:0.1s">
+        <div class="stat-num cs">Nearly $1M</div>
         <div class="stat-label">Implementation &amp; expansion value</div>
         <div class="stat-sub">Core rollouts + pilot conversions + CRs</div>
       </div>
@@ -328,8 +330,8 @@ footer{border-top:1px solid var(--border);padding:1.5rem;text-align:center;font-
         <div class="stat-label">Monthly savings driven</div>
         <div class="stat-sub">Amazon · defect prioritization framework</div>
       </div>
-        <div class="stat-card amber reveal" style="transition-delay:0.2s">
-        <div class="stat-num amber">4</div>
+      <div class="stat-card teal reveal" style="transition-delay:0.2s">
+        <div class="stat-num teal">4</div>
         <div class="stat-label">AI-powered products built & shipped</div>
         <div class="stat-sub">FM Engine · Parabls · AI Config Assistant · FAAX</div>
       </div>
