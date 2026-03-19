@@ -169,13 +169,14 @@ body.light .proj-icon.v4{background:rgba(224,92,138,0.07);color:#c0426e;border-c
 .edu-uni{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--text3)}
 
 /* ─── BOOKING ─── */
-.booking-wrap{display:grid;grid-template-columns:1fr 1.4fr;gap:2.5rem;align-items:start}
+.booking-wrap{display:grid;grid-template-columns:minmax(300px,1fr) minmax(0,1.4fr);gap:2.5rem;align-items:start}
 .booking-tagline{font-family:'Spectral',serif;font-size:1.2rem;font-weight:300;font-style:italic;color:var(--text);margin-bottom:0.6rem}
 .booking-sub{font-size:0.88rem;color:var(--text2);line-height:1.65;margin-bottom:1.2rem}
 .booking-details{display:flex;flex-direction:column;gap:0.5rem}
 .booking-detail-item{display:flex;align-items:center;gap:0.6rem;font-size:0.8rem;color:var(--text2)}
 .booking-detail-icon{color:var(--teal);font-size:0.9rem;width:16px;text-align:center;flex-shrink:0}
-.booking-embed{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:background 0.3s,border-color 0.3s}
+.booking-embed{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:background 0.3s,border-color 0.3s;margin-top:-3.2rem}
+.booking-embed iframe{display:block;width:100%;height:500px;border:0;min-width:0}
 
 /* ─── CONTACT ─── */
 .contact-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:2.5rem;display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:center;transition:background 0.3s,border-color 0.3s}
@@ -256,6 +257,7 @@ footer{border-top:1px solid var(--border);padding:1.5rem;text-align:center;font-
   .skills-grid{grid-template-columns:1fr;gap:0.85rem}
 
   .booking-wrap{grid-template-columns:1fr}
+  .booking-embed{margin-top:0}
   .booking-embed iframe{height:420px}
   .contact-wrap{grid-template-columns:1fr;padding:1.5rem;gap:1.5rem}
   .contact-left h3{font-size:1.3rem}
@@ -540,7 +542,7 @@ footer{border-top:1px solid var(--border);padding:1.5rem;text-align:center;font-
     <div class="booking-embed">
       <iframe src="https://calendly.com/inbarajb91/30min?embed_domain=inbarajb91.github.io&embed_type=Inline&hide_event_type_details=1&hide_gdpr_banner=1" 
         width="100%" height="480" frameborder="0" scrolling="no"
-        style="border-radius:8px;min-width:280px"></iframe>
+        style="border-radius:8px"></iframe>
     </div>
   </div>
 </section>
