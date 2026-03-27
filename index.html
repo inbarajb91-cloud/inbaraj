@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inbaraj B — Implementation Lead & Builder</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<style>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"><style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --bg:#0a0a0b;
@@ -278,6 +276,15 @@ footer{border-top:1px solid var(--border);padding:1.5rem;text-align:center;font-
   .hero-actions{flex-direction:column}
   .btn-primary,.btn-ghost{width:100%;justify-content:center;text-align:center}
   .nav-cta{display:none}
+}
+
+/* ─── PRINT / DOWNLOAD CV ─── */
+@media print{
+  @page{size:A4 portrait;margin:0}
+  nav,section,.hero,hr.section-divider,footer,.cv-fab,#resume-content+*{display:none!important}
+  body>*{display:none!important}
+  #resume-content{display:block!important;position:static!important}
+  #resume-content>div{width:100%!important;padding:12mm 14mm!important;box-sizing:border-box!important;font-size:8.5pt!important}
 }
 
 /* ─── DOWNLOAD CV ─── */
@@ -858,41 +865,14 @@ toggle.addEventListener('click',()=>{
 function downloadCV(){
   const fab=document.getElementById('cv-fab');
   const navBtn=document.getElementById('cv-nav-btn');
-  const fabOrig=fab.innerHTML;
-  const navOrig=navBtn.innerHTML;
-  fab.innerHTML='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1"/></svg> Generating…';
-  fab.disabled=true;
-  navBtn.innerHTML='…';
-  navBtn.disabled=true;
-
-  const now=new Date();
-  const pad=n=>String(n).padStart(2,'0');
-  const filename=`Inbaraj_B_Resume_${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}.pdf`;
-
-  /* Clone content into a temp absolute-positioned element.
-     html2canvas can capture position:absolute off-screen elements;
-     position:fixed at left:-9999px causes it to hang. */
-  const src=document.getElementById('resume-content');
-  const tmp=document.createElement('div');
-  tmp.style.cssText='position:absolute;top:0;left:-9999px;z-index:-1;background:#fff;';
-  tmp.innerHTML=src.innerHTML;
-  document.body.appendChild(tmp);
-
-  const reset=()=>{
-    if(document.body.contains(tmp))document.body.removeChild(tmp);
-    fab.innerHTML=fabOrig;fab.disabled=false;
-    navBtn.innerHTML=navOrig;navBtn.disabled=false;
-  };
-
-  const opt={
-    margin:0,
-    filename:filename,
-    image:{type:'jpeg',quality:0.98},
-    html2canvas:{scale:2,useCORS:true,logging:false,backgroundColor:'#ffffff',allowTaint:true},
-    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
-  };
-
-  html2pdf().set(opt).from(tmp).save().then(reset).catch(reset);
+  const fabSVG='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8M5 7l3 3 3-3M3 12h10"/></svg>';
+  window.addEventListener('afterprint',()=>{
+    fab.innerHTML=fabSVG+' Download CV';fab.disabled=false;
+    navBtn.innerHTML=fabSVG+'CV';navBtn.disabled=false;
+  },{once:true});
+  fab.innerHTML='Preparing…';fab.disabled=true;
+  navBtn.innerHTML='…';navBtn.disabled=true;
+  setTimeout(()=>window.print(),80);
 }
 </script>
 </body>
