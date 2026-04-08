@@ -142,3 +142,63 @@ The current single-prompt approach does NOT reliably prevent fabrication. Claude
 
 ### ResumePrint is a separate render tree
 `ResumePrint.tsx` renders a completely independent layout for PDF. It must be updated separately from the visible page components. It receives the same merged `data` prop but renders with its own inline styles for print formatting. It also renders `customSections` so AI-added sections appear in PDFs.
+
+## Session handoff protocol
+
+When the user says **"session completed"** (or similar), follow this checklist before ending:
+
+1. **Check for unmerged branches**: `git fetch --all && git branch -a --no-merged main` — warn if any exist
+2. **Verify main is clean**: `git status` on main — no uncommitted work
+3. **Update documentation**:
+   - `memory.md` — add session entry with changes, bugs, decisions, lessons
+   - `memory.md` checklist — mark completed items, add any new planned items
+   - `CLAUDE.md` — add any new gotchas discovered
+   - `context.md` — update history table and roadmap if needed
+4. **Generate next-session prompt** — paste a ready-to-use prompt below (update it with current state)
+5. **Commit and push** all doc updates to main
+
+---
+
+## Next session prompt
+
+Copy-paste this when starting a new Claude Code session on this repo:
+
+```
+I'm continuing development on my portfolio + resume customization site at inbaraj.info.
+
+## Quick orientation
+- Read `CLAUDE.md` for project conventions, structure, and gotchas
+- Read `memory.md` for full history and the **development checklist** (completed + planned)
+- Read `context.md` for architecture, how things work, and the roadmap
+
+## What exists today
+A Next.js 16 App Router site deployed on Vercel with:
+- Base resume at `/` (from `data/base.json`)
+- AI-tailored company profiles at `/r/<company-name>` (generated via Claude API)
+- Admin dashboard at `/admin` — login, paste JD, generate, preview, publish
+- Cookie-based isolation so HR can't discover the base resume
+- GitHub API as database (profile JSONs committed to repo)
+- PDF download with `window.print()` + print-optimized template
+
+## Critical known issue
+The AI HALLUCINATES — it invents skills, metrics, and experience that don't exist in the base resume. See the "AI hallucination" gotcha in CLAUDE.md and the detailed write-up in memory.md. This is the #1 priority to fix.
+
+## What to work on next: Phase 0 — Anti-hallucination agent
+From the checklist in memory.md:
+- [ ] Ground truth file (`data/ground-truth.json`)
+- [ ] Validation step — second Claude call compares output against ground truth
+- [ ] Validation loop — re-prompt with specific feedback on failures (max 2 retries)
+- [ ] Zod schema enforcement on AI output structure
+- [ ] Diff view — toggle button highlights all changes from base before publishing
+- [ ] Structured logging — input, output, validation results per generation
+
+This must all work serverless (Vercel functions, no traditional backend). The generate API route chains multiple Claude calls: generate → validate → retry if needed → return with diff.
+
+## After Phase 0, the full roadmap is:
+- Phase 1: Agentic UX (user-friendly language, conversational wrapper)
+- Phase 2: Apify URL scraping (paste URL instead of JD text)
+- Phase 3: Inline editing with AI assist (highlight-to-edit, manual or AI)
+- Phase 4: Security audit (XSS, auth, rate limiting, CSRF)
+
+Start by reading the three docs, then proceed with Phase 0.
+```
