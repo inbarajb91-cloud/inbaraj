@@ -97,6 +97,46 @@ Built the entire Next.js app: 45 files, ~10,500 lines.
 
 ---
 
+## Session 3 — "Review and fix outstanding issues" (Apr 8, 2026, continued)
+
+### Context
+User reviewed the previous session's summary and wanted all outstanding bugs fixed, documentation created, and the branch merged to main.
+
+### Starting state
+The Next.js app lived on branch `claude/profile-resume-customization-zG0Gk` (not yet merged to `main`). The current working branch `claude/review-profile-resume-changes-jVRrw` only had the original `index.html`.
+
+### Bug fixes (commit: `2064f50`)
+
+1. **Claude API 500 errors** — Added retry with 3s/6s backoff on 500/socket errors. Strip markdown code fences from JSON responses before parsing.
+2. **Stale registry in admin** — `GET /api/profiles` was reading from build-time static import. Switched to `getRegistryFromGitHub()` for runtime reads.
+3. **Profile pages 404** — `loadProfile()` now falls back to GitHub API when filesystem miss occurs. Added `force-dynamic` to profile page.
+4. **Admin layout too narrow** — Removed `maxWidth: 1200`, full-width responsive.
+5. **No rebuild notification** — Added post-publish polling every 15s with status indicator.
+6. **Iframe too short** — Changed from fixed 700px to `calc(100vh - 260px)`.
+
+### User feedback round (commit: `37b5a4a`)
+
+1. **Profile dropdown** — Replaced flat tabs with `<select>` dropdown sorted by most recent.
+2. **Deploy status overlay** — Spinner "Deploying to Vercel..." while building, replaced by iframe once live.
+3. **PDF missing custom sections** — Added `customSections` rendering to `ResumePrint.tsx`.
+4. **Session persistence** — Admin password in `sessionStorage` (survives refresh, cleared on tab close).
+
+### Cookie redirect bug (commit: `d21cbc1`)
+Base resume tab was showing ZakApps content because `profile_lock` cookie redirected the iframe's `/` request. Fixed with `?view=base` bypass and iframe detection via `sec-fetch-dest` header.
+
+### Calendly 404 bug (commit: `bf383ac`)
+`BookingSection.tsx` was wrapping `personal.calendly` (already a full URL) in another `https://calendly.com/` prefix, causing a double-nested URL. Fixed to use the value directly.
+
+### Slug readability (commit: `93fae20`)
+Changed from SHA-256 hash slugs (`ecdb2e7d`) to company-name slugs (`rippling`). Added optional role label for multi-role scenarios (`rippling-implementation-lead`).
+
+### Documentation and merge
+- Created `CLAUDE.md`, `memory.md`, `context.md`
+- Created PR #3, squash-merged to `main`
+- All subsequent fixes pushed directly to `main`
+
+---
+
 ## Lessons learned
 
 1. **Static imports in Next.js are build-time snapshots.** Any data imported via `import x from './file.json'` is baked into the build. For dynamic data, read from an API or filesystem at request time.
@@ -112,3 +152,7 @@ Built the entire Next.js app: 45 files, ~10,500 lines.
 6. **`html2canvas` hangs on `position:fixed` off-screen elements.** `window.print()` with `@media print` CSS is far more reliable for PDF generation.
 
 7. **Project-level vs team-level settings in Vercel** — env vars, domain settings, and framework presets all need to be at the project level.
+
+8. **Always check if data values are already full URLs.** The Calendly embed bug happened because the component assumed a relative path but `base.json` stored a full URL.
+
+9. **Hash-based slugs feel scammy.** Human-readable slugs (`/r/rippling`) are more trustworthy for HR recipients than random hashes (`/r/ecdb2e7d`).

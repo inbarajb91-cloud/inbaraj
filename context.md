@@ -10,7 +10,7 @@ A personal portfolio and resume website for **Inbaraj B** — an Implementation 
 
 The site has two modes:
 1. **Public portfolio** — the base resume visible to everyone at the root URL
-2. **Targeted resumes** — AI-tailored versions of the resume for specific companies, accessible at obfuscated URLs
+2. **Targeted resumes** — AI-tailored versions of the resume for specific companies, accessible at readable URLs (e.g. `/r/rippling`)
 
 ## Why does this exist?
 
@@ -58,7 +58,7 @@ The `mergeResume()` function deep-merges the override with the base at render ti
 
 ### The AI tailoring process
 
-1. Admin pastes company name + job description
+1. Admin pastes company name + optional role label + job description
 2. API sends base resume JSON + JD to Claude API with a system prompt that enforces:
    - Only reword, reorder, and re-emphasize — never fabricate
    - Return only changed fields as JSON
@@ -122,3 +122,43 @@ The "Download CV" button triggers `window.print()`. A `@media print` CSS rule hi
 | Apr 8 | Fixed deployment bugs, cookie issues, API errors |
 | Apr 8 | Added profile dropdown, deploy status, session persistence |
 | Apr 8 | Created PR #3, merged to main, deployed |
+| Apr 8 | Fixed Calendly embed 404 (double URL prefix) |
+| Apr 8 | Changed slugs from hashes to readable company names |
+| Apr 8 | Added optional role label for multi-role slugs |
+| Apr 8 | Updated all documentation |
+
+---
+
+## Roadmap — planned next development
+
+### Phase 1: Agentic UX overhaul
+Repackage the admin dashboard as an "agent" experience. Replace tech jargon ("deploying to Vercel", "committing to GitHub") with user-friendly language ("Publishing your resume...", "Your page is now live!"). The system should feel like a conversation with an assistant, not a developer tool.
+
+### Phase 2: URL-based JD scraping (Apify)
+Instead of pasting raw job descriptions, allow pasting a URL (LinkedIn job posting, company careers page). An Apify actor scrapes the content and extracts the JD automatically. Requires `APIFY_API_KEY` env var and a new API route.
+
+### Phase 3: Inline editing with AI assist
+Allow editing generated/published content before or after publishing:
+- **Highlight any section** on the resume preview → two options appear:
+  - **Edit manually** — inline text editor
+  - **AI assist** — describe what you want changed, agent asks clarifying questions, then updates on confirmation
+- This could work as an overlay/popup on the resume preview, or as a dedicated `/update` route
+- Should work both in admin and on the live profile page (with auth)
+
+### Phase 4: Security audit
+Full review of:
+- API route authentication (currently header-based password)
+- XSS vectors in `dangerouslySetInnerHTML` usage
+- GitHub token permissions (should be minimal)
+- Cookie security (httpOnly, sameSite, secure flags)
+- Input validation on all API endpoints
+- Rate limiting on generate/publish endpoints
+
+### Architecture note: "No backend"
+The current system runs entirely on Vercel's serverless infrastructure:
+- **API routes** = serverless functions (run on-demand, no standing server)
+- **GitHub API** = persistent storage (no database)
+- **Vercel** = hosting + CDN + SSL + auto-deploy
+- **Claude API** = AI processing (external service)
+
+There is no traditional backend server. Next.js API routes are serverless functions that cold-start on each request. Data persists in the Git repo. This is a fully serverless architecture.

@@ -66,9 +66,9 @@ data/
 lib/
 ├── types.ts                       # All TypeScript interfaces
 ├── resume.ts                      # Data loading + deep merge
-├── ai.ts                          # Claude API integration
+├── ai.ts                          # Claude API integration with retry
 ├── github.ts                      # GitHub Contents API client
-└── slug.ts                        # SHA-256 slug generation
+└── slug.ts                        # Company-name-based slug generation
 
 middleware.ts                      # Cookie-based profile isolation
 index.html                         # Original static site (preserved)
@@ -130,3 +130,12 @@ The file `index.html` is preserved in the repo for reference but is NOT served b
 
 ### Profile override format
 Profile JSONs only contain fields that differ from the base. The `mergeResume()` function deep-merges them. Setting a section to `false` hides it entirely. The `customSections` array adds new sections not in the base.
+
+### Slug generation
+Slugs are derived from the company name (and optional role label). `"Rippling"` → `rippling`, `"Rippling" + "Implementation Lead"` → `rippling-implementation-lead`. Non-alphanumeric characters become hyphens. No hashes or random IDs.
+
+### Calendly URL in base.json
+`personal.calendly` stores the **full URL** (e.g. `https://calendly.com/inbarajb91/30min`). The `BookingSection` component uses it directly — do NOT wrap it in another `https://calendly.com/` prefix.
+
+### ResumePrint is a separate render tree
+`ResumePrint.tsx` renders a completely independent layout for PDF. It must be updated separately from the visible page components. It receives the same merged `data` prop but renders with its own inline styles for print formatting. It also renders `customSections` so AI-added sections appear in PDFs.
