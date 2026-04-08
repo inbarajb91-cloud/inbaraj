@@ -5,8 +5,8 @@
     "active": true
   },
   "hero": {
-    "headline": "Implementation <em>specialist</em> who bridges business needs and technical execution",
-    "description": "5 years delivering enterprise SaaS implementations with deep expertise in data migration, stakeholder management, and platform configuration. 20 successful rollouts across global markets, specializing in complex multi-stakeholder projects and post-go-live optimization."
+    "headline": "Implementation <em>specialist</em> who bridges business and technology",
+    "description": "5+ years delivering seamless enterprise onboardings with 20 successful SaaS rollouts across UK, US, and Middle East. Expert at data migration, stakeholder coordination, and platform configuration. Proven track record of turning complex business requirements into streamlined implementations while driving process improvements and automation."
   },
   "experience": [
     {
@@ -15,30 +15,30 @@
       "badge": "CMMS · SaaS",
       "title": "Lead, Product Implementation",
       "bullets": [
-        "Led 20 end-to-end enterprise SaaS implementations with full ownership of data migration, platform configuration, and stakeholder coordination across UK, US, and Middle East markets.",
-        "Managed complex data migration projects involving legacy system integrations, data format standardization, and multi-tenant platform configurations tailored to client operational workflows.",
-        "Collaborated extensively with cross-functional teams including engineering, product, and support to ensure seamless technical delivery and post-implementation optimization.",
-        "Developed comprehensive documentation frameworks and process improvement initiatives that reduced implementation timelines and enhanced customer onboarding experience."
+        "Led 20 end-to-end enterprise SaaS implementations with full lifecycle ownership — requirements gathering, data migration, platform configuration, UAT coordination, and post-go-live support across UK, US, and Middle East markets.",
+        "Collaborated extensively with cross-functional teams (sales, engineering, product, support) and external stakeholders to ensure seamless onboarding experiences and smooth system integrations.",
+        "Engineered custom SaaS configurations and data migration processes for each client implementation, ensuring platform adoption and operational efficiency post-deployment.",
+        "Developed comprehensive documentation frameworks and standardized implementation processes — reducing onboarding complexity and enabling scalable delivery across multiple concurrent projects."
       ],
       "highlights": [
         {
           "label": "Process Innovation",
-          "text": "Built a use-case-driven implementation framework with complexity scoring and automated effort estimation — enabling accurate project scoping, timeline prediction, and elimination of requirement ambiguity during delivery.",
+          "text": "Designed a use-case-driven implementation framework with complexity scoring and effort estimation models — enabling accurate project scoping, automated timeline calculations, and streamlined requirements documentation.",
           "color": "purple"
+        },
+        {
+          "label": "Data Migration Expertise",
+          "text": "Successfully migrated complex enterprise datasets across 20+ implementations, handling diverse data formats and legacy system integrations while maintaining data integrity and minimizing business disruption.",
+          "color": "teal"
         },
         {
           "label": "Stakeholder Management",
-          "text": "Successfully managed multi-stakeholder projects involving executives and operational teams across different time zones, ensuring effective communication and timely project delivery through structured workshop facilitation.",
-          "color": "green"
-        },
-        {
-          "label": "Global Implementation",
-          "text": "Delivered on-site implementations in Saudi Arabia and UK for high-value engagements, managing complex data migrations and conducting stakeholder training sessions for enterprise-scale rollouts.",
+          "text": "Served as primary point of contact for executive and operational stakeholders during implementations — facilitating workshops, managing project communications, and ensuring alignment across internal and external teams.",
           "color": "purple"
         },
         {
-          "label": "Platform Expertise",
-          "text": "Achieved deep SME status across multiple product modules within 6 months, becoming the go-to resource for complex configuration challenges and serving as primary POC for technical workstreams.",
+          "label": "Platform Expertise Development",
+          "text": "Became subject matter expert on enterprise CMMS platform within first quarter, enabling faster onboardings and serving as go-to resource for complex configuration challenges across the implementation team.",
           "color": "green"
         }
       ]
@@ -49,9 +49,10 @@
       "badge": "E-Commerce · Ops",
       "title": "Senior Catalog Specialist",
       "bullets": [
-        "Managed large-scale data operations and process optimization for Amazon Fresh, Pantry, and Prime Now platforms, focusing on data accuracy and operational efficiency improvements.",
-        "Designed and implemented automated data prioritization frameworks using forecasting models and inventory analytics — delivering measurable operational improvements and cost savings.",
-        "Collaborated with cross-functional support teams to streamline data workflows, reduce processing bottlenecks, and improve inter-team communication protocols."
+        "Managed complex data migration and catalog integration projects for Amazon Fresh, Amazon Pantry, and Prime Now — ensuring data accuracy and operational continuity during system transitions.",
+        "Developed automated prioritization frameworks using forecasting data, inventory metrics, and user analytics — delivering $230K monthly operational savings through improved resource allocation.",
+        "Collaborated with cross-functional support teams to identify and resolve process gaps, reducing invalid case assignments by ~50 per day through standardized workflows and clear documentation.",
+        "Served as subject matter expert for catalog data processes, providing guidance and knowledge transfer to support seamless operations across multiple product lines."
       ],
       "highlights": []
     }
@@ -61,55 +62,55 @@
       "title": "Implementation & Data Migration",
       "color": "accent",
       "items": [
-        "Enterprise SaaS implementation lifecycle",
-        "Complex data migration & format handling",
+        "End-to-end SaaS implementation lifecycle",
+        "Payroll & HR data migration expertise",
         "Platform configuration & system integration",
-        "Multi-stakeholder project coordination",
-        "Post-implementation support & optimization"
+        "UAT coordination & go-live support",
+        "Cross-functional project management"
       ]
     },
     {
-      "title": "Technical & Platform Expertise",
+      "title": "Stakeholder Management",
       "color": "teal",
       "items": [
-        "Rapid platform learning & SME development",
-        "Data manipulation (Excel, Google Sheets)",
-        "API integrations & system connectivity",
-        "Process automation & workflow optimization",
-        "Documentation & knowledge management"
-      ]
-    },
-    {
-      "title": "Stakeholder & Project Management",
-      "color": "amber",
-      "items": [
+        "Client workshop facilitation",
+        "Executive stakeholder engagement",
         "Cross-functional team collaboration",
-        "Customer-facing communication",
-        "Workshop facilitation & requirements gathering",
-        "Timeline management & delivery coordination",
-        "Change management & adoption strategies"
+        "Requirements gathering & documentation",
+        "Change management & user adoption"
       ]
     },
     {
       "title": "Process & Product Improvement",
-      "color": "accent",
+      "color": "amber",
       "items": [
-        "Proactive process optimization identification",
-        "Automation opportunity assessment",
-        "Customer experience enhancement",
-        "Knowledge transfer & training development",
-        "Continuous improvement methodologies"
+        "Process automation & optimization",
+        "Knowledge management & documentation",
+        "Gap analysis & solution design",
+        "Proactive improvement identification",
+        "Best practice development & sharing"
       ]
     },
     {
-      "title": "Tools & Platforms",
+      "title": "Technical & Data Management",
+      "color": "accent",
+      "items": [
+        "Google Sheets & Excel proficiency",
+        "API integrations & system connectivity",
+        "Data format handling & transformation",
+        "Platform configuration expertise",
+        "Technical documentation & SOPs"
+      ]
+    },
+    {
+      "title": "Project & Communication",
       "color": "teal",
       "items": [
-        "Google Workspace & data management tools",
-        "Project tracking & documentation systems",
-        "Multi-platform integration experience",
-        "Customer communication platforms",
-        "Analytics & reporting tools"
+        "Multi-stakeholder project coordination",
+        "Timeline management & delivery tracking",
+        "Customer communication & support",
+        "Internal team collaboration",
+        "Knowledge transfer & training"
       ]
     }
   ]
