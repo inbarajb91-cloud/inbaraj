@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "company": "Rippling",
+    "created": "2026-04-08",
+    "active": true
+  },
+  "hero": {
+    "headline": "Implementation <em>analyst</em> who bridges business needs and technical execution",
+    "description": "20 enterprise SaaS rollouts with deep expertise in data migration, payroll systems, and cross-functional stakeholder management. 5+ years translating complex business requirements into seamless platform implementations. Proven track record of process improvement and automation that drives customer success."
+  },
+  "experience": [
+    {
+      "period": "Nov 2021 — Present",
+      "company": "Facilio",
+      "badge": "CMMS · SaaS",
+      "title": "Lead, Product Implementation",
+      "bullets": [
+        "Led 20 end-to-end enterprise SaaS implementations with full data migration ownership — managing payroll, operational, and configuration data transitions from legacy systems to modern platforms.",
+        "Served as primary POC for complex implementation workstreams, coordinating between external clients and internal engineering, product, and support teams to ensure seamless execution.",
+        "Developed comprehensive documentation frameworks and process knowledge transfer systems — enabling team-wide adoption of best practices and reducing onboarding time for new implementations.",
+        "Proactively identified automation opportunities and process improvements, designing frameworks that reduced implementation complexity scoring and eliminated BRD/UAT ambiguity for faster customer onboarding."
+      ],
+      "highlights": [
+        {
+          "label": "Process Innovation",
+          "text": "Built use-case-driven implementation framework with automated complexity scoring — enabling accurate scoping, timeline calculation, and streamlined customer onboarding workflows across all enterprise deployments.",
+          "color": "purple"
+        },
+        {
+          "label": "Data Migration Expertise",
+          "text": "Successfully migrated complex enterprise datasets across UK, US, and Middle East implementations — handling diverse data formats, system integrations, and ensuring zero data loss during go-live transitions.",
+          "color": "teal"
+        },
+        {
+          "label": "Cross-functional Leadership",
+          "text": "Coordinated multi-stakeholder projects involving C-level executives, operational teams, and technical staff — facilitating workshops, requirements gathering, and change management for smooth adoption.",
+          "color": "purple"
+        },
+        {
+          "label": "Customer Success Impact",
+          "text": "Achieved 80% pilot-to-enterprise conversion rate through structured discovery, early value demonstration, and deep stakeholder alignment — driving $350K+ in expansion revenue.",
+          "color": "green"
+        }
+      ]
+    },
+    {
+      "period": "May 2016 — Oct 2021",
+      "company": "Amazon",
+      "badge": "E-Commerce · Ops",
+      "title": "Senior Catalog Specialist",
+      "bullets": [
+        "Managed complex data workflows and system integrations for Amazon Fresh, Pantry, and Prime Now — resolving catalog and procurement data inconsistencies across multiple platforms.",
+        "Designed and implemented data-driven prioritization frameworks using forecasts, inventory values, and performance metrics — delivering $230K monthly operational savings through process automation.",
+        "Collaborated with cross-functional support teams to identify process gaps and implement solutions, reducing invalid case assignments by ~50 per day through improved SOP documentation."
+      ],
+      "highlights": []
+    }
+  ],
+  "skills": [
+    {
+      "title": "Implementation & Data Migration",
+      "color": "accent",
+      "items": [
+        "End-to-end SaaS implementation",
+        "Payroll & HR data migration",
+        "Platform configuration & system integration",
+        "Go-live support & post-implementation",
+        "Data validation & quality assurance"
+      ]
+    },
+    {
+      "title": "Project Management & Stakeholder Coordination",
+      "color": "teal",
+      "items": [
+        "Cross-functional project leadership",
+        "Multi-stakeholder communication",
+        "Requirements gathering & documentation",
+        "Change management & adoption",
+        "Timeline management & delivery"
+      ]
+    },
+    {
+      "title": "Process Improvement & Automation",
+      "color": "amber",
+      "items": [
+        "Process optimization & standardization",
+        "Automation framework development",
+        "Documentation & knowledge transfer",
+        "SOP creation & maintenance",
+        "Performance metrics & tracking"
+      ]
+    },
+    {
+      "title": "Technical & Data Management",
+      "color": "accent",
+      "items": [
+        "Google Sheets & Excel proficiency",
+        "Data format handling & manipulation",
+        "API integrations & system connections",
+        "Platform configuration scripting",
+        "Technical troubleshooting & support"
+      ]
+    },
+    {
+      "title": "Tools & Platform Expertise",
+      "color": "teal",
+      "items": [
+        "HRIS/Payroll system integrations",
+        "SaaS platform configuration",
+        "Data migration tools & workflows",
+        "Project tracking & documentation",
+        "Customer onboarding platforms"
+      ]
+    }
+  ],
+  "summary": "Implementation analyst with 5+ years managing 20 enterprise SaaS implementations, specializing in data migration and cross-functional stakeholder coordination. Expert at translating complex business requirements into seamless platform configurations while driving process improvements and automation. Deep experience with payroll systems, HRIS integrations, and multi-region deployments across UK, US, and Middle East markets."
+}
