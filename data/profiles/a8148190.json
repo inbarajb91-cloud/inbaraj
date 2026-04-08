@@ -1,0 +1,118 @@
+{
+  "meta": {
+    "company": "ZakApps",
+    "created": "2026-04-08",
+    "active": true
+  },
+  "hero": {
+    "headline": "Business Analyst who bridges <em>requirements</em> and delivery",
+    "description": "5+ years translating business requirements into technical solutions across 20 enterprise implementations. Expert in SDLC, stakeholder workshops, and cross-functional collaboration. Deep experience with eCommerce operations at Amazon and SaaS delivery at scale."
+  },
+  "experience": [
+    {
+      "period": "Nov 2021 — Present",
+      "company": "Facilio",
+      "badge": "CMMS · SaaS",
+      "title": "Lead, Product Implementation",
+      "bullets": [
+        "Gathered and analyzed complex business requirements from 20+ enterprise clients through structured workshops with executives and operational teams — translating needs into comprehensive BRDs and solution designs.",
+        "Collaborated closely with development teams to configure SaaS solutions, ensuring technical delivery aligned with documented functional requirements and business objectives.",
+        "Designed and executed UAT frameworks, coordinating testing phases and issue resolution across multiple stakeholder groups for seamless go-live delivery.",
+        "Built standardized requirement gathering frameworks and effort estimation models — enabling accurate project scoping and reducing BRD ambiguity by systematizing the analysis process."
+      ],
+      "highlights": [
+        {
+          "label": "Process Innovation",
+          "text": "Engineered a use-case-driven requirements analysis framework with complexity scoring — enabling pre-sales to scope accurately, auto-calculate timelines, and eliminate BRD/UAT ambiguity across enterprise implementations.",
+          "color": "purple"
+        },
+        {
+          "label": "Cross-functional Leadership",
+          "text": "Acted as primary liaison between clients and internal teams (product, engineering, design) — driving requirements clarification and solution refinement throughout the SDLC.",
+          "color": "green"
+        },
+        {
+          "label": "Global Requirements Gathering",
+          "text": "Conducted on-site requirement analysis in Saudi Arabia and UK for high-value engagements — facilitating executive workshops and technical discovery across diverse business contexts.",
+          "color": "purple"
+        },
+        {
+          "label": "Solution Validation",
+          "text": "Led 4 of 5 pilot-to-enterprise conversions through structured requirement validation and early value demonstration — driving $350K+ in expansion value through thorough business analysis.",
+          "color": "green"
+        }
+      ]
+    },
+    {
+      "period": "May 2016 — Oct 2021",
+      "company": "Amazon",
+      "badge": "E-Commerce · Ops",
+      "title": "Senior Catalog Specialist",
+      "bullets": [
+        "Analyzed operational requirements and designed process improvements for Amazon Fresh, Amazon Pantry, and Prime Now — directly supporting eCommerce catalog and supply chain operations.",
+        "Developed analytical frameworks using SQL queries and data analysis to prioritize operational defects — creating a systematic approach that delivered $230K monthly savings.",
+        "Collaborated with development and testing teams to identify SOP gaps and process inefficiencies — reducing invalid case assignments by ~50 per day through targeted analysis and documentation."
+      ],
+      "highlights": []
+    }
+  ],
+  "skills": [
+    {
+      "title": "Business Analysis Core",
+      "color": "accent",
+      "items": [
+        "Requirements gathering & BRD development",
+        "Functional & non-functional documentation",
+        "Stakeholder workshop facilitation",
+        "Solution design & gap analysis",
+        "SDLC & Agile methodology expertise"
+      ]
+    },
+    {
+      "title": "Technical & Development",
+      "color": "teal",
+      "items": [
+        "SQL querying & data analysis",
+        "SaaS configuration & system integration",
+        "API integrations & testing support",
+        "JavaScript-like scripting",
+        "Jira & project tracking tools"
+      ]
+    },
+    {
+      "title": "Domain Expertise",
+      "color": "amber",
+      "items": [
+        "eCommerce operations (Amazon experience)",
+        "Supply chain & logistics processes",
+        "Enterprise SaaS implementations",
+        "CMMS / facility management systems",
+        "ERP integration concepts"
+      ]
+    },
+    {
+      "title": "Collaboration & Communication",
+      "color": "accent",
+      "items": [
+        "Cross-functional team coordination",
+        "Executive stakeholder management",
+        "UAT design & testing coordination",
+        "Issue resolution & change management",
+        "Technical documentation & training"
+      ]
+    }
+  ],
+  "customSections": [
+    {
+      "id": "domain-experience",
+      "title": "Relevant Domain Experience",
+      "position": "after:skills",
+      "items": [
+        "5+ years in eCommerce operations at Amazon — deep understanding of catalog management, supply chain processes, and retail operational workflows",
+        "3+ years implementing enterprise software solutions with complex business requirements across multiple industries",
+        "Experience with global business contexts — requirement gathering and solution delivery across UK, US, and Middle East markets",
+        "Strong background in operational process analysis and improvement — proven track record of identifying gaps and driving efficiency"
+      ]
+    }
+  ]
+}
