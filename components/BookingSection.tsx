@@ -6,7 +6,7 @@ interface BookingSectionProps {
 
 export default function BookingSection({ data }: BookingSectionProps) {
   const { booking, personal } = data;
-  const calendlyUrl = `https://calendly.com/${personal.calendly}`;
+  const calendlyUrl = personal.calendly;
   const embedUrl = `${calendlyUrl}?embed_domain=${personal.website}&embed_type=Inline&hide_event_type_details=1&hide_gdpr_banner=1`;
 
   return (
