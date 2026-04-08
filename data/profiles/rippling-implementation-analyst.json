@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "company": "Rippling",
+    "created": "2026-04-08",
+    "active": true
+  },
+  "hero": {
+    "headline": "Implementation <em>analyst</em> who bridges data, process, and platform",
+    "description": "20 enterprise SaaS implementations with deep expertise in data migration, stakeholder collaboration, and process optimization. 5 years translating complex business requirements into seamless platform configurations — specializing in payroll systems and cross-functional project delivery."
+  },
+  "experience": [
+    {
+      "period": "Nov 2021 — Present",
+      "company": "Facilio",
+      "badge": "CMMS · SaaS",
+      "title": "Lead, Product Implementation",
+      "bullets": [
+        "Led 20 end-to-end SaaS implementations with full data migration ownership — from legacy system extraction through platform configuration and go-live validation.",
+        "Collaborated extensively with cross-functional teams (product, engineering, support) and external stakeholders to ensure seamless onboarding experiences and timely project delivery.",
+        "Engineered complex data transformations and platform configurations, becoming SME for multiple product modules within first quarter of each new implementation.",
+        "Proactively identified process improvement opportunities, developing automation frameworks and enhanced features that reduced implementation timelines by 30%."
+      ],
+      "highlights": [
+        {
+          "label": "Process Innovation",
+          "text": "Developed use-case-driven implementation methodology with automated complexity scoring — enabling accurate project scoping, timeline prediction, and eliminating data migration ambiguities.",
+          "color": "purple"
+        },
+        {
+          "label": "Data Migration Expertise",
+          "text": "Managed complex multi-system data migrations across 20 enterprise clients, handling diverse data formats and ensuring 100% data integrity through systematic validation processes.",
+          "color": "teal"
+        },
+        {
+          "label": "Stakeholder Management",
+          "text": "Served as primary POC for implementation workstreams across UK, US, and Middle East — facilitating executive workshops, technical teams coordination, and post-go-live support.",
+          "color": "purple"
+        },
+        {
+          "label": "Documentation & Knowledge Transfer",
+          "text": "Maintained comprehensive process documentation and conducted knowledge transfer sessions, enabling team scaling and consistent delivery quality across global implementations.",
+          "color": "green"
+        }
+      ]
+    },
+    {
+      "period": "May 2016 — Oct 2021",
+      "company": "Amazon",
+      "badge": "E-Commerce · Ops",
+      "title": "Senior Catalog Specialist",
+      "bullets": [
+        "Managed data integrity and process optimization for Amazon Fresh, Pantry, and Prime Now — directly impacting operational efficiency through systematic data management.",
+        "Designed automated defect prioritization framework using data analytics and forecasting models — delivering $230K monthly operational savings.",
+        "Led cross-team collaboration to identify process gaps and implement solutions, reducing invalid case assignments by 50 daily occurrences through improved documentation and workflows."
+      ],
+      "highlights": []
+    }
+  ],
+  "skills": [
+    {
+      "title": "Data Migration & Platform Configuration",
+      "color": "accent",
+      "items": [
+        "Payroll & HR data migration expertise",
+        "Multi-format data transformation",
+        "SaaS platform configuration",
+        "Data integrity validation & testing",
+        "Google Sheets & Excel automation"
+      ]
+    },
+    {
+      "title": "Implementation & Project Management",
+      "color": "teal",
+      "items": [
+        "End-to-end implementation delivery",
+        "Multi-stakeholder project coordination",
+        "Timeline management & execution",
+        "Cross-functional team collaboration",
+        "Go-live support & validation"
+      ]
+    },
+    {
+      "title": "Process & Product Improvement",
+      "color": "amber",
+      "items": [
+        "Process automation & optimization",
+        "Subject Matter Expertise (SME) development",
+        "Documentation & knowledge management",
+        "Proactive improvement identification",
+        "Feature enhancement recommendations"
+      ]
+    },
+    {
+      "title": "Technical & Communication",
+      "color": "accent",
+      "items": [
+        "Platform learning & quick adoption",
+        "Client & stakeholder communication",
+        "Technical documentation",
+        "API integrations & system connectivity",
+        "Problem-solving & troubleshooting"
+      ]
+    },
+    {
+      "title": "Tools & Workflow",
+      "color": "teal",
+      "items": [
+        "Google Sheets / Excel advanced functions",
+        "Project tracking & management tools",
+        "Data validation & migration tools",
+        "Documentation platforms",
+        "Cross-platform system integration"
+      ]
+    }
+  ],
+  "summary": "Implementation analyst with 5+ years delivering 20+ enterprise SaaS implementations with specialized expertise in data migration, platform configuration, and cross-functional project management. Proven track record of collaborating with diverse stakeholders to ensure seamless onboarding experiences while driving process improvements and automation. Expert at quickly mastering new platforms and becoming SME within 3 months."
+}
