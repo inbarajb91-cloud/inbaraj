@@ -289,3 +289,5 @@ footer{border-top:1px solid var(--border);padding:1.5rem;text-align:center;font-
 .cv-fab:disabled{opacity:0.6;cursor:not-allowed;transform:none}
 .cv-fab svg{width:16px;height:16px;flex-shrink:0}
 @media(max-width:768px){.cv-fab{bottom:1.25rem;right:1.25rem;padding:0.65rem 1.1rem;font-size:0.8rem}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}

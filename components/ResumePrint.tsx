@@ -5,7 +5,7 @@ interface ResumePrintProps {
 }
 
 export default function ResumePrint({ data }: ResumePrintProps) {
-  const { personal, stats, summary, experience, projects, skills, education } = data;
+  const { personal, stats, summary, experience, projects, skills, education, customSections } = data;
 
   const colorMap: Record<string, string> = {
     purple: '#4535d4',
@@ -445,6 +445,45 @@ export default function ResumePrint({ data }: ResumePrintProps) {
             </div>
           </div>
         )}
+
+        {/* CUSTOM SECTIONS */}
+        {customSections && customSections.length > 0 && customSections.map((section) => (
+          <div key={section.id} style={{ marginBottom: '14px' }}>
+            <div
+              style={{
+                fontFamily: "'DM Mono', monospace",
+                fontSize: '7.5pt',
+                color: '#4535d4',
+                letterSpacing: '0.13em',
+                textTransform: 'uppercase',
+                marginBottom: '10px',
+                fontWeight: 500,
+                paddingBottom: '5px',
+                borderBottom: '1.5px solid #dedad4',
+              }}
+            >
+              {section.title}
+            </div>
+            <div>
+              {section.items.map((item, j) => (
+                <div
+                  key={j}
+                  style={{
+                    fontSize: '10pt',
+                    color: '#4a4844',
+                    lineHeight: 1.65,
+                    paddingLeft: '12px',
+                    position: 'relative',
+                    marginBottom: j < section.items.length - 1 ? '3px' : 0,
+                  }}
+                >
+                  <span style={{ position: 'absolute', left: 0, color: '#8a8884' }}>&mdash;</span>
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
 
         {/* EDUCATION */}
         <div>

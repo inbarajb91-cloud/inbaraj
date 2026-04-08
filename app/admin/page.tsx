@@ -31,11 +31,23 @@ export default function AdminPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [liveCheckUrl, setLiveCheckUrl] = useState<string | null>(null);
   const [liveCheckStatus, setLiveCheckStatus] = useState<'checking' | 'live' | null>(null);
+  const [liveCheckSlug, setLiveCheckSlug] = useState<string | null>(null);
+
+  // Restore session from sessionStorage on mount
+  useEffect(() => {
+    const saved = sessionStorage.getItem('admin_pwd');
+    if (saved) {
+      setStoredPassword(saved);
+      setAuthenticated(true);
+      loadProfiles(saved);
+    }
+  }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setStoredPassword(password);
     setAuthenticated(true);
+    sessionStorage.setItem('admin_pwd', password);
     loadProfiles(password);
   };
 
@@ -49,6 +61,7 @@ export default function AdminPage() {
         setRegistry(data.registry);
       } else {
         setAuthenticated(false);
+        sessionStorage.removeItem('admin_pwd');
         setMessage({ type: 'error', text: 'Invalid password' });
       }
     } catch {
@@ -72,6 +85,7 @@ export default function AdminPage() {
         const res = await fetch(liveCheckUrl, { method: 'HEAD', cache: 'no-store' });
         if (res.ok) {
           setLiveCheckStatus('live');
+          setLiveCheckSlug(null);
           setMessage({ type: 'success', text: `Profile is now live at ${liveCheckUrl}` });
           clearInterval(interval);
         }
@@ -136,8 +150,10 @@ export default function AdminPage() {
         text: `Published to GitHub! Waiting for Vercel to rebuild... Checking ${fullUrl} every 15s.`,
       });
       setLiveCheckUrl(fullUrl);
+      setLiveCheckSlug(data.slug);
       setLiveCheckStatus(null);
       setGenerated(null);
+      setActiveTab(data.slug);
       loadProfiles(storedPassword);
     } catch (error) {
       setMessage({
@@ -336,7 +352,15 @@ export default function AdminPage() {
                 Delete Profile
               </button>
             </div>
-            <ProfilePreview slug={activeTab} password={storedPassword} />
+            {liveCheckSlug === activeTab && liveCheckStatus === 'checking' ? (
+              <div style={styles.deployingOverlay}>
+                <div style={styles.deployingSpinner} />
+                <p style={styles.deployingText}>Deploying to Vercel...</p>
+                <p style={styles.deployingSub}>The profile page will appear here once the build completes. Checking every 15s.</p>
+              </div>
+            ) : (
+              <ProfilePreview slug={activeTab} password={storedPassword} />
+            )}
           </div>
         )}
       </div>
@@ -531,5 +555,37 @@ const styles: Record<string, React.CSSProperties> = {
   message: {
     fontSize: '0.82rem',
     marginTop: '0.75rem',
+  },
+  deployingOverlay: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: '#111113',
+    border: '1px solid #2a2a30',
+    borderRadius: 10,
+    padding: '4rem 2rem',
+    minHeight: 400,
+  },
+  deployingSpinner: {
+    width: 32,
+    height: 32,
+    border: '3px solid #2a2a30',
+    borderTopColor: '#7c6cfa',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
+    marginBottom: '1.5rem',
+  },
+  deployingText: {
+    fontSize: '1rem',
+    color: '#e8e8ec',
+    fontFamily: "'DM Sans', sans-serif",
+    marginBottom: '0.4rem',
+  },
+  deployingSub: {
+    fontSize: '0.78rem',
+    color: '#70708a',
+    fontFamily: "'DM Mono', monospace",
+    textAlign: 'center',
   },
 };
