@@ -1,0 +1,186 @@
+{
+  "personal": {
+    "name": "Inbaraj B",
+    "title": "Implementation Lead",
+    "location": "Chennai, India",
+    "email": "inbarajb91@gmail.com",
+    "phone": "+91 7200108575",
+    "linkedin": "linkedin.com/in/inbarajb91",
+    "linkedinUrl": "https://www.linkedin.com/in/inbarajb91/",
+    "website": "inbaraj.info",
+    "calendly": "https://calendly.com/inbarajb91/30min",
+    "whatsapp": "https://wa.me/917200108575",
+    "portfolio": "https://www.parabls.com/r/inbaraj",
+    "portfolioLabel": "parabls.com/r/inbaraj"
+  },
+  "hero": {
+    "tag": "Open to opportunities \u00b7 Chennai, India",
+    "headline": "Implementation <em>lead</em> who builds what he deploys",
+    "description": "20 enterprise SaaS rollouts across the UK, US, and Middle East. 5 years bridging business requirements and technical execution \u2014 on-site and remote. Now building AI-native tools that solve the problems I\u2019ve lived through.",
+    "badges": [
+      { "text": "Business Analysis", "variant": "ba" },
+      { "text": "Implementation", "variant": "impl" },
+      { "text": "Customer Success", "variant": "cs" },
+      { "text": "Account Management", "variant": "am" }
+    ]
+  },
+  "stats": [
+    { "value": "$4.1M+", "label": "Total contract value delivered", "sub": "UK \u00b7 US \u00b7 Middle East", "color": "purple" },
+    { "value": "Nearly $1M", "label": "Implementation & expansion value", "sub": "Core rollouts + pilot conversions + CRs", "color": "cs" },
+    { "value": "$230K", "label": "Monthly savings driven", "sub": "Amazon \u00b7 defect prioritisation framework", "color": "teal" },
+    { "value": "4", "label": "AI-powered products built & shipped", "sub": "FM Engine \u00b7 Parabls \u00b7 AI Config Assistant \u00b7 FAAX", "color": "teal" }
+  ],
+  "experience": [
+    {
+      "period": "Nov 2021 \u2014 Present",
+      "company": "Facilio",
+      "badge": "CMMS \u00b7 SaaS",
+      "title": "Lead, Product Implementation",
+      "bullets": [
+        "Spearheaded 20 end-to-end enterprise CMMS/SaaS rollouts for mid-to-large clients \u2014 full lifecycle ownership from scoping through post-go-live support.",
+        "Facilitated client workshops with executives and operational teams; translated requirements into BRDs, solution designs, and WBS-based project plans.",
+        "Engineered and tested SaaS configurations tailored to each client, driving adoption and smooth maintenance operations.",
+        "Acted as the internal voice of the customer \u2014 bridging clients with product, engineering, and design to drive continuous improvements."
+      ],
+      "highlights": [
+        { "label": "Key initiative", "text": "Conceptualized a use-case-driven implementation framework with complexity scoring and effort models \u2014 enabling pre-sales to scope accurately, auto-calculate timelines, and cut BRD/UAT ambiguity.", "color": "purple" },
+        { "label": "Revenue impact", "text": "Identified unaccounted scope-change efforts and built a tracking mechanism. Collaborated with Sales to introduce pre-purchased Professional Services credits \u2014 converting informal changes into billable units.", "color": "green" },
+        { "label": "Global delivery", "text": "Travelled on-site to Saudi Arabia for a half-million dollar engagement and to the UK for MHA \u2014 field requirement gathering, stakeholder workshops, and go-live training across UK, US, and Middle East.", "color": "purple" },
+        { "label": "Pilot \u2192 Enterprise conversions", "text": "4 of 5 pilots converted to full-scale enterprise rollouts \u2014 through structured discovery, early value demonstration, and deep stakeholder alignment during the pilot phase, driving $350K+ in expansion value.", "color": "green" }
+      ]
+    },
+    {
+      "period": "May 2016 \u2014 Oct 2021",
+      "company": "Amazon",
+      "badge": "E-Commerce \u00b7 Ops",
+      "title": "Senior Catalog Specialist",
+      "bullets": [
+        "Managed and resolved catalog and procurement defects for Amazon Fresh, Amazon Pantry, and Prime Now \u2014 directly improving operational efficiency.",
+        "Designed a defect prioritisation framework using product forecasts, inventory value, and glance views \u2014 yielding an estimated $230K in monthly savings.",
+        "Streamlined defect reduction by identifying SOP gaps, reducing invalid case assignments between support teams by ~50 per day."
+      ],
+      "highlights": []
+    }
+  ],
+  "projects": [
+    {
+      "name": "FM Engine",
+      "icon": "FM",
+      "variant": "v1",
+      "type": "WhatsApp-First CMMS",
+      "description": "Zero-training facility management platform. Residents report maintenance issues via WhatsApp \u2014 informal chat messages triaged into structured professional service requests. Multi-tenant architecture.",
+      "tags": ["React 19", "Supabase", "Gemini Flash", "Twilio", "Vercel Edge"],
+      "url": "https://codeat32-7.github.io/FM-Engine-Summary/"
+    },
+    {
+      "name": "Parabls",
+      "icon": "PB",
+      "variant": "v2",
+      "type": "Conversational AI Job Platform",
+      "description": "AI-driven \u201cconversation-first\u201d job search. Zero-form onboarding via AI chat generates profiles and ATS-optimised resumes. Narrative-based fit scores and transparent application tracking.",
+      "tags": ["React", "Node.js", "OpenAI", "Adzuna API", "TypeScript"],
+      "url": "https://www.parabls.com/"
+    },
+    {
+      "name": "AI Config Assistant",
+      "icon": "AI",
+      "variant": "v3",
+      "type": "Enterprise Support Tool",
+      "description": "AI-powered assistant that lets support teams query enterprise platform configurations in natural language \u2014 eliminating dependency on implementation engineers post go-live.",
+      "tags": ["XML", "RAG", "NLP", "Internal tooling"],
+      "url": null
+    },
+    {
+      "name": "FAAX",
+      "icon": "FX",
+      "variant": "v4",
+      "type": "AI-Assisted Options Trading Platform",
+      "description": "Bridges the gap between raw trading interfaces and disciplined strategy-driven execution. Users define structured trading blueprints \u2014 AI monitors conditions, generates setups, and drafts trades for human approval.",
+      "tags": ["Strategy blueprinting", "Real-time AI", "Risk management", "Human-in-loop"],
+      "url": null
+    }
+  ],
+  "skills": [
+    {
+      "title": "Implementation & Delivery",
+      "color": "accent",
+      "items": [
+        "End-to-end SaaS implementation",
+        "Project planning & WBS",
+        "UAT design & go-live support",
+        "SOP development & standardisation",
+        "CMMS / facility tech expertise"
+      ]
+    },
+    {
+      "title": "Business Analysis",
+      "color": "teal",
+      "items": [
+        "Requirements gathering (BRD)",
+        "Solution design & scoping",
+        "Stakeholder workshop facilitation",
+        "Complexity scoring & effort models",
+        "Process improvement & gap analysis"
+      ]
+    },
+    {
+      "title": "Client & Account Management",
+      "color": "amber",
+      "items": [
+        "Executive stakeholder engagement",
+        "Cross-functional team leadership",
+        "Change management & adoption",
+        "Revenue tracking & PS billing",
+        "Post-go-live relationship management"
+      ]
+    },
+    {
+      "title": "Technical",
+      "color": "accent",
+      "items": [
+        "SaaS configuration & system integration",
+        "JavaScript-like UI scripting",
+        "API integrations",
+        "Supabase \u00b7 React \u00b7 Tailwind",
+        "Prompt engineering & LLM tooling"
+      ]
+    },
+    {
+      "title": "Tools & Workflow",
+      "color": "teal",
+      "items": [
+        "Notion / Jira / project tracking",
+        "Vercel \u00b7 GitHub \u00b7 CLI tools",
+        "AI-enhanced documentation workflows",
+        "System integration & API tooling",
+        "Postman \u00b7 Primitive"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "M.Tech \u2014 Embedded Systems",
+      "university": "Hindustan University, Chennai"
+    },
+    {
+      "degree": "B.E \u2014 Electronics & Communication",
+      "university": "Balaji Institute of Engineering & Technology"
+    }
+  ],
+  "booking": {
+    "tagline": "30 minutes. No agenda needed.",
+    "description": "Whether you\u2019re hiring, evaluating, or just want to understand how I work \u2014 pick a slot and let\u2019s have a conversation.",
+    "details": [
+      { "icon": "\u25f7", "text": "30 minutes" },
+      { "icon": "\u25ce", "text": "Google Meet / Phone" },
+      { "icon": "\u25c8", "text": "Roles: Implementation \u00b7 BA \u00b7 Account Management \u00b7 Customer Success \u00b7 Product Adoption" }
+    ]
+  },
+  "contact": {
+    "heading": "I\u2019m looking for my <em>next challenge</em>",
+    "description": "Targeting roles in implementation leadership, business analysis, or account management \u2014 ideally at a company where enterprise depth meets product thinking.",
+    "subtext": "Based in Chennai. Available for hybrid or remote roles."
+  },
+  "summary": "Implementation lead with 5+ years delivering 20 enterprise SaaS/CMMS rollouts across the UK, US, and Middle East \u2014 full lifecycle ownership from scoping through post-go-live. Expert at translating complex business requirements into working SaaS configurations and measurable outcomes. Now building AI-native tools that solve the operational problems I\u2019ve lived through firsthand.",
+  "footer": "Inbaraj B \u00b7 Chennai, India \u00b7 inbarajb91@gmail.com \u00b7 +91 7200108575"
+}
