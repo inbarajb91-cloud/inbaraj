@@ -55,6 +55,8 @@ Chronological history of decisions, changes, and lessons learned across sessions
 - [ ] AI assist option — describe change, agent asks clarifying questions, updates on confirmation
 - [ ] Manual edits feed back into ground truth for future generations
 - [ ] Works within admin iframe preview
+- [ ] Option to edit both before publishing (generated preview) and after (published profile)
+- [ ] Consider `/update` route as auth-protected in-browser editing mode (alternative to admin-only)
 
 ### Phase 4 — Security audit
 
