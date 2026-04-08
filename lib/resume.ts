@@ -3,6 +3,7 @@ import baseData from '@/data/base.json';
 import registry from '@/data/profiles/registry.json';
 import fs from 'fs';
 import path from 'path';
+import { getProfileFromGitHub } from './github';
 
 export function loadBase(): ResumeData {
   return baseData as ResumeData;
@@ -13,13 +14,23 @@ export function loadRegistry(): Registry {
 }
 
 export async function loadProfile(slug: string): Promise<ProfileOverride | null> {
+  // Try filesystem first (works for build-time and profiles committed before build)
   try {
     const filePath = path.join(process.cwd(), 'data', 'profiles', `${slug}.json`);
     const content = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(content) as ProfileOverride;
   } catch {
-    return null;
+    // Filesystem miss — try GitHub API (for profiles published after last build)
   }
+
+  try {
+    const data = await getProfileFromGitHub(slug);
+    if (data) return data as unknown as ProfileOverride;
+  } catch {
+    // GitHub read failed
+  }
+
+  return null;
 }
 
 export function mergeResume(base: ResumeData, override: ProfileOverride): ResumeData {

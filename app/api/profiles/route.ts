@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { loadRegistry } from '@/lib/resume';
-import { commitFile, getFileContent } from '@/lib/github';
+import { commitFile, getFileContent, getRegistryFromGitHub } from '@/lib/github';
 
 function checkAuth(request: NextRequest): boolean {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -13,7 +12,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const registry = loadRegistry();
+  // Read registry from GitHub at runtime (not from build-time static import)
+  const registry = await getRegistryFromGitHub();
   const profiles: Record<string, unknown> = {};
 
   for (const slug of Object.keys(registry)) {

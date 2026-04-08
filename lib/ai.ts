@@ -26,6 +26,15 @@ The override format:
 
 Only include fields you are changing. The system will deep-merge your overrides with the base.`;
 
+function stripCodeFences(text: string): string {
+  let cleaned = text.trim();
+  // Remove ```json ... ``` or ``` ... ```
+  if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '');
+  }
+  return cleaned.trim();
+}
+
 export async function tailorResume(
   base: ResumeData,
   jobDescription: string
@@ -37,23 +46,43 @@ export async function tailorResume(
 
   const client = new Anthropic({ apiKey });
 
-  const message = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 4096,
-    system: SYSTEM_PROMPT,
-    messages: [
-      {
-        role: 'user',
-        content: `## Base Resume (JSON)\n\`\`\`json\n${JSON.stringify(base, null, 2)}\n\`\`\`\n\n## Job Description\n${jobDescription}\n\nProduce the tailored override JSON now.`,
-      },
-    ],
-  });
+  const makeRequest = async (attempt: number) => {
+    try {
+      const message = await client.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4096,
+        system: SYSTEM_PROMPT,
+        messages: [
+          {
+            role: 'user',
+            content: `## Base Resume (JSON)\n\`\`\`json\n${JSON.stringify(base, null, 2)}\n\`\`\`\n\n## Job Description\n${jobDescription}\n\nProduce the tailored override JSON now.`,
+          },
+        ],
+      });
 
-  const textBlock = message.content.find((b) => b.type === 'text');
-  if (!textBlock || textBlock.type !== 'text') {
-    throw new Error('No text response from Claude');
-  }
+      const textBlock = message.content.find((b) => b.type === 'text');
+      if (!textBlock || textBlock.type !== 'text') {
+        throw new Error('No text response from Claude');
+      }
 
-  const parsed = JSON.parse(textBlock.text);
-  return parsed as Partial<ProfileOverride>;
+      const cleaned = stripCodeFences(textBlock.text);
+      return JSON.parse(cleaned) as Partial<ProfileOverride>;
+    } catch (error) {
+      const isRetryable =
+        error instanceof Error &&
+        (error.message.includes('500') ||
+          error.message.includes('socket') ||
+          error.message.includes('overloaded') ||
+          error.message.includes('Internal server error'));
+
+      if (isRetryable && attempt < 2) {
+        const delay = (attempt + 1) * 3000;
+        await new Promise((r) => setTimeout(r, delay));
+        return makeRequest(attempt + 1);
+      }
+      throw error;
+    }
+  };
+
+  return makeRequest(0);
 }

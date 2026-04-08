@@ -29,6 +29,8 @@ export default function AdminPage() {
   const [generated, setGenerated] = useState<GeneratedProfile | null>(null);
   const [publishing, setPublishing] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [liveCheckUrl, setLiveCheckUrl] = useState<string | null>(null);
+  const [liveCheckStatus, setLiveCheckStatus] = useState<'checking' | 'live' | null>(null);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,10 +58,27 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (message) {
-      const timer = setTimeout(() => setMessage(null), 5000);
+      const timer = setTimeout(() => setMessage(null), 8000);
       return () => clearTimeout(timer);
     }
   }, [message]);
+
+  // Poll to check if a newly published profile is live
+  useEffect(() => {
+    if (!liveCheckUrl || liveCheckStatus === 'live') return;
+    setLiveCheckStatus('checking');
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(liveCheckUrl, { method: 'HEAD', cache: 'no-store' });
+        if (res.ok) {
+          setLiveCheckStatus('live');
+          setMessage({ type: 'success', text: `Profile is now live at ${liveCheckUrl}` });
+          clearInterval(interval);
+        }
+      } catch { /* still building */ }
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [liveCheckUrl, liveCheckStatus]);
 
   const handleGenerate = async (companyName: string, jobDescription: string) => {
     setGenerating(true);
@@ -111,10 +130,13 @@ export default function AdminPage() {
       }
 
       const data = await res.json();
+      const fullUrl = `${window.location.origin}${data.url}`;
       setMessage({
         type: 'success',
-        text: `Published to GitHub! URL: ${window.location.origin}${data.url} — page will be live in ~1-2 minutes after Vercel rebuilds.`,
+        text: `Published to GitHub! Waiting for Vercel to rebuild... Checking ${fullUrl} every 15s.`,
       });
+      setLiveCheckUrl(fullUrl);
+      setLiveCheckStatus(null);
       setGenerated(null);
       loadProfiles(storedPassword);
     } catch (error) {
@@ -192,6 +214,43 @@ export default function AdminPage() {
           }}
         >
           {message.text}
+        </div>
+      )}
+
+      {liveCheckStatus === 'checking' && liveCheckUrl && (
+        <div style={{
+          padding: '0.6rem 1rem',
+          borderRadius: 8,
+          border: '1px solid #fcd34d',
+          background: '#fefce8',
+          color: '#a16207',
+          marginBottom: '1rem',
+          fontSize: '0.82rem',
+          fontFamily: "'DM Mono', monospace",
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+        }}>
+          <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#f59e0b', animation: 'pulse 1.5s infinite' }} />
+          Vercel is rebuilding... checking {liveCheckUrl} every 15s
+        </div>
+      )}
+      {liveCheckStatus === 'live' && liveCheckUrl && (
+        <div style={{
+          padding: '0.6rem 1rem',
+          borderRadius: 8,
+          border: '1px solid #86efac',
+          background: '#f0fdf4',
+          color: '#16a34a',
+          marginBottom: '1rem',
+          fontSize: '0.82rem',
+          fontFamily: "'DM Mono', monospace",
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+        }}>
+          <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#22c55e' }} />
+          Live! <a href={liveCheckUrl} target="_blank" rel="noopener" style={{ color: '#16a34a', textDecoration: 'underline' }}>{liveCheckUrl}</a>
         </div>
       )}
 
@@ -300,7 +359,7 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 12,
     padding: '3rem',
     width: '100%',
-    maxWidth: 400,
+    maxWidth: 440,
   },
   loginTitle: {
     fontFamily: "'Spectral', serif",
@@ -344,9 +403,7 @@ const styles: Record<string, React.CSSProperties> = {
     background: '#0a0a0b',
     color: '#e8e8ec',
     fontFamily: "'DM Sans', sans-serif",
-    padding: '2rem 3rem',
-    maxWidth: 1200,
-    margin: '0 auto',
+    padding: '1.5rem 2.5rem',
   },
   header: {
     marginBottom: '2rem',

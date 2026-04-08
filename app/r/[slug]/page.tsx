@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { loadBase, loadProfile, mergeResume, getProfileSlugs } from '@/lib/resume';
 import ResumeLayout from '@/components/ResumeLayout';
 
+export const dynamic = 'force-dynamic';
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
