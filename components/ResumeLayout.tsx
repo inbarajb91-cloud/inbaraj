@@ -9,6 +9,7 @@ import Contact from '@/components/Contact';
 import CustomSection from '@/components/CustomSection';
 import ResumePrint from '@/components/ResumePrint';
 import { FabDownloadButton } from '@/components/ResumeDownload';
+import ScrollReveal from '@/components/ScrollReveal';
 
 interface ResumeLayoutProps {
   data: ResumeData;
@@ -75,6 +76,7 @@ export default function ResumeLayout({ data, isolated }: ResumeLayoutProps) {
 
       <footer dangerouslySetInnerHTML={{ __html: data.footer }} />
 
+      <ScrollReveal />
       <FabDownloadButton />
       <ResumePrint data={data} />
     </>
