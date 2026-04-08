@@ -1,0 +1,116 @@
+{
+  "meta": {
+    "company": "Rippling",
+    "created": "2026-04-08",
+    "active": true
+  },
+  "hero": {
+    "headline": "Implementation <em>specialist</em> who bridges business needs and technical execution",
+    "description": "5 years delivering enterprise SaaS implementations with deep expertise in data migration, stakeholder management, and platform configuration. 20 successful rollouts across global markets, specializing in complex multi-stakeholder projects and post-go-live optimization."
+  },
+  "experience": [
+    {
+      "period": "Nov 2021 — Present",
+      "company": "Facilio",
+      "badge": "CMMS · SaaS",
+      "title": "Lead, Product Implementation",
+      "bullets": [
+        "Led 20 end-to-end enterprise SaaS implementations with full ownership of data migration, platform configuration, and stakeholder coordination across UK, US, and Middle East markets.",
+        "Managed complex data migration projects involving legacy system integrations, data format standardization, and multi-tenant platform configurations tailored to client operational workflows.",
+        "Collaborated extensively with cross-functional teams including engineering, product, and support to ensure seamless technical delivery and post-implementation optimization.",
+        "Developed comprehensive documentation frameworks and process improvement initiatives that reduced implementation timelines and enhanced customer onboarding experience."
+      ],
+      "highlights": [
+        {
+          "label": "Process Innovation",
+          "text": "Built a use-case-driven implementation framework with complexity scoring and automated effort estimation — enabling accurate project scoping, timeline prediction, and elimination of requirement ambiguity during delivery.",
+          "color": "purple"
+        },
+        {
+          "label": "Stakeholder Management",
+          "text": "Successfully managed multi-stakeholder projects involving executives and operational teams across different time zones, ensuring effective communication and timely project delivery through structured workshop facilitation.",
+          "color": "green"
+        },
+        {
+          "label": "Global Implementation",
+          "text": "Delivered on-site implementations in Saudi Arabia and UK for high-value engagements, managing complex data migrations and conducting stakeholder training sessions for enterprise-scale rollouts.",
+          "color": "purple"
+        },
+        {
+          "label": "Platform Expertise",
+          "text": "Achieved deep SME status across multiple product modules within 6 months, becoming the go-to resource for complex configuration challenges and serving as primary POC for technical workstreams.",
+          "color": "green"
+        }
+      ]
+    },
+    {
+      "period": "May 2016 — Oct 2021",
+      "company": "Amazon",
+      "badge": "E-Commerce · Ops",
+      "title": "Senior Catalog Specialist",
+      "bullets": [
+        "Managed large-scale data operations and process optimization for Amazon Fresh, Pantry, and Prime Now platforms, focusing on data accuracy and operational efficiency improvements.",
+        "Designed and implemented automated data prioritization frameworks using forecasting models and inventory analytics — delivering measurable operational improvements and cost savings.",
+        "Collaborated with cross-functional support teams to streamline data workflows, reduce processing bottlenecks, and improve inter-team communication protocols."
+      ],
+      "highlights": []
+    }
+  ],
+  "skills": [
+    {
+      "title": "Implementation & Data Migration",
+      "color": "accent",
+      "items": [
+        "Enterprise SaaS implementation lifecycle",
+        "Complex data migration & format handling",
+        "Platform configuration & system integration",
+        "Multi-stakeholder project coordination",
+        "Post-implementation support & optimization"
+      ]
+    },
+    {
+      "title": "Technical & Platform Expertise",
+      "color": "teal",
+      "items": [
+        "Rapid platform learning & SME development",
+        "Data manipulation (Excel, Google Sheets)",
+        "API integrations & system connectivity",
+        "Process automation & workflow optimization",
+        "Documentation & knowledge management"
+      ]
+    },
+    {
+      "title": "Stakeholder & Project Management",
+      "color": "amber",
+      "items": [
+        "Cross-functional team collaboration",
+        "Customer-facing communication",
+        "Workshop facilitation & requirements gathering",
+        "Timeline management & delivery coordination",
+        "Change management & adoption strategies"
+      ]
+    },
+    {
+      "title": "Process & Product Improvement",
+      "color": "accent",
+      "items": [
+        "Proactive process optimization identification",
+        "Automation opportunity assessment",
+        "Customer experience enhancement",
+        "Knowledge transfer & training development",
+        "Continuous improvement methodologies"
+      ]
+    },
+    {
+      "title": "Tools & Platforms",
+      "color": "teal",
+      "items": [
+        "Google Workspace & data management tools",
+        "Project tracking & documentation systems",
+        "Multi-platform integration experience",
+        "Customer communication platforms",
+        "Analytics & reporting tools"
+      ]
+    }
+  ]
+}
