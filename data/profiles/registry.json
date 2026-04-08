@@ -3,5 +3,10 @@
     "company": "ZakApps",
     "created": "2026-04-08",
     "active": true
+  },
+  "rippling": {
+    "company": "Rippling",
+    "created": "2026-04-08",
+    "active": true
   }
 }
