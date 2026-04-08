@@ -131,8 +131,21 @@ The "Download CV" button triggers `window.print()`. A `@media print` CSS rule hi
 
 ## Roadmap — planned next development
 
+### Phase 0: Anti-hallucination agent (CRITICAL)
+The current single-prompt approach causes Claude to fabricate skills and experience. Must implement:
+- **Ground truth file** (`data/ground-truth.json`) — accumulates verified facts from base + manual edits
+- **Generate → Validate → Review pipeline** — validator catches fabrication before user sees it
+- **Diff view** — toggle button highlights all changes from base before publishing
+- **Validation loop** — re-prompt Claude with specific feedback on failures (max 2 retries)
+- **Zod schema** enforcement on output structure
+- **Structured logging** for every generation (input, output, validation results, user edits)
+- All serverless — validation is just additional Claude API calls in the same request
+
 ### Phase 1: Agentic UX overhaul
-Repackage the admin dashboard as an "agent" experience. Replace tech jargon ("deploying to Vercel", "committing to GitHub") with user-friendly language ("Publishing your resume...", "Your page is now live!"). The system should feel like a conversation with an assistant, not a developer tool.
+Repackage the admin dashboard as an "agent" experience:
+- Replace tech jargon ("deploying to Vercel", "committing to GitHub") with user-friendly language ("Publishing your resume...", "Your page is now live!")
+- Conversational wrapper — system feels like talking to an assistant
+- Progress states visible to user without technical detail
 
 ### Phase 2: URL-based JD scraping (Apify)
 Instead of pasting raw job descriptions, allow pasting a URL (LinkedIn job posting, company careers page). An Apify actor scrapes the content and extracts the JD automatically. Requires `APIFY_API_KEY` env var and a new API route.
@@ -142,17 +155,17 @@ Allow editing generated/published content before or after publishing:
 - **Highlight any section** on the resume preview → two options appear:
   - **Edit manually** — inline text editor
   - **AI assist** — describe what you want changed, agent asks clarifying questions, then updates on confirmation
-- This could work as an overlay/popup on the resume preview, or as a dedicated `/update` route
-- Should work both in admin and on the live profile page (with auth)
+- Overlay popup on the resume preview within admin
+- Manual edits feed back into ground truth for future generations
 
 ### Phase 4: Security audit
 Full review of:
-- API route authentication (currently header-based password)
+- API route authentication (currently header-based password — needs hashing + rate limiting)
 - XSS vectors in `dangerouslySetInnerHTML` usage
-- GitHub token permissions (should be minimal)
+- GitHub token permissions (should be minimal scope)
 - Cookie security (httpOnly, sameSite, secure flags)
-- Input validation on all API endpoints
-- Rate limiting on generate/publish endpoints
+- Input sanitization on all API endpoints
+- CSRF protection on mutating API routes
 
 ### Architecture note: "No backend"
 The current system runs entirely on Vercel's serverless infrastructure:

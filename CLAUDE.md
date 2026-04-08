@@ -137,5 +137,8 @@ Slugs are derived from the company name (and optional role label). `"Rippling"` 
 ### Calendly URL in base.json
 `personal.calendly` stores the **full URL** (e.g. `https://calendly.com/inbarajb91/30min`). The `BookingSection` component uses it directly — do NOT wrap it in another `https://calendly.com/` prefix.
 
+### AI hallucination in generated profiles
+The current single-prompt approach does NOT reliably prevent fabrication. Claude will invent skills, metrics, and experience to match the JD despite the "NEVER fabricate" instruction. All AI-generated content MUST be validated against the base resume before publishing. A validation pipeline (Phase 0 in roadmap) is planned to fix this. Until then, manually review every generated profile for fabricated content.
+
 ### ResumePrint is a separate render tree
 `ResumePrint.tsx` renders a completely independent layout for PDF. It must be updated separately from the visible page components. It receives the same merged `data` prop but renders with its own inline styles for print formatting. It also renders `customSections` so AI-added sections appear in PDFs.

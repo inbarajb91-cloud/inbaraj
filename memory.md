@@ -156,3 +156,56 @@ Changed from SHA-256 hash slugs (`ecdb2e7d`) to company-name slugs (`rippling`).
 8. **Always check if data values are already full URLs.** The Calendly embed bug happened because the component assumed a relative path but `base.json` stored a full URL.
 
 9. **Hash-based slugs feel scammy.** Human-readable slugs (`/r/rippling`) are more trustworthy for HR recipients than random hashes (`/r/ecdb2e7d`).
+
+---
+
+## Critical finding: AI hallucination in generated profiles (Apr 8, 2026)
+
+### The problem
+The Claude API is **fabricating skills and experience** that don't exist in the base resume. Example from a Rippling-targeted profile:
+- "Payroll & HR data migration expertise" — fabricated (not in base)
+- "Multi-format data transformation" — fabricated
+- "Data integrity validation & testing" — fabricated
+- "reduced implementation timelines by 30%" — fabricated metric
+
+The current system prompt says "NEVER fabricate" but Claude still invents content to better match the JD. This is a critical trust issue — the resume must only contain things that are actually true.
+
+### Root cause
+The current approach uses a single Claude API call with a simple "don't fabricate" instruction. There's no:
+- Strict ground truth enforcement
+- Validation step to catch fabrication
+- Diff view for human review
+- Structured evaluation of output fidelity
+
+### Planned fix: Agent architecture
+Instead of a single API call, implement a multi-step agent with:
+
+1. **Ground truth data** — A growing `ground-truth.json` that accumulates verified facts across all profiles. Every manual edit by the user becomes additional ground truth. The AI can ONLY use facts from this document.
+
+2. **Workflow states** — `generate → validate → review → publish` pipeline:
+   - Generate: Claude tailors the resume
+   - Validate: A second Claude call acts as "judge", comparing output against ground truth
+   - Review: User sees a diff view highlighting all changes
+   - Publish: Only after user confirmation
+
+3. **Evaluations** — Automated checks:
+   - Every bullet point must map to a source bullet in the base
+   - No new metrics/numbers unless they exist in ground truth
+   - Skills must be derivable from existing skills (rephrasing OK, invention not)
+
+4. **Log observability** — Structured logs for every generation:
+   - Input (base + JD)
+   - Raw output from Claude
+   - Validation results (pass/fail per section)
+   - User edits before publish
+
+5. **Output structure** — Zod schema validation on Claude's response. Reject malformed output before it reaches the UI.
+
+6. **Validation loop** — If validation fails, re-prompt Claude with specific feedback ("bullet 3 contains fabricated content, rephrase using only source material") and validate again. Max 2 retries.
+
+### Diff highlight view
+Before publishing, a toggle button shows all changes from the base resume:
+- Added text highlighted in green
+- Removed text highlighted in red
+- Modified text shown side-by-side
+This is client-side only — compare base JSON vs override JSON.
