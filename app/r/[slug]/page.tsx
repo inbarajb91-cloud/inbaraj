@@ -3,6 +3,8 @@ import { Metadata } from 'next';
 import { loadBase, loadProfile, mergeResume, getProfileSlugs } from '@/lib/resume';
 import ResumeLayout from '@/components/ResumeLayout';
 
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
   const slugs = getProfileSlugs();
   return slugs.map((slug) => ({ slug }));

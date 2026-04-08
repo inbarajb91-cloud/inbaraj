@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { loadRegistry } from '@/lib/resume';
-import fs from 'fs/promises';
-import path from 'path';
+import { commitFile, getFileContent } from '@/lib/github';
 
 function checkAuth(request: NextRequest): boolean {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -19,11 +18,10 @@ export async function GET(request: NextRequest) {
 
   for (const slug of Object.keys(registry)) {
     try {
-      const filePath = path.join(process.cwd(), 'data', 'profiles', `${slug}.json`);
-      const content = await fs.readFile(filePath, 'utf-8');
+      const content = await getFileContent(`data/profiles/${slug}.json`);
       profiles[slug] = {
         ...registry[slug],
-        data: JSON.parse(content),
+        data: content ? JSON.parse(content) : null,
       };
     } catch {
       profiles[slug] = { ...registry[slug], data: null };
@@ -58,25 +56,32 @@ export async function POST(request: NextRequest) {
       ...overrides,
     };
 
-    const profilesDir = path.join(process.cwd(), 'data', 'profiles');
-    const profilePath = path.join(profilesDir, `${slug}.json`);
-    await fs.writeFile(profilePath, JSON.stringify(profileData, null, 2));
+    // Commit profile JSON to GitHub
+    await commitFile(
+      `data/profiles/${slug}.json`,
+      JSON.stringify(profileData, null, 2),
+      `Add profile: ${companyName}`
+    );
 
-    const registryPath = path.join(profilesDir, 'registry.json');
-    const registryContent = await fs.readFile(registryPath, 'utf-8');
-    const registry = JSON.parse(registryContent);
+    // Update registry
+    const registryContent = await getFileContent('data/profiles/registry.json');
+    const registry = registryContent ? JSON.parse(registryContent) : {};
     registry[slug] = {
       company: companyName,
       created: profileData.meta.created,
       active: true,
     };
-    await fs.writeFile(registryPath, JSON.stringify(registry, null, 2));
+    await commitFile(
+      'data/profiles/registry.json',
+      JSON.stringify(registry, null, 2),
+      `Update registry: add ${companyName}`
+    );
 
     return NextResponse.json({ success: true, slug, url: `/r/${slug}` });
   } catch (error) {
-    console.error('Save error:', error);
+    console.error('Publish error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Save failed' },
+      { error: error instanceof Error ? error.message : 'Publish failed' },
       { status: 500 }
     );
   }

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
+import { getFileContent, commitFile } from '@/lib/github';
 
 function checkAuth(request: NextRequest): boolean {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -19,8 +18,10 @@ export async function GET(
   const { slug } = await params;
 
   try {
-    const filePath = path.join(process.cwd(), 'data', 'profiles', `${slug}.json`);
-    const content = await fs.readFile(filePath, 'utf-8');
+    const content = await getFileContent(`data/profiles/${slug}.json`);
+    if (!content) {
+      return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+    }
     return NextResponse.json(JSON.parse(content));
   } catch {
     return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
@@ -38,18 +39,16 @@ export async function DELETE(
   const { slug } = await params;
 
   try {
-    const profilesDir = path.join(process.cwd(), 'data', 'profiles');
-
-    // Remove profile file
-    const filePath = path.join(profilesDir, `${slug}.json`);
-    await fs.unlink(filePath).catch(() => {});
-
-    // Update registry
-    const registryPath = path.join(profilesDir, 'registry.json');
-    const registryContent = await fs.readFile(registryPath, 'utf-8');
-    const registry = JSON.parse(registryContent);
+    // Update registry to remove the profile
+    const registryContent = await getFileContent('data/profiles/registry.json');
+    const registry = registryContent ? JSON.parse(registryContent) : {};
+    const company = registry[slug]?.company || slug;
     delete registry[slug];
-    await fs.writeFile(registryPath, JSON.stringify(registry, null, 2));
+    await commitFile(
+      'data/profiles/registry.json',
+      JSON.stringify(registry, null, 2),
+      `Remove profile: ${company}`
+    );
 
     return NextResponse.json({ success: true });
   } catch (error) {

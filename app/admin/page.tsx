@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import ProfileTabs from './_components/ProfileTabs';
 import JDForm from './_components/JDForm';
 import ProfilePreview from './_components/ProfilePreview';
+import GeneratedPreview from './_components/GeneratedPreview';
 
 interface RegistryEntry {
   company: string;
@@ -112,7 +113,7 @@ export default function AdminPage() {
       const data = await res.json();
       setMessage({
         type: 'success',
-        text: `Published! URL: ${window.location.origin}${data.url}`,
+        text: `Published to GitHub! URL: ${window.location.origin}${data.url} — page will be live in ~1-2 minutes after Vercel rebuilds.`,
       });
       setGenerated(null);
       loadProfiles(storedPassword);
@@ -244,9 +245,7 @@ export default function AdminPage() {
                     </button>
                   </div>
                 </div>
-                <pre style={styles.jsonPreview}>
-                  {JSON.stringify(generated.overrides, null, 2)}
-                </pre>
+                <GeneratedPreview overrides={generated.overrides} />
               </div>
             )}
           </div>

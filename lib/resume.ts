@@ -1,6 +1,8 @@
 import { ResumeData, ProfileOverride, Registry } from './types';
 import baseData from '@/data/base.json';
 import registry from '@/data/profiles/registry.json';
+import fs from 'fs';
+import path from 'path';
 
 export function loadBase(): ResumeData {
   return baseData as ResumeData;
@@ -12,8 +14,9 @@ export function loadRegistry(): Registry {
 
 export async function loadProfile(slug: string): Promise<ProfileOverride | null> {
   try {
-    const profile = await import(`@/data/profiles/${slug}.json`);
-    return profile.default as ProfileOverride;
+    const filePath = path.join(process.cwd(), 'data', 'profiles', `${slug}.json`);
+    const content = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(content) as ProfileOverride;
   } catch {
     return null;
   }
