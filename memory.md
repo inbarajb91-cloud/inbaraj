@@ -4,6 +4,70 @@ Chronological history of decisions, changes, and lessons learned across sessions
 
 ---
 
+## Development checklist
+
+### Completed
+
+- [x] **Static portfolio** — Single `index.html` with dark/light theme, responsive design, scroll animations
+- [x] **Downloadable CV** — `window.print()` with `@media print` CSS, 2-page A4 layout
+- [x] **Resume readability** — HR-standard font sizes (10pt min), clean header, embedded project links
+- [x] **Next.js migration** — App Router, 13 components, structured JSON data model
+- [x] **Admin dashboard** — Password-protected at `/admin`, login with session persistence
+- [x] **AI resume tailoring** — Claude API generates profile overrides from job descriptions
+- [x] **Profile system** — JSON overrides deep-merged with base, stored in git via GitHub API
+- [x] **Company profile pages** — Dynamic pages at `/r/<slug>` with GitHub API fallback
+- [x] **Cookie-based isolation** — HR locked to profile page, can't discover base resume
+- [x] **Deploy status** — Post-publish polling with "deploying" overlay → "live" indicator
+- [x] **Profile dropdown** — Sorted by most recent in admin tabs
+- [x] **PDF custom sections** — AI-added sections render in print template
+- [x] **Readable slugs** — Company-name URLs (`/r/rippling`) with optional role label
+- [x] **Calendly embed fix** — Stopped double-wrapping the full URL
+- [x] **Session persistence** — `sessionStorage` survives refresh, cleared on tab close
+- [x] **Documentation** — `CLAUDE.md`, `memory.md`, `context.md` with gotchas and roadmap
+
+### Phase 0 — Anti-hallucination agent (CRITICAL, next)
+
+- [ ] Ground truth file (`data/ground-truth.json`) — verified facts from base + manual edits
+- [ ] Validation step — second Claude call compares output against ground truth
+- [ ] Validation loop — re-prompt with specific feedback on failures (max 2 retries)
+- [ ] Zod schema enforcement on AI output structure
+- [ ] Diff view — toggle button highlights all changes from base before publishing
+- [ ] Structured logging — input, output, validation results, user edits per generation
+
+### Phase 1 — Agentic UX overhaul
+
+- [ ] Replace tech jargon with user-friendly language throughout admin
+- [ ] Conversational agent wrapper — feels like talking to an assistant
+- [ ] Progress states visible without technical detail
+- [ ] Package generation as a multi-step agent with visible workflow states
+
+### Phase 2 — URL-based JD scraping
+
+- [ ] Apify integration — paste a URL instead of raw JD text
+- [ ] `APIFY_API_KEY` env var and scraper API route
+- [ ] Support LinkedIn job posts, company careers pages
+- [ ] Fallback to manual paste if scrape fails
+
+### Phase 3 — Inline editing with AI assist
+
+- [ ] Highlight-to-edit on resume preview — select text, popup appears
+- [ ] Manual edit option — inline text editor overlay
+- [ ] AI assist option — describe change, agent asks clarifying questions, updates on confirmation
+- [ ] Manual edits feed back into ground truth for future generations
+- [ ] Works within admin iframe preview
+
+### Phase 4 — Security audit
+
+- [ ] Hash admin password (bcrypt or similar) instead of plain comparison
+- [ ] Rate limiting on generate/publish endpoints
+- [ ] Audit `dangerouslySetInnerHTML` for XSS vectors
+- [ ] Tighten GitHub token to minimal permissions
+- [ ] Input sanitization on all API endpoints
+- [ ] CSRF protection on mutating routes
+- [ ] Cookie flags: `httpOnly`, `secure`, proper `sameSite`
+
+---
+
 ## Session 1 — "Add profile customization and resume changes" (Mar 27-28, 2026)
 
 ### What existed before
