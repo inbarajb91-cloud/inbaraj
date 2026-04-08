@@ -6,19 +6,21 @@ interface ProfilePreviewProps {
 }
 
 export default function ProfilePreview({ slug }: ProfilePreviewProps) {
-  const url = slug ? `/r/${slug}` : '/';
+  const displayUrl = slug ? `/r/${slug}` : '/';
+  // Use ?view=base to bypass the profile_lock cookie redirect in middleware
+  const iframeSrc = slug ? `/r/${slug}` : '/?view=base';
 
   return (
     <div style={styles.container}>
       <div style={styles.iframeHeader}>
-        <span style={styles.url}>{url}</span>
-        <a href={url} target="_blank" rel="noopener" style={styles.openBtn}>
+        <span style={styles.url}>{displayUrl}</span>
+        <a href={displayUrl} target="_blank" rel="noopener" style={styles.openBtn}>
           Open in new tab ↗
         </a>
       </div>
       <div style={styles.iframeWrap}>
         <iframe
-          src={url}
+          src={iframeSrc}
           style={styles.iframe}
           title={slug ? `Profile: ${slug}` : 'Base Resume'}
         />
