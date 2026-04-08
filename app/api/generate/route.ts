@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const overrides = await tailorResume(base, jobDescription);
 
     const date = new Date().toISOString().slice(0, 10);
-    const slug = generateSlug(companyName, date);
+    const slug = generateSlug(companyName);
 
     return NextResponse.json({
       slug,
