@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { jobDescription, companyName } = body;
+    const { jobDescription, companyName, roleLabel } = body;
 
     if (!jobDescription || !companyName) {
       return NextResponse.json(
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const overrides = await tailorResume(base, jobDescription);
 
     const date = new Date().toISOString().slice(0, 10);
-    const slug = generateSlug(companyName);
+    const slug = generateSlug(companyName, roleLabel);
 
     return NextResponse.json({
       slug,

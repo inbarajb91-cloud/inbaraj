@@ -3,18 +3,19 @@
 import { useState } from 'react';
 
 interface JDFormProps {
-  onGenerate: (companyName: string, jobDescription: string) => void;
+  onGenerate: (companyName: string, jobDescription: string, roleLabel?: string) => void;
   generating: boolean;
 }
 
 export default function JDForm({ onGenerate, generating }: JDFormProps) {
   const [companyName, setCompanyName] = useState('');
+  const [roleLabel, setRoleLabel] = useState('');
   const [jobDescription, setJobDescription] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (companyName.trim() && jobDescription.trim()) {
-      onGenerate(companyName.trim(), jobDescription.trim());
+      onGenerate(companyName.trim(), jobDescription.trim(), roleLabel.trim() || undefined);
     }
   };
 
@@ -30,7 +31,18 @@ export default function JDForm({ onGenerate, generating }: JDFormProps) {
           style={styles.input}
           required
         />
-        <p style={styles.hint}>Used internally only. The URL will be an encoded slug, not the company name.</p>
+        <p style={styles.hint}>Used for the profile URL: inbaraj.info/r/company-name</p>
+      </div>
+      <div style={styles.field}>
+        <label style={styles.label}>Role Label <span style={{ color: '#70708a', textTransform: 'none', letterSpacing: 0 }}>(optional)</span></label>
+        <input
+          type="text"
+          value={roleLabel}
+          onChange={(e) => setRoleLabel(e.target.value)}
+          placeholder="e.g. Implementation Lead, Business Analyst"
+          style={styles.input}
+        />
+        <p style={styles.hint}>If applying for multiple roles at the same company. URL becomes /r/company-role-label</p>
       </div>
       <div style={styles.field}>
         <label style={styles.label}>Job Description</label>

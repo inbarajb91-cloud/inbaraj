@@ -94,7 +94,7 @@ export default function AdminPage() {
     return () => clearInterval(interval);
   }, [liveCheckUrl, liveCheckStatus]);
 
-  const handleGenerate = async (companyName: string, jobDescription: string) => {
+  const handleGenerate = async (companyName: string, jobDescription: string, roleLabel?: string) => {
     setGenerating(true);
     setMessage(null);
     try {
@@ -104,7 +104,7 @@ export default function AdminPage() {
           'Content-Type': 'application/json',
           'x-admin-password': storedPassword,
         },
-        body: JSON.stringify({ companyName, jobDescription }),
+        body: JSON.stringify({ companyName, jobDescription, roleLabel }),
       });
 
       if (!res.ok) {
