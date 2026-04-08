@@ -1,18 +1,42 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { ResumeData, ProfileOverride } from './types';
+import { GroundTruth } from './ground-truth';
+import { ProfileOverrideSchema } from './schemas';
+
+export interface ValidationViolation {
+  section: string;
+  field: string;
+  generated: string;
+  issue: 'fabricated_skill' | 'fabricated_metric' | 'fabricated_claim' | 'unverifiable';
+  suggestion: string;
+}
+
+export interface ValidationResult {
+  valid: boolean;
+  violations: ValidationViolation[];
+}
+
+export interface GenerationPipelineResult {
+  overrides: Partial<ProfileOverride>;
+  validation: ValidationResult;
+  retryCount: number;
+}
 
 const SYSTEM_PROMPT = `You are a resume tailoring expert. Given a candidate's base resume data (JSON) and a job description, produce a tailored version.
 
 Rules:
-1. ONLY reword, reorder, and re-emphasize existing achievements. NEVER fabricate or invent new experience.
-2. Rewrite the hero headline and description to align with the role's language and priorities.
-3. Reorder and rephrase experience bullets so the most relevant achievements lead.
-4. Adjust skill emphasis — bring forward skills matching the JD, de-emphasize less relevant ones.
-5. Tweak project descriptions to highlight aspects most relevant to the role.
-6. You may add customSections (e.g. "Certifications", "Domain Expertise") if the JD strongly values something not covered by existing sections.
-7. You may set a section to false to hide it if it's irrelevant to the role.
-8. Return ONLY a JSON object with the fields that differ from the base. Do not include unchanged fields.
-9. The response must be valid JSON — no markdown, no code fences, no commentary.
+1. ONLY reword, reorder, and re-emphasize existing achievements. NEVER fabricate or invent new experience, skills, metrics, or claims.
+2. Every bullet point in your output MUST be a rephrased version of an existing bullet. Do not combine bullets or invent new ones.
+3. Every skill MUST be derivable from existing skills — rephrasing is OK, but inventing new skills is NOT.
+4. Every metric or number MUST exist in the base resume. Do not invent percentages, dollar amounts, or quantities.
+5. Rewrite the hero headline and description to align with the role's language and priorities.
+6. Reorder and rephrase experience bullets so the most relevant achievements lead.
+7. Adjust skill emphasis — bring forward skills matching the JD, de-emphasize less relevant ones.
+8. Tweak project descriptions to highlight aspects most relevant to the role.
+9. You may add customSections (e.g. "Domain Expertise") that reorganize EXISTING facts from the base resume. Items in custom sections must be traceable to the base.
+10. You may set a section to false to hide it if it's irrelevant to the role.
+11. Return ONLY a JSON object with the fields that differ from the base. Do not include unchanged fields.
+12. The response must be valid JSON — no markdown, no code fences, no commentary.
 
 The override format:
 {
@@ -26,63 +50,171 @@ The override format:
 
 Only include fields you are changing. The system will deep-merge your overrides with the base.`;
 
+const VALIDATION_SYSTEM_PROMPT = `You are a resume fact-checker. Your job is to compare a generated resume override against a ground truth document and flag any fabricated content.
+
+The ground truth contains ALL verified facts about this candidate: their actual skills, metrics, experience bullets, highlight texts, project names, project descriptions, tools, education, companies, and job titles.
+
+For each section in the generated override, check:
+1. SKILLS: Every skill item must be a rephrasing of a skill in the ground truth. Skills that don't map to any ground truth skill are fabricated.
+2. METRICS: Every number, percentage, dollar amount, or quantitative claim must exist in the ground truth metrics. Invented metrics are fabricated.
+3. EXPERIENCE BULLETS: Every bullet must be traceable to an original bullet or highlight in the ground truth. Bullets with new claims are fabricated.
+4. HIGHLIGHTS: Every highlight text must map to an original highlight. New claims are fabricated.
+5. CUSTOM SECTIONS: Every item must be traceable to existing skills, bullets, or project descriptions.
+6. SUMMARY: Claims must be supported by ground truth. New claims are fabricated.
+7. HERO: Description claims must be supported by ground truth.
+
+Rephrasing is ALLOWED — the candidate's bullet about "20 end-to-end enterprise CMMS/SaaS rollouts" can become "20 enterprise SaaS implementations". But inventing new facts is NOT allowed.
+
+Return ONLY a JSON object in this exact format (no markdown, no code fences):
+{
+  "valid": true/false,
+  "violations": [
+    {
+      "section": "skills|experience|summary|hero|customSections|highlights",
+      "field": "specific field or item index",
+      "generated": "the fabricated text",
+      "issue": "fabricated_skill|fabricated_metric|fabricated_claim|unverifiable",
+      "suggestion": "how to fix it using ground truth"
+    }
+  ]
+}
+
+If everything checks out, return {"valid": true, "violations": []}.
+Be strict. When in doubt, flag it.`;
+
 function stripCodeFences(text: string): string {
   let cleaned = text.trim();
-  // Remove ```json ... ``` or ``` ... ```
   if (cleaned.startsWith('```')) {
     cleaned = cleaned.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '');
   }
   return cleaned.trim();
 }
 
-export async function tailorResume(
-  base: ResumeData,
-  jobDescription: string
-): Promise<Partial<ProfileOverride>> {
+function getClient(): Anthropic {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     throw new Error('ANTHROPIC_API_KEY environment variable is not set');
   }
+  return new Anthropic({ apiKey });
+}
 
-  const client = new Anthropic({ apiKey });
+async function callClaude(
+  client: Anthropic,
+  system: string,
+  userMessage: string,
+  attempt = 0
+): Promise<string> {
+  try {
+    const message = await client.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      system,
+      messages: [{ role: 'user', content: userMessage }],
+    });
 
-  const makeRequest = async (attempt: number) => {
-    try {
-      const message = await client.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
-        system: SYSTEM_PROMPT,
-        messages: [
-          {
-            role: 'user',
-            content: `## Base Resume (JSON)\n\`\`\`json\n${JSON.stringify(base, null, 2)}\n\`\`\`\n\n## Job Description\n${jobDescription}\n\nProduce the tailored override JSON now.`,
-          },
-        ],
-      });
-
-      const textBlock = message.content.find((b) => b.type === 'text');
-      if (!textBlock || textBlock.type !== 'text') {
-        throw new Error('No text response from Claude');
-      }
-
-      const cleaned = stripCodeFences(textBlock.text);
-      return JSON.parse(cleaned) as Partial<ProfileOverride>;
-    } catch (error) {
-      const isRetryable =
-        error instanceof Error &&
-        (error.message.includes('500') ||
-          error.message.includes('socket') ||
-          error.message.includes('overloaded') ||
-          error.message.includes('Internal server error'));
-
-      if (isRetryable && attempt < 2) {
-        const delay = (attempt + 1) * 3000;
-        await new Promise((r) => setTimeout(r, delay));
-        return makeRequest(attempt + 1);
-      }
-      throw error;
+    const textBlock = message.content.find((b) => b.type === 'text');
+    if (!textBlock || textBlock.type !== 'text') {
+      throw new Error('No text response from Claude');
     }
-  };
 
-  return makeRequest(0);
+    return stripCodeFences(textBlock.text);
+  } catch (error) {
+    const isRetryable =
+      error instanceof Error &&
+      (error.message.includes('500') ||
+        error.message.includes('socket') ||
+        error.message.includes('overloaded') ||
+        error.message.includes('Internal server error'));
+
+    if (isRetryable && attempt < 2) {
+      const delay = (attempt + 1) * 3000;
+      await new Promise((r) => setTimeout(r, delay));
+      return callClaude(client, system, userMessage, attempt + 1);
+    }
+    throw error;
+  }
+}
+
+async function generateOverrides(
+  client: Anthropic,
+  base: ResumeData,
+  jobDescription: string,
+  feedbackFromValidation?: string
+): Promise<Partial<ProfileOverride>> {
+  let userMessage = `## Base Resume (JSON)\n\`\`\`json\n${JSON.stringify(base, null, 2)}\n\`\`\`\n\n## Job Description\n${jobDescription}\n\nProduce the tailored override JSON now.`;
+
+  if (feedbackFromValidation) {
+    userMessage += `\n\n## IMPORTANT: Previous attempt had fabrication issues\nThe following violations were found. Fix them by using ONLY content from the base resume:\n${feedbackFromValidation}`;
+  }
+
+  const raw = await callClaude(client, SYSTEM_PROMPT, userMessage);
+  const parsed = JSON.parse(raw);
+
+  // Zod validation
+  const result = ProfileOverrideSchema.safeParse(parsed);
+  if (!result.success) {
+    const issues = result.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; ');
+    throw new Error(`Invalid AI output structure: ${issues}`);
+  }
+
+  return result.data as Partial<ProfileOverride>;
+}
+
+async function validateOverrides(
+  client: Anthropic,
+  groundTruth: GroundTruth,
+  overrides: Partial<ProfileOverride>
+): Promise<ValidationResult> {
+  const userMessage = `## Ground Truth (all verified facts)\n\`\`\`json\n${JSON.stringify(groundTruth, null, 2)}\n\`\`\`\n\n## Generated Override to Validate\n\`\`\`json\n${JSON.stringify(overrides, null, 2)}\n\`\`\`\n\nValidate the override against the ground truth and return your findings as JSON.`;
+
+  const raw = await callClaude(client, VALIDATION_SYSTEM_PROMPT, userMessage);
+
+  try {
+    const parsed = JSON.parse(raw);
+    return {
+      valid: !!parsed.valid,
+      violations: Array.isArray(parsed.violations) ? parsed.violations : [],
+    };
+  } catch {
+    // If validator response is malformed, treat as unvalidated
+    return { valid: false, violations: [{ section: 'system', field: 'validator', generated: raw.slice(0, 200), issue: 'unverifiable', suggestion: 'Validator returned malformed response' }] };
+  }
+}
+
+function formatViolationsAsFeedback(violations: ValidationViolation[]): string {
+  return violations.map((v, i) =>
+    `${i + 1}. [${v.section}] "${v.generated}" — ${v.issue}: ${v.suggestion}`
+  ).join('\n');
+}
+
+export async function tailorResumeWithValidation(
+  base: ResumeData,
+  jobDescription: string,
+  groundTruth: GroundTruth
+): Promise<GenerationPipelineResult> {
+  const client = getClient();
+  const maxRetries = 2;
+  let retryCount = 0;
+  let overrides: Partial<ProfileOverride>;
+  let validation: ValidationResult;
+
+  // Initial generation
+  overrides = await generateOverrides(client, base, jobDescription);
+
+  // Validation loop
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    validation = await validateOverrides(client, groundTruth, overrides);
+
+    if (validation.valid || attempt === maxRetries) {
+      return { overrides, validation, retryCount };
+    }
+
+    // Re-generate with feedback
+    retryCount++;
+    const feedback = formatViolationsAsFeedback(validation.violations);
+    overrides = await generateOverrides(client, base, jobDescription, feedback);
+  }
+
+  // Should not reach here, but TypeScript needs it
+  return { overrides, validation: { valid: false, violations: [] }, retryCount };
 }

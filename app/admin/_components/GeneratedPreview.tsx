@@ -1,13 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import DiffView from './DiffView';
+
+interface ValidationViolation {
+  section: string;
+  field: string;
+  generated: string;
+  issue: string;
+  suggestion: string;
+}
+
+interface ValidationResult {
+  valid: boolean;
+  violations: ValidationViolation[];
+}
 
 interface GeneratedPreviewProps {
   overrides: Record<string, unknown>;
+  validation?: ValidationResult;
+  password: string;
 }
 
-export default function GeneratedPreview({ overrides }: GeneratedPreviewProps) {
-  const [showJson, setShowJson] = useState(false);
+type ViewMode = 'formatted' | 'diff' | 'json';
+
+export default function GeneratedPreview({ overrides, validation, password }: GeneratedPreviewProps) {
+  const [viewMode, setViewMode] = useState<ViewMode>('formatted');
+  const [base, setBase] = useState<Record<string, unknown> | null>(null);
+  const [showViolations, setShowViolations] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/base', {
+          headers: { 'x-admin-password': password },
+        });
+        if (res.ok) {
+          setBase(await res.json());
+        }
+      } catch { /* base load failed, diff view won't be available */ }
+    })();
+  }, [password]);
 
   const hero = overrides.hero as { headline?: string; description?: string } | undefined;
   const experience = overrides.experience as Array<{
@@ -25,18 +58,93 @@ export default function GeneratedPreview({ overrides }: GeneratedPreviewProps) {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.75rem' }}>
-        <button
-          onClick={() => setShowJson(!showJson)}
-          style={styles.toggleBtn}
+      {/* Validation banner */}
+      {validation && (
+        <div
+          style={{
+            ...styles.validationBanner,
+            background: validation.valid ? 'rgba(45,212,168,0.08)' : 'rgba(251,191,36,0.08)',
+            borderColor: validation.valid ? 'rgba(45,212,168,0.3)' : 'rgba(251,191,36,0.3)',
+          }}
         >
-          {showJson ? 'Formatted View' : 'Raw JSON'}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  background: validation.valid ? '#2dd4a8' : '#fbbf24',
+                }}
+              />
+              <span style={{ color: validation.valid ? '#2dd4a8' : '#fbbf24', fontSize: '0.8rem' }}>
+                {validation.valid
+                  ? 'All fact checks passed'
+                  : `${validation.violations.length} potential issue${validation.violations.length !== 1 ? 's' : ''} found`}
+              </span>
+            </div>
+            {!validation.valid && validation.violations.length > 0 && (
+              <button
+                onClick={() => setShowViolations(!showViolations)}
+                style={styles.toggleViolationsBtn}
+              >
+                {showViolations ? 'Hide details' : 'Show details'}
+              </button>
+            )}
+          </div>
+          {showViolations && validation.violations.length > 0 && (
+            <div style={styles.violationsList}>
+              {validation.violations.map((v, i) => (
+                <div key={i} style={styles.violationItem}>
+                  <div style={styles.violationHeader}>
+                    <span style={styles.violationSection}>{v.section}</span>
+                    <span style={styles.violationIssue}>{v.issue.replace(/_/g, ' ')}</span>
+                  </div>
+                  <div style={styles.violationGenerated}>&ldquo;{v.generated}&rdquo;</div>
+                  <div style={styles.violationSuggestion}>{v.suggestion}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* View mode toggles */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.75rem', gap: '0.25rem' }}>
+        <button
+          onClick={() => setViewMode('formatted')}
+          style={viewMode === 'formatted' ? styles.toggleBtnActive : styles.toggleBtn}
+        >
+          Formatted
+        </button>
+        <button
+          onClick={() => setViewMode('diff')}
+          disabled={!base}
+          style={viewMode === 'diff' ? styles.toggleBtnActive : styles.toggleBtn}
+        >
+          Diff View
+        </button>
+        <button
+          onClick={() => setViewMode('json')}
+          style={viewMode === 'json' ? styles.toggleBtnActive : styles.toggleBtn}
+        >
+          Raw JSON
         </button>
       </div>
 
-      {showJson ? (
+      {/* Diff view */}
+      {viewMode === 'diff' && base && (
+        <DiffView base={base} overrides={overrides} />
+      )}
+
+      {/* Raw JSON */}
+      {viewMode === 'json' && (
         <pre style={styles.json}>{JSON.stringify(overrides, null, 2)}</pre>
-      ) : (
+      )}
+
+      {/* Formatted view */}
+      {viewMode === 'formatted' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {hero && (
             <div style={styles.card}>
@@ -133,11 +241,76 @@ export default function GeneratedPreview({ overrides }: GeneratedPreviewProps) {
 }
 
 const styles: Record<string, React.CSSProperties> = {
+  validationBanner: {
+    padding: '0.75rem 1rem',
+    borderRadius: 8,
+    border: '1px solid',
+    marginBottom: '0.75rem',
+    fontFamily: "'DM Mono', monospace",
+  },
+  toggleViolationsBtn: {
+    fontSize: '0.68rem',
+    color: '#fbbf24',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    fontFamily: "'DM Mono', monospace",
+    textDecoration: 'underline',
+  },
+  violationsList: {
+    marginTop: '0.75rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.5rem',
+  },
+  violationItem: {
+    background: 'rgba(0,0,0,0.2)',
+    borderRadius: 6,
+    padding: '0.6rem 0.75rem',
+  },
+  violationHeader: {
+    display: 'flex',
+    gap: '0.5rem',
+    alignItems: 'center',
+    marginBottom: '0.25rem',
+  },
+  violationSection: {
+    fontSize: '0.64rem',
+    color: '#7c6cfa',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.08em',
+  },
+  violationIssue: {
+    fontSize: '0.64rem',
+    color: '#fbbf24',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.08em',
+  },
+  violationGenerated: {
+    fontSize: '0.78rem',
+    color: '#ef4444',
+    fontStyle: 'italic',
+    marginBottom: '0.2rem',
+  },
+  violationSuggestion: {
+    fontSize: '0.74rem',
+    color: '#a8a8b8',
+  },
   toggleBtn: {
     fontSize: '0.7rem',
     color: '#70708a',
     background: 'transparent',
     border: '1px solid #2a2a30',
+    borderRadius: 4,
+    padding: '0.3rem 0.7rem',
+    cursor: 'pointer',
+    fontFamily: "'DM Mono', monospace",
+  },
+  toggleBtnActive: {
+    fontSize: '0.7rem',
+    color: '#e8e8ec',
+    background: '#2a2a30',
+    border: '1px solid #38383f',
     borderRadius: 4,
     padding: '0.3rem 0.7rem',
     cursor: 'pointer',

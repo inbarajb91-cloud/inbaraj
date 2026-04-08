@@ -12,11 +12,25 @@ interface RegistryEntry {
   active: boolean;
 }
 
+interface ValidationViolation {
+  section: string;
+  field: string;
+  generated: string;
+  issue: string;
+  suggestion: string;
+}
+
+interface ValidationResult {
+  valid: boolean;
+  violations: ValidationViolation[];
+}
+
 interface GeneratedProfile {
   slug: string;
   companyName: string;
   date: string;
   overrides: Record<string, unknown>;
+  validation?: ValidationResult;
 }
 
 export default function AdminPage() {
@@ -308,9 +322,10 @@ export default function AdminPage() {
                     <button
                       onClick={handlePublish}
                       disabled={publishing}
-                      style={styles.publishBtn}
+                      style={generated.validation && !generated.validation.valid ? styles.publishBtnWarn : styles.publishBtn}
+                      title={generated.validation && !generated.validation.valid ? 'Validation found potential issues — review before publishing' : undefined}
                     >
-                      {publishing ? 'Publishing...' : 'Publish'}
+                      {publishing ? 'Publishing...' : generated.validation && !generated.validation.valid ? 'Publish (with warnings)' : 'Publish'}
                     </button>
                     <button
                       onClick={() => setGenerated(null)}
@@ -320,7 +335,7 @@ export default function AdminPage() {
                     </button>
                   </div>
                 </div>
-                <GeneratedPreview overrides={generated.overrides} />
+                <GeneratedPreview overrides={generated.overrides} validation={generated.validation} password={storedPassword} />
               </div>
             )}
           </div>
@@ -522,6 +537,17 @@ const styles: Record<string, React.CSSProperties> = {
   publishBtn: {
     padding: '0.5rem 1.2rem',
     background: '#2dd4a8',
+    color: '#0a0a0b',
+    border: 'none',
+    borderRadius: 6,
+    fontSize: '0.8rem',
+    fontWeight: 500,
+    cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+  },
+  publishBtnWarn: {
+    padding: '0.5rem 1.2rem',
+    background: '#fbbf24',
     color: '#0a0a0b',
     border: 'none',
     borderRadius: 6,
