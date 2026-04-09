@@ -35,7 +35,7 @@ interface GeneratedProfile {
 }
 
 type WizardPhase =
-  | { phase: 'intake'; step: 'url' | 'company' | 'role' | 'jd' | 'confirm' }
+  | { phase: 'intake'; step: 'url' | 'company' | 'role' | 'jd' | 'confirm' | 'select-source' | 'adapt-details' }
   | { phase: 'processing' }
   | { phase: 'review' }
   | { phase: 'publishing' }
@@ -62,7 +62,8 @@ function getWizardStepIndex(phase: WizardPhase): number {
   switch (phase.phase) {
     case 'intake': {
       if (phase.step === 'url') return 0;
-      // All detail steps (company/role/jd/confirm) map to "Details"
+      if (phase.step === 'select-source') return 0;
+      // All detail steps (company/role/jd/confirm/adapt-details) map to "Details"
       return 1;
     }
     case 'processing': return 2;
@@ -234,6 +235,10 @@ export default function AdminPage() {
   const [scrapeError, setScrapeError] = useState<string>('');
   const [scrapeUrlValue, setScrapeUrlValue] = useState<string>('');
 
+  // Adapt-from-existing state
+  const [adaptSource, setAdaptSource] = useState<string | null>(null); // slug or null for base
+  const [adaptInstruction, setAdaptInstruction] = useState<string>('');
+
   // Inline editing state (pre-publish)
   const [editMode, setEditMode] = useState(false);
   const [baseData, setBaseData] = useState<Record<string, unknown> | null>(null);
@@ -331,6 +336,8 @@ export default function AdminPage() {
     setScrapeState('idle');
     setScrapeError('');
     setScrapeUrlValue('');
+    setAdaptSource(null);
+    setAdaptInstruction('');
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
@@ -375,6 +382,48 @@ export default function AdminPage() {
         text: error instanceof Error ? error.message : 'Something went wrong generating your resume. Try again?',
       });
       setWizardPhase({ phase: 'intake', step: scrapeUrlValue ? 'confirm' : 'jd' });
+    } finally {
+      abortControllerRef.current = null;
+    }
+  };
+
+  const handleStartAdapt = async () => {
+    setWizardPhase({ phase: 'processing' });
+    setMessage(null);
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    try {
+      const res = await fetch('/api/adapt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': storedPassword,
+        },
+        body: JSON.stringify({
+          sourceSlug: adaptSource,
+          companyName: intakeData.companyName,
+          roleLabel: intakeData.roleLabel || undefined,
+          instruction: adaptInstruction,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Adaptation failed');
+      }
+
+      const data = await res.json();
+      setGenerated(data);
+      setViolationDecisions({});
+      setWizardPhase({ phase: 'review' });
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      setMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Something went wrong adapting your resume. Try again?',
+      });
+      setWizardPhase({ phase: 'intake', step: 'adapt-details' });
     } finally {
       abortControllerRef.current = null;
     }
@@ -686,6 +735,7 @@ export default function AdminPage() {
                   onNext={() => {
                     if (wizardPhase.step === 'company') setWizardPhase({ phase: 'intake', step: 'role' });
                     else if (wizardPhase.step === 'role') setWizardPhase({ phase: 'intake', step: 'jd' });
+                    else if (wizardPhase.step === 'select-source') setWizardPhase({ phase: 'intake', step: 'adapt-details' });
                   }}
                   onBack={() => {
                     if (wizardPhase.step === 'company') {
@@ -695,14 +745,20 @@ export default function AdminPage() {
                     } else if (wizardPhase.step === 'jd') {
                       setWizardPhase({ phase: 'intake', step: 'role' });
                     } else if (wizardPhase.step === 'confirm') {
-                      // Going back from confirm resets to URL step
                       setScrapeState('idle');
                       setScrapeError('');
+                      setWizardPhase({ phase: 'intake', step: 'url' });
+                    } else if (wizardPhase.step === 'adapt-details') {
+                      setWizardPhase({ phase: 'intake', step: 'select-source' });
+                    } else if (wizardPhase.step === 'select-source') {
+                      setAdaptSource(null);
+                      setAdaptInstruction('');
                       setWizardPhase({ phase: 'intake', step: 'url' });
                     }
                   }}
                   onStartTailoring={handleStartTailoring}
                   onEnterManually={() => setWizardPhase({ phase: 'intake', step: 'company' })}
+                  onAdaptExisting={() => setWizardPhase({ phase: 'intake', step: 'select-source' })}
                   scrapeState={scrapeState}
                   scrapeError={scrapeError}
                   scrapeUrl={scrapeUrlValue}
@@ -714,6 +770,12 @@ export default function AdminPage() {
                     }
                   }}
                   onScrapeSubmit={handleScrapeUrl}
+                  registry={registry}
+                  adaptSource={adaptSource}
+                  onAdaptSourceChange={setAdaptSource}
+                  adaptInstruction={adaptInstruction}
+                  onAdaptInstructionChange={setAdaptInstruction}
+                  onStartAdapt={handleStartAdapt}
                 />
               </FadeIn>
             )}
@@ -723,7 +785,8 @@ export default function AdminPage() {
               <FadeIn>
                 <ProcessingView onCancel={() => {
                   abortControllerRef.current?.abort();
-                  setWizardPhase({ phase: 'intake', step: scrapeUrlValue ? 'confirm' : 'jd' });
+                  const backStep = adaptSource !== null ? 'adapt-details' : scrapeUrlValue ? 'confirm' : 'jd';
+                  setWizardPhase({ phase: 'intake', step: backStep });
                 }} />
               </FadeIn>
             )}
@@ -771,7 +834,8 @@ export default function AdminPage() {
                         onClick={() => {
                           if (confirm('Going back will discard the generated resume. You\'ll need to generate again, which uses an API call. Continue?')) {
                             setEditMode(false);
-                            setWizardPhase({ phase: 'intake', step: scrapeUrlValue ? 'confirm' : 'jd' });
+                            const backStep = adaptSource !== null ? 'adapt-details' : scrapeUrlValue ? 'confirm' : 'jd';
+                            setWizardPhase({ phase: 'intake', step: backStep });
                           }
                         }}
                         style={styles.discardBtn}

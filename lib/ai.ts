@@ -91,6 +91,30 @@ Return ONLY a JSON object in this exact format (no markdown, no code fences):
 If everything checks out, return {"valid": true, "violations": []}.
 Only flag genuine fabrication. Do NOT flag reasonable rephrasings.`;
 
+const ADAPT_SYSTEM_PROMPT = `You are a resume adaptation expert. Given a candidate's current resume data (JSON) and specific instructions on what to change, produce an updated version.
+
+Rules:
+1. ONLY modify what the user asks for. Keep everything else unchanged.
+2. NEVER fabricate or invent new experience, skills, metrics, or claims.
+3. Every bullet point in your output MUST be based on content from the source resume. Do not invent new ones.
+4. Every skill MUST be derivable from existing skills — rephrasing is OK, but inventing new skills is NOT.
+5. Every metric or number MUST exist in the source resume. Do not invent percentages, dollar amounts, or quantities.
+6. You may reword, reorder, re-emphasize, add custom sections (from existing content), or hide sections as instructed.
+7. Return ONLY a JSON object with the fields that differ from the source. Do not include unchanged fields.
+8. The response must be valid JSON — no markdown, no code fences, no commentary.
+
+The override format:
+{
+  "hero": { "headline": "...", "description": "..." },
+  "experience": [...],
+  "skills": [...],
+  "projects": [...] or false,
+  "summary": "...",
+  "customSections": [{ "id": "...", "title": "...", "position": "after:skills", "items": [...] }]
+}
+
+Only include fields you are changing. The system will deep-merge your overrides with the base.`;
+
 function stripCodeFences(text: string): string {
   let cleaned = text.trim();
   if (cleaned.startsWith('```')) {
@@ -225,5 +249,60 @@ export async function tailorResumeWithValidation(
   }
 
   // Should not reach here, but TypeScript needs it
+  return { overrides, validation: { valid: false, violations: [] }, retryCount };
+}
+
+async function generateAdaptOverrides(
+  client: Anthropic,
+  sourceResume: ResumeData,
+  instruction: string,
+  feedbackFromValidation?: string
+): Promise<Partial<ProfileOverride>> {
+  let userMessage = `## Source Resume (JSON)\n\`\`\`json\n${JSON.stringify(sourceResume, null, 2)}\n\`\`\`\n\n## What to change\n${instruction}\n\nProduce the override JSON reflecting these changes.`;
+
+  if (feedbackFromValidation) {
+    userMessage += `\n\n## IMPORTANT: Previous attempt had fabrication issues\nThe following violations were found. Fix them by using ONLY content from the source resume:\n${feedbackFromValidation}`;
+  }
+
+  const raw = await callClaude(client, ADAPT_SYSTEM_PROMPT, userMessage);
+  const parsed = JSON.parse(raw);
+
+  const result = ProfileOverrideSchema.safeParse(parsed);
+  if (!result.success) {
+    const issues = result.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; ');
+    throw new Error(`Invalid AI output structure: ${issues}`);
+  }
+
+  return result.data as Partial<ProfileOverride>;
+}
+
+export async function adaptResumeWithValidation(
+  sourceResume: ResumeData,
+  instruction: string,
+  groundTruth: GroundTruth
+): Promise<GenerationPipelineResult> {
+  const client = getClient();
+  const maxRetries = 2;
+  let retryCount = 0;
+  let overrides: Partial<ProfileOverride>;
+  let validation: ValidationResult;
+
+  // Initial generation
+  overrides = await generateAdaptOverrides(client, sourceResume, instruction);
+
+  // Validation loop
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    validation = await validateOverrides(client, groundTruth, overrides);
+
+    if (validation.valid || attempt === maxRetries) {
+      return { overrides, validation, retryCount };
+    }
+
+    // Re-generate with feedback
+    retryCount++;
+    const feedback = formatViolationsAsFeedback(validation.violations);
+    overrides = await generateAdaptOverrides(client, sourceResume, instruction, feedback);
+  }
+
   return { overrides, validation: { valid: false, violations: [] }, retryCount };
 }
