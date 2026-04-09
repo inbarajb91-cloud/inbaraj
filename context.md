@@ -130,6 +130,10 @@ The "Download CV" button triggers `window.print()`. A `@media print` CSS rule hi
 | Apr 9 | UX improvements: semantic validator, Keep/Remove buttons, side-by-side diff |
 | Apr 9 | Added BA & Integration highlights to Facilio experience |
 | Apr 9 | PR #4 merged to main |
+| Apr 9 | Phase 1: Friendly language overhaul across 6 admin components |
+| Apr 9 | Phase 1: Wizard flow — 5-phase sequential creation experience |
+| Apr 9 | Phase 1: Step-by-step intake, processing view, published view |
+| Apr 9 | PR #5 created for Phase 1 |
 
 ---
 
@@ -142,11 +146,15 @@ All items implemented and merged via PR #4:
 - Semantic validator (not keyword matching), Keep/Remove violation actions
 - BA & Integration highlights added to base resume
 
-### Phase 1: Agentic UX overhaul
-Repackage the admin dashboard as an "agent" experience:
-- Replace tech jargon ("deploying to Vercel", "committing to GitHub") with user-friendly language ("Publishing your resume...", "Your page is now live!")
-- Conversational wrapper — system feels like talking to an assistant
-- Progress states visible to user without technical detail
+### Phase 1: Agentic UX overhaul (COMPLETED Apr 9, 2026)
+All items implemented via PR #5:
+- Replaced all tech jargon with user-friendly conversational language
+- 5-phase wizard flow: Intake → Processing → Review → Publishing → Published
+- Step-by-step intake (one field per screen with conversational prompts)
+- Multi-step progress indicator during generation
+- FadeIn transitions, breadcrumb navigation, tab-switch guard
+- Cancel support during processing, Revise with cost warning
+- Published phase with inline live-check and success actions
 
 ### Phase 2: URL-based JD scraping (Apify)
 Instead of pasting raw job descriptions, allow pasting a URL (LinkedIn job posting, company careers page). An Apify actor scrapes the content and extracts the JD automatically. Requires `APIFY_API_KEY` env var and a new API route.

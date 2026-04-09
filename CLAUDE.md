@@ -144,6 +144,15 @@ The current single-prompt approach does NOT reliably prevent fabrication. Claude
 ### ResumePrint is a separate render tree
 `ResumePrint.tsx` renders a completely independent layout for PDF. It must be updated separately from the visible page components. It receives the same merged `data` prop but renders with its own inline styles for print formatting. It also renders `customSections` so AI-added sections appear in PDFs.
 
+### Admin create flow is a wizard state machine
+The "create" tab in `/admin` uses a `WizardPhase` discriminated union to render one phase at a time (intake → processing → review → publishing → published). State lives in `page.tsx`. The `JDForm` component is presentational — it receives `step`, `data`, and callbacks from the parent. Do NOT add internal state to `JDForm`.
+
+### Intake data lives in page.tsx, not JDForm
+`intakeData` (companyName, roleLabel, jobDescription) is stored in `page.tsx` and passed down to `JDForm`. This ensures data persists across back/forward navigation between intake steps.
+
+### AbortController for generation cancellation
+`handleStartTailoring` creates an `AbortController` stored in `abortControllerRef`. The Cancel button in `ProcessingView` calls `abort()` and resets to the JD step. The catch block checks for `AbortError` to avoid showing an error message on intentional cancellation.
+
 ## Session handoff protocol
 
 When the user says **"session completed"** (or similar), follow this checklist before ending:
@@ -176,31 +185,27 @@ I'm continuing development on my portfolio + resume customization site at inbara
 A Next.js 16 App Router site deployed on Vercel with:
 - Base resume at `/` (from `data/base.json`)
 - AI-tailored company profiles at `/r/<company-name>` (generated via Claude API)
-- Admin dashboard at `/admin` — login, paste JD, generate, preview, publish
+- Admin dashboard at `/admin` — "Resume Studio" with wizard flow
 - Cookie-based isolation so HR can't discover the base resume
 - GitHub API as database (profile JSONs committed to repo)
 - PDF download with `window.print()` + print-optimized template
 - Phase 0 anti-hallucination pipeline: generate → validate → retry with ground truth, Zod schemas, semantic validation, Keep/Remove violation actions, side-by-side diff view
+- Phase 1 agentic UX: 5-phase wizard (intake → processing → review → publishing → published), friendly language throughout, step-by-step intake, breadcrumb navigation, FadeIn transitions
 
-## What to work on next: Phase 1 — Agentic UX overhaul
+## What to work on next: Phase 2 — URL-based JD scraping
 From the checklist in memory.md:
-- [ ] Replace tech jargon with user-friendly language throughout admin
-- [ ] Conversational agent wrapper — feels like talking to an assistant
-- [ ] Progress states visible without technical detail
-- [ ] Package generation as a multi-step agent with visible workflow states
+- [ ] Apify integration — paste a URL instead of raw JD text
+- [ ] `APIFY_API_KEY` env var and scraper API route
+- [ ] Support LinkedIn job posts, company careers pages
+- [ ] Fallback to manual paste if scrape fails
 
-The admin dashboard currently uses developer-facing language ("deploying to Vercel", "committing to GitHub", "Zod validation"). Repackage it so it feels like talking to an assistant: "Publishing your resume...", "Your page is now live!", "I found 3 things to check before publishing".
+The current wizard asks the user to paste a full job description. Phase 2 adds an option to paste a URL instead — the system scrapes the page (via Apify) and extracts the JD automatically. The manual paste remains as a fallback.
 
-Key areas to transform:
-- Generation loading state → multi-step progress ("Tailoring your resume..." → "Checking for accuracy..." → "Almost done...")
-- Validation violations → friendly language ("I noticed a few things that might not match your actual experience")
-- Publish flow → "Publishing your resume page..." → "Your page is live at inbaraj.info/r/company"
-- Error messages → human-friendly, not stack traces
+This should integrate into the wizard's JD step (step 3 of intake): add a toggle or auto-detect between URL and text input. If a URL is pasted, show a "Fetching job description..." state, then populate the textarea with the scraped content for the user to review before proceeding.
 
-## After Phase 1, the full roadmap is:
-- Phase 2: Apify URL scraping (paste URL instead of JD text)
+## After Phase 2, the full roadmap is:
 - Phase 3: Inline editing with AI assist (highlight-to-edit, manual or AI)
 - Phase 4: Security audit (XSS, auth, rate limiting, CSRF)
 
-Start by reading the three docs, then proceed with Phase 1.
+Start by reading the three docs, then proceed with Phase 2.
 ```
