@@ -77,10 +77,10 @@ export default function AdminPage() {
       } else {
         setAuthenticated(false);
         sessionStorage.removeItem('admin_pwd');
-        setMessage({ type: 'error', text: 'Invalid password' });
+        setMessage({ type: 'error', text: 'That password didn\'t work. Try again?' });
       }
     } catch {
-      setMessage({ type: 'error', text: 'Failed to load profiles' });
+      setMessage({ type: 'error', text: 'Couldn\'t load your profiles. Please refresh the page.' });
     }
   };
 
@@ -101,7 +101,7 @@ export default function AdminPage() {
         if (res.ok) {
           setLiveCheckStatus('live');
           setLiveCheckSlug(null);
-          setMessage({ type: 'success', text: `Profile is now live at ${liveCheckUrl}` });
+          setMessage({ type: 'success', text: `Your page is live! ${liveCheckUrl}` });
           clearInterval(interval);
         }
       } catch { /* still building */ }
@@ -130,11 +130,11 @@ export default function AdminPage() {
       const data = await res.json();
       setGenerated(data);
       setViolationDecisions({});
-      setMessage({ type: 'success', text: `Generated tailored resume for ${companyName}` });
+      setMessage({ type: 'success', text: `Your tailored resume for ${companyName} is ready!` });
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error instanceof Error ? error.message : 'Generation failed',
+        text: error instanceof Error ? error.message : 'Something went wrong generating your resume. Try again?',
       });
     } finally {
       setGenerating(false);
@@ -163,7 +163,7 @@ export default function AdminPage() {
       const fullUrl = `${window.location.origin}${data.url}`;
       setMessage({
         type: 'success',
-        text: `Published to GitHub! Waiting for Vercel to rebuild... Checking ${fullUrl} every 15s.`,
+        text: `Publishing your resume page... This usually takes about a minute.`,
       });
       setLiveCheckUrl(fullUrl);
       setLiveCheckSlug(data.slug);
@@ -174,7 +174,7 @@ export default function AdminPage() {
     } catch (error) {
       setMessage({
         type: 'error',
-        text: error instanceof Error ? error.message : 'Publish failed',
+        text: error instanceof Error ? error.message : 'Something went wrong publishing your page. Try again?',
       });
     } finally {
       setPublishing(false);
@@ -182,19 +182,19 @@ export default function AdminPage() {
   };
 
   const handleDelete = async (slug: string) => {
-    if (!confirm(`Delete profile ${registry[slug]?.company}?`)) return;
+    if (!confirm(`Remove the ${registry[slug]?.company} profile? This can't be undone.`)) return;
     try {
       const res = await fetch(`/api/profiles/${slug}`, {
         method: 'DELETE',
         headers: { 'x-admin-password': storedPassword },
       });
       if (res.ok) {
-        setMessage({ type: 'success', text: 'Profile deleted' });
+        setMessage({ type: 'success', text: 'Profile removed successfully' });
         setActiveTab('base');
         loadProfiles(storedPassword);
       }
     } catch {
-      setMessage({ type: 'error', text: 'Delete failed' });
+      setMessage({ type: 'error', text: 'Something went wrong removing the profile. Try again?' });
     }
   };
 
@@ -235,8 +235,8 @@ export default function AdminPage() {
     <div style={styles.container}>
       <header style={styles.header}>
         <div>
-          <h1 style={styles.title}>Resume Admin</h1>
-          <p style={styles.subtitle}>Manage base resume and company-specific profiles</p>
+          <h1 style={styles.title}>Resume Studio</h1>
+          <p style={styles.subtitle}>Create tailored resumes for specific companies</p>
         </div>
       </header>
 
@@ -268,7 +268,7 @@ export default function AdminPage() {
           gap: '0.5rem',
         }}>
           <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#f59e0b', animation: 'pulse 1.5s infinite' }} />
-          Vercel is rebuilding... checking {liveCheckUrl} every 15s
+          Publishing your page... this usually takes about a minute
         </div>
       )}
       {liveCheckStatus === 'live' && liveCheckUrl && (
@@ -286,7 +286,7 @@ export default function AdminPage() {
           gap: '0.5rem',
         }}>
           <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#22c55e' }} />
-          Live! <a href={liveCheckUrl} target="_blank" rel="noopener" style={{ color: '#16a34a', textDecoration: 'underline' }}>{liveCheckUrl}</a>
+          Your page is live! <a href={liveCheckUrl} target="_blank" rel="noopener" style={{ color: '#16a34a', textDecoration: 'underline' }}>{liveCheckUrl}</a>
         </div>
       )}
 
@@ -302,7 +302,7 @@ export default function AdminPage() {
             <div style={styles.sectionHeader}>
               <h2 style={styles.sectionTitle}>Base Resume</h2>
               <a href="/" target="_blank" rel="noopener" style={styles.linkBtn}>
-                View Live ↗
+                View page ↗
               </a>
             </div>
             <ProfilePreview slug={null} password={storedPassword} />
@@ -311,17 +311,17 @@ export default function AdminPage() {
 
         {activeTab === 'create' && (
           <div>
-            <h2 style={styles.sectionTitle}>Create New Profile</h2>
+            <h2 style={styles.sectionTitle}>Create New Resume</h2>
             <JDForm onGenerate={handleGenerate} generating={generating} />
             {generated && (
               <div style={styles.generatedSection}>
                 <div style={styles.generatedHeader}>
                   <div>
                     <h3 style={styles.generatedTitle}>
-                      Generated: {generated.companyName}
+                      Tailored for {generated.companyName}
                     </h3>
                     <p style={styles.generatedSlug}>
-                      Slug: <code>{generated.slug}</code> &mdash; URL: /r/{generated.slug}
+                      Your page: inbaraj.info/r/{generated.slug}
                     </p>
                   </div>
                   <div style={styles.generatedActions}>
@@ -336,14 +336,14 @@ export default function AdminPage() {
                       title={(() => {
                         if (!generated.validation || generated.validation.valid) return undefined;
                         const unresolvedCount = generated.validation.violations.filter((_, i) => !violationDecisions[i]).length;
-                        return unresolvedCount > 0 ? `${unresolvedCount} unresolved issues — review before publishing` : undefined;
+                        return unresolvedCount > 0 ? `${unresolvedCount} items need your review before publishing` : undefined;
                       })()}
                     >
                       {(() => {
                         if (publishing) return 'Publishing...';
                         if (!generated.validation || generated.validation.valid) return 'Publish';
                         const unresolvedCount = generated.validation.violations.filter((_, i) => !violationDecisions[i]).length;
-                        return unresolvedCount > 0 ? `Publish (${unresolvedCount} unresolved)` : 'Publish';
+                        return unresolvedCount > 0 ? `Publish (${unresolvedCount} to review)` : 'Publish';
                       })()}
                     </button>
                     <button
@@ -374,14 +374,14 @@ export default function AdminPage() {
                   {registry[activeTab]?.company}
                 </h2>
                 <p style={styles.profileMeta}>
-                  Slug: <code>{activeTab}</code> &middot; Created: {registry[activeTab]?.created} &middot;{' '}
+                  inbaraj.info/r/{activeTab} &middot; Created {registry[activeTab]?.created} &middot;{' '}
                   <a
                     href={`/r/${activeTab}`}
                     target="_blank"
                     rel="noopener"
                     style={styles.linkBtn}
                   >
-                    View Live ↗
+                    View page ↗
                   </a>
                 </p>
               </div>
@@ -389,14 +389,14 @@ export default function AdminPage() {
                 onClick={() => handleDelete(activeTab)}
                 style={styles.deleteBtn}
               >
-                Delete Profile
+                Remove Profile
               </button>
             </div>
             {liveCheckSlug === activeTab && liveCheckStatus === 'checking' ? (
               <div style={styles.deployingOverlay}>
                 <div style={styles.deployingSpinner} />
-                <p style={styles.deployingText}>Deploying to Vercel...</p>
-                <p style={styles.deployingSub}>The profile page will appear here once the build completes. Checking every 15s.</p>
+                <p style={styles.deployingText}>Publishing your page...</p>
+                <p style={styles.deployingSub}>Your page is being published. It&apos;ll appear here in about a minute.</p>
               </div>
             ) : (
               <ProfilePreview slug={activeTab} password={storedPassword} />

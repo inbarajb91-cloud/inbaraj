@@ -30,7 +30,7 @@ function DiffBlock({ label, oldText, newText }: { label?: string; oldText: strin
       {label && <FieldLabel>{label}</FieldLabel>}
       <div style={styles.diffPair}>
         <div style={styles.oldBlock}>
-          <div style={styles.blockLabel}>Base</div>
+          <div style={styles.blockLabel}>Original</div>
           <p style={styles.blockText}>{oldText}</p>
         </div>
         <div style={styles.newBlock}>
@@ -72,7 +72,7 @@ export default function DiffView({ base, overrides }: DiffViewProps) {
   if (!hasChanges) {
     return (
       <div style={styles.card}>
-        <p style={styles.noChanges}>No changes from base resume.</p>
+        <p style={styles.noChanges}>No changes from your original resume.</p>
       </div>
     );
   }
@@ -127,7 +127,7 @@ export default function DiffView({ base, overrides }: DiffViewProps) {
                       if (!baseBullet) {
                         return (
                           <div key={j} style={styles.newBlock}>
-                            <div style={styles.blockLabelNew}>New bullet</div>
+                            <div style={styles.blockLabelNew}>Added</div>
                             <p style={styles.blockText}>{bullet}</p>
                           </div>
                         );
@@ -142,7 +142,7 @@ export default function DiffView({ base, overrides }: DiffViewProps) {
                       return (
                         <div key={j} style={styles.diffPair}>
                           <div style={styles.oldBlock}>
-                            <div style={styles.blockLabel}>Base</div>
+                            <div style={styles.blockLabel}>Original</div>
                             <p style={styles.blockText}>{baseBullet}</p>
                           </div>
                           <div style={styles.newBlock}>
@@ -163,7 +163,7 @@ export default function DiffView({ base, overrides }: DiffViewProps) {
                       if (!baseHighlight?.text) {
                         return (
                           <div key={k} style={styles.newBlock}>
-                            <div style={styles.blockLabelNew}>{h.label || 'New highlight'}</div>
+                            <div style={styles.blockLabelNew}>{h.label || 'Added'}</div>
                             <p style={styles.blockText}>{h.text}</p>
                           </div>
                         );
@@ -181,7 +181,7 @@ export default function DiffView({ base, overrides }: DiffViewProps) {
                           <div style={styles.highlightLabel}>{h.label || baseHighlight.label}</div>
                           <div style={styles.diffPair}>
                             <div style={styles.oldBlock}>
-                              <div style={styles.blockLabel}>Base</div>
+                              <div style={styles.blockLabel}>Original</div>
                               <p style={styles.blockText}>{baseHighlight.text}</p>
                             </div>
                             <div style={styles.newBlock}>
@@ -225,7 +225,7 @@ export default function DiffView({ base, overrides }: DiffViewProps) {
                   )}
                   <div style={{ display: 'flex', gap: '1.5rem' }}>
                     <div style={{ flex: 1 }}>
-                      <div style={styles.miniLabel}>Base</div>
+                      <div style={styles.miniLabel}>Original</div>
                       {baseItems.map((item, j) => (
                         <div key={j} style={{
                           ...styles.skillItem,
@@ -243,7 +243,7 @@ export default function DiffView({ base, overrides }: DiffViewProps) {
                           ...(!baseSet.has(item) ? { color: '#2dd4a8' } : {}),
                         }}>
                           · {item}
-                          {!baseSet.has(item) && <span style={styles.newBadge}>new</span>}
+                          {!baseSet.has(item) && <span style={styles.newBadge}>added</span>}
                         </div>
                       ))}
                     </div>
@@ -258,7 +258,7 @@ export default function DiffView({ base, overrides }: DiffViewProps) {
       {/* Custom Sections (always new) */}
       {overCustomSections && overCustomSections.length > 0 && (
         <DiffCard borderColor="rgba(45,212,168,0.3)">
-          <SectionLabel>Custom Sections (added)</SectionLabel>
+          <SectionLabel>New Sections</SectionLabel>
           {overCustomSections.map((section, i) => (
             <div key={i} style={i > 0 ? { marginTop: '0.75rem' } : {}}>
               <div style={styles.skillGroupTitle}>{section.title}</div>
@@ -274,19 +274,19 @@ export default function DiffView({ base, overrides }: DiffViewProps) {
       {overrides.projects === false && (
         <DiffCard borderColor="rgba(239,68,68,0.3)">
           <SectionLabel>Projects</SectionLabel>
-          <p style={{ ...styles.noChanges, color: '#ef4444' }}>Section hidden for this profile</p>
+          <p style={{ ...styles.noChanges, color: '#ef4444' }}>This section is hidden for this version</p>
         </DiffCard>
       )}
       {overrides.experience === false && (
         <DiffCard borderColor="rgba(239,68,68,0.3)">
           <SectionLabel>Experience</SectionLabel>
-          <p style={{ ...styles.noChanges, color: '#ef4444' }}>Section hidden for this profile</p>
+          <p style={{ ...styles.noChanges, color: '#ef4444' }}>This section is hidden for this version</p>
         </DiffCard>
       )}
       {overrides.skills === false && (
         <DiffCard borderColor="rgba(239,68,68,0.3)">
           <SectionLabel>Skills</SectionLabel>
-          <p style={{ ...styles.noChanges, color: '#ef4444' }}>Section hidden for this profile</p>
+          <p style={{ ...styles.noChanges, color: '#ef4444' }}>This section is hidden for this version</p>
         </DiffCard>
       )}
     </div>
