@@ -126,20 +126,21 @@ The "Download CV" button triggers `window.print()`. A `@media print` CSS rule hi
 | Apr 8 | Changed slugs from hashes to readable company names |
 | Apr 8 | Added optional role label for multi-role slugs |
 | Apr 8 | Updated all documentation |
+| Apr 9 | Phase 0: Anti-hallucination pipeline (ground truth, Zod, validation agent, diff view) |
+| Apr 9 | UX improvements: semantic validator, Keep/Remove buttons, side-by-side diff |
+| Apr 9 | Added BA & Integration highlights to Facilio experience |
+| Apr 9 | PR #4 merged to main |
 
 ---
 
 ## Roadmap — planned next development
 
-### Phase 0: Anti-hallucination agent (CRITICAL)
-The current single-prompt approach causes Claude to fabricate skills and experience. Must implement:
-- **Ground truth file** (`data/ground-truth.json`) — accumulates verified facts from base + manual edits
-- **Generate → Validate → Review pipeline** — validator catches fabrication before user sees it
-- **Diff view** — toggle button highlights all changes from base before publishing
-- **Validation loop** — re-prompt Claude with specific feedback on failures (max 2 retries)
-- **Zod schema** enforcement on output structure
-- **Structured logging** for every generation (input, output, validation results, user edits)
-- All serverless — validation is just additional Claude API calls in the same request
+### Phase 0: Anti-hallucination agent (COMPLETED Apr 9, 2026)
+All items implemented and merged via PR #4:
+- Ground truth file, Zod schema validation, validation agent (second Claude call)
+- Validation loop with retry, structured logging, side-by-side diff view
+- Semantic validator (not keyword matching), Keep/Remove violation actions
+- BA & Integration highlights added to base resume
 
 ### Phase 1: Agentic UX overhaul
 Repackage the admin dashboard as an "agent" experience:

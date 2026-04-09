@@ -25,14 +25,17 @@ Chronological history of decisions, changes, and lessons learned across sessions
 - [x] **Session persistence** — `sessionStorage` survives refresh, cleared on tab close
 - [x] **Documentation** — `CLAUDE.md`, `memory.md`, `context.md` with gotchas and roadmap
 
-### Phase 0 — Anti-hallucination agent (CRITICAL, next)
+### Phase 0 — Anti-hallucination agent (COMPLETED)
 
-- [ ] Ground truth file (`data/ground-truth.json`) — verified facts from base + manual edits
-- [ ] Validation step — second Claude call compares output against ground truth
-- [ ] Validation loop — re-prompt with specific feedback on failures (max 2 retries)
-- [ ] Zod schema enforcement on AI output structure
-- [ ] Diff view — toggle button highlights all changes from base before publishing
-- [ ] Structured logging — input, output, validation results, user edits per generation
+- [x] Ground truth file (`data/ground-truth.json`) — verified facts from base + manual edits
+- [x] Validation step — second Claude call compares output against ground truth
+- [x] Validation loop — re-prompt with specific feedback on failures (max 2 retries)
+- [x] Zod schema enforcement on AI output structure
+- [x] Diff view — side-by-side Base/Tailored comparison panels
+- [x] Structured logging — input, output, validation results per generation
+- [x] Semantic validator — understands rephrasing, only flags genuine fabrication
+- [x] Keep/Remove buttons — per-violation actions with optional reason tracking
+- [x] BA & Integration highlights — added to Facilio experience in base.json
 
 ### Phase 1 — Agentic UX overhaul
 
@@ -275,3 +278,85 @@ Before publishing, a toggle button shows all changes from the base resume:
 - Removed text highlighted in red
 - Modified text shown side-by-side
 This is client-side only — compare base JSON vs override JSON.
+
+---
+
+## Session 4 — "Phase 0: Anti-hallucination pipeline" (Apr 9, 2026)
+
+### Context
+Continuing from Session 3, which identified AI hallucination as the #1 priority. This session implemented the full Phase 0 anti-hallucination pipeline and added new resume content.
+
+### Changes made
+
+#### Phase 0 implementation (commit: `9370132`)
+
+1. **Ground truth file** — Created `data/ground-truth.json` with all verified facts extracted from `base.json`: skills, metrics, companies, titles, tools, bullets, highlights, projects, education, locations.
+
+2. **Zod schema validation** — Created `lib/schemas.ts` with strict Zod schemas for `ProfileOverride`. Uses `.strict()` mode to reject unknown keys. Validates structure before any further processing.
+
+3. **Validation agent** — Added second Claude API call in `lib/ai.ts` that acts as a fact-checker. Compares generated overrides against ground truth. Returns structured `ValidationResult` with per-violation details (section, field, issue type, suggestion).
+
+4. **Validation loop** — If validation finds violations, re-prompts the generator with specific feedback listing each violation. Max 2 retries. Returns best result even if some issues remain.
+
+5. **Structured logging** — Created `lib/logger.ts`. Logs generation timing, validation results, and retry count as structured JSON to console (captured by Vercel Log Drain).
+
+6. **Diff view** — Created `app/admin/_components/DiffView.tsx`. Initially used inline word-level diff with strikethrough.
+
+7. **Base API endpoint** — Created `app/api/base/route.ts` (auth-protected GET) so client components can fetch base resume data for diff comparison.
+
+8. **Admin UI updates** — `GeneratedPreview.tsx` gained 3-way toggle (Formatted/Diff/Raw JSON) and validation banner. `admin/page.tsx` updated with validation-aware publish button.
+
+#### UX improvements based on user testing (commit: `4918381`)
+
+User tested on Vercel preview and reported three issues:
+
+1. **Validator was keyword-matching, not semantic** — Flagging legitimate rephrasings like "managing complex implementations" from "end-to-end enterprise rollouts". Fixed by rewriting the validator system prompt with explicit ALLOWED vs FABRICATED examples, emphasizing semantic understanding over keyword matching.
+
+2. **No way to act on violations** — Added Keep/Remove buttons per violation. "Keep" prompts for optional reason. Resolved violations fade out. Publish button shows unresolved count and turns green when all resolved.
+
+3. **Inline diff was unreadable** — Replaced inline strikethrough with side-by-side Base/Tailored panels. Each bullet, highlight, and text field shows old and new in separate colored blocks. Skills show two-column comparison.
+
+#### Resume content additions (commit: `931433c`)
+
+User requested new highlights about Business Analysis and Integration work at Facilio:
+
+1. **Business Analysis highlight** — End-to-end requirements lifecycle, BRD documentation, cross-functional collaboration with integration/product/engineering teams.
+
+2. **Integration & Configuration highlight** — SSO (SAML/SCIM) and third-party platform integrations (Xero, CorrigoPro, Equiem, Wooqer, Bill.com, SiteFotos, SFG20). API feasibility validation via Postman, integration pattern decisions (polling vs webhook), integration requirement documentation.
+
+Updated `ground-truth.json` with new highlight texts and platform names.
+
+#### Git workflow convention (commit: `c0f52ec`)
+Added to CLAUDE.md: Always push to feature branches, no squash unless fixing errors, wait for user to test before merging.
+
+### PR and merge
+- Branch: `claude/continue-portfolio-dev-7Xb5m`
+- PR #4 created and merged to main (merge commit, not squash)
+
+### Key decisions
+
+1. **Semantic validation over keyword matching** — The validator must understand that rephrasing is the whole point of resume tailoring. Only genuinely new claims (skills, metrics, experience) should be flagged.
+
+2. **Violations are advisory, not blocking** — User can Keep or Remove each violation. Publish works regardless. This respects user judgment while providing guardrails.
+
+3. **Side-by-side diff over inline** — Inline word-level diff with strikethrough is hard to read for long text. Stacked Base/Tailored panels are clearer.
+
+4. **Ground truth as flat arrays** — Not a hierarchical copy of base.json. Flat arrays of skills, metrics, bullets, etc. make it easy for the validator to search and match.
+
+### Lessons learned
+
+10. **Keyword-matching validation creates false positives.** The initial "be strict, when in doubt flag it" prompt caused the validator to flag legitimate rephrasings. Semantic understanding with explicit examples of what's allowed produces much better results.
+
+11. **Users need actionable controls, not just warnings.** Showing violations without Keep/Remove buttons was frustrating — the user could see issues but couldn't do anything about them inline.
+
+12. **Side-by-side beats inline for diff readability.** Inline word-diff with strikethrough becomes unreadable when most of the text changes. Separate panels let you read each version independently.
+
+### New files added this session
+| File | Purpose |
+|------|---------|
+| `data/ground-truth.json` | Verified facts for validation |
+| `lib/ground-truth.ts` | Ground truth loader + builder |
+| `lib/schemas.ts` | Zod schemas for AI output |
+| `lib/logger.ts` | Structured generation logging |
+| `app/api/base/route.ts` | Base resume API endpoint |
+| `app/admin/_components/DiffView.tsx` | Side-by-side diff view |

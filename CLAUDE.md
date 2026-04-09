@@ -180,26 +180,27 @@ A Next.js 16 App Router site deployed on Vercel with:
 - Cookie-based isolation so HR can't discover the base resume
 - GitHub API as database (profile JSONs committed to repo)
 - PDF download with `window.print()` + print-optimized template
+- Phase 0 anti-hallucination pipeline: generate → validate → retry with ground truth, Zod schemas, semantic validation, Keep/Remove violation actions, side-by-side diff view
 
-## Critical known issue
-The AI HALLUCINATES — it invents skills, metrics, and experience that don't exist in the base resume. See the "AI hallucination" gotcha in CLAUDE.md and the detailed write-up in memory.md. This is the #1 priority to fix.
-
-## What to work on next: Phase 0 — Anti-hallucination agent
+## What to work on next: Phase 1 — Agentic UX overhaul
 From the checklist in memory.md:
-- [ ] Ground truth file (`data/ground-truth.json`)
-- [ ] Validation step — second Claude call compares output against ground truth
-- [ ] Validation loop — re-prompt with specific feedback on failures (max 2 retries)
-- [ ] Zod schema enforcement on AI output structure
-- [ ] Diff view — toggle button highlights all changes from base before publishing
-- [ ] Structured logging — input, output, validation results per generation
+- [ ] Replace tech jargon with user-friendly language throughout admin
+- [ ] Conversational agent wrapper — feels like talking to an assistant
+- [ ] Progress states visible without technical detail
+- [ ] Package generation as a multi-step agent with visible workflow states
 
-This must all work serverless (Vercel functions, no traditional backend). The generate API route chains multiple Claude calls: generate → validate → retry if needed → return with diff.
+The admin dashboard currently uses developer-facing language ("deploying to Vercel", "committing to GitHub", "Zod validation"). Repackage it so it feels like talking to an assistant: "Publishing your resume...", "Your page is now live!", "I found 3 things to check before publishing".
 
-## After Phase 0, the full roadmap is:
-- Phase 1: Agentic UX (user-friendly language, conversational wrapper)
+Key areas to transform:
+- Generation loading state → multi-step progress ("Tailoring your resume..." → "Checking for accuracy..." → "Almost done...")
+- Validation violations → friendly language ("I noticed a few things that might not match your actual experience")
+- Publish flow → "Publishing your resume page..." → "Your page is live at inbaraj.info/r/company"
+- Error messages → human-friendly, not stack traces
+
+## After Phase 1, the full roadmap is:
 - Phase 2: Apify URL scraping (paste URL instead of JD text)
 - Phase 3: Inline editing with AI assist (highlight-to-edit, manual or AI)
 - Phase 4: Security audit (XSS, auth, rate limiting, CSRF)
 
-Start by reading the three docs, then proceed with Phase 0.
+Start by reading the three docs, then proceed with Phase 1.
 ```
