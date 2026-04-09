@@ -128,7 +128,7 @@ async function fetchGenericPage(url: string, apiKey: string): Promise<string> {
     body: JSON.stringify({
       startUrls: [{ url }],
       maxCrawlPages: 1,
-      crawlerType: 'playwright',
+      crawlerType: 'playwright:adaptive',
     }),
     signal: AbortSignal.timeout(120_000),
   });
