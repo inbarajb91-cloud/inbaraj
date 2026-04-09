@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { scrapeUrl } from '@/lib/apify';
-import { extractJobDescription } from '@/lib/scrape';
+import { extractJobData } from '@/lib/scrape';
 
 export async function POST(request: NextRequest) {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -36,17 +36,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 2: Extract JD from raw page text via Claude
-    const jobDescription = await extractJobDescription(pageText);
+    // Step 2: Extract structured job data from raw page text via Claude
+    const jobData = await extractJobData(pageText);
 
     return NextResponse.json({
-      jobDescription,
+      companyName: jobData.companyName,
+      roleTitle: jobData.roleTitle,
+      jobDescription: jobData.jobDescription,
       sourceUrl: url,
     });
   } catch (error) {
     console.error('Scrape error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to extract job description' },
+      { error: error instanceof Error ? error.message : 'Failed to extract job posting data' },
       { status: 500 }
     );
   }
