@@ -16,18 +16,33 @@ interface ValidationResult {
   violations: ValidationViolation[];
 }
 
+type ViolationDecision = {
+  action: 'keep' | 'remove';
+  reason?: string;
+};
+
 interface GeneratedPreviewProps {
   overrides: Record<string, unknown>;
   validation?: ValidationResult;
   password: string;
+  onViolationDecision?: (index: number, decision: ViolationDecision) => void;
+  violationDecisions?: Record<number, ViolationDecision>;
 }
 
 type ViewMode = 'formatted' | 'diff' | 'json';
 
-export default function GeneratedPreview({ overrides, validation, password }: GeneratedPreviewProps) {
+export default function GeneratedPreview({
+  overrides,
+  validation,
+  password,
+  onViolationDecision,
+  violationDecisions = {},
+}: GeneratedPreviewProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('formatted');
   const [base, setBase] = useState<Record<string, unknown> | null>(null);
-  const [showViolations, setShowViolations] = useState(false);
+  const [showViolations, setShowViolations] = useState(true);
+  const [reasonInputIndex, setReasonInputIndex] = useState<number | null>(null);
+  const [reasonText, setReasonText] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -56,6 +71,36 @@ export default function GeneratedPreview({ overrides, validation, password }: Ge
     items?: string[];
   }> | undefined;
 
+  const unresolvedCount = validation
+    ? validation.violations.filter((_, i) => !violationDecisions[i]).length
+    : 0;
+
+  const handleKeep = (index: number) => {
+    if (reasonInputIndex === index) {
+      // Submit the keep with reason
+      onViolationDecision?.(index, { action: 'keep', reason: reasonText || undefined });
+      setReasonInputIndex(null);
+      setReasonText('');
+    } else {
+      // Show reason input
+      setReasonInputIndex(index);
+      setReasonText('');
+    }
+  };
+
+  const handleRemove = (index: number) => {
+    onViolationDecision?.(index, { action: 'remove' });
+    if (reasonInputIndex === index) {
+      setReasonInputIndex(null);
+      setReasonText('');
+    }
+  };
+
+  const handleCancelReason = () => {
+    setReasonInputIndex(null);
+    setReasonText('');
+  };
+
   return (
     <div>
       {/* Validation banner */}
@@ -63,8 +108,16 @@ export default function GeneratedPreview({ overrides, validation, password }: Ge
         <div
           style={{
             ...styles.validationBanner,
-            background: validation.valid ? 'rgba(45,212,168,0.08)' : 'rgba(251,191,36,0.08)',
-            borderColor: validation.valid ? 'rgba(45,212,168,0.3)' : 'rgba(251,191,36,0.3)',
+            background: validation.valid
+              ? 'rgba(45,212,168,0.08)'
+              : unresolvedCount === 0
+                ? 'rgba(45,212,168,0.08)'
+                : 'rgba(251,191,36,0.08)',
+            borderColor: validation.valid
+              ? 'rgba(45,212,168,0.3)'
+              : unresolvedCount === 0
+                ? 'rgba(45,212,168,0.3)'
+                : 'rgba(251,191,36,0.3)',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -75,13 +128,15 @@ export default function GeneratedPreview({ overrides, validation, password }: Ge
                   width: 8,
                   height: 8,
                   borderRadius: '50%',
-                  background: validation.valid ? '#2dd4a8' : '#fbbf24',
+                  background: validation.valid || unresolvedCount === 0 ? '#2dd4a8' : '#fbbf24',
                 }}
               />
-              <span style={{ color: validation.valid ? '#2dd4a8' : '#fbbf24', fontSize: '0.8rem' }}>
+              <span style={{ color: validation.valid || unresolvedCount === 0 ? '#2dd4a8' : '#fbbf24', fontSize: '0.8rem' }}>
                 {validation.valid
                   ? 'All fact checks passed'
-                  : `${validation.violations.length} potential issue${validation.violations.length !== 1 ? 's' : ''} found`}
+                  : unresolvedCount === 0
+                    ? `All ${validation.violations.length} issues resolved`
+                    : `${unresolvedCount} of ${validation.violations.length} issue${validation.violations.length !== 1 ? 's' : ''} need review`}
               </span>
             </div>
             {!validation.valid && validation.violations.length > 0 && (
@@ -95,16 +150,80 @@ export default function GeneratedPreview({ overrides, validation, password }: Ge
           </div>
           {showViolations && validation.violations.length > 0 && (
             <div style={styles.violationsList}>
-              {validation.violations.map((v, i) => (
-                <div key={i} style={styles.violationItem}>
-                  <div style={styles.violationHeader}>
-                    <span style={styles.violationSection}>{v.section}</span>
-                    <span style={styles.violationIssue}>{v.issue.replace(/_/g, ' ')}</span>
+              {validation.violations.map((v, i) => {
+                const decision = violationDecisions[i];
+                const isResolved = !!decision;
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      ...styles.violationItem,
+                      ...(isResolved ? { opacity: 0.5 } : {}),
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={styles.violationHeader}>
+                          <span style={styles.violationSection}>{v.section}</span>
+                          <span style={styles.violationIssue}>{v.issue.replace(/_/g, ' ')}</span>
+                          {isResolved && (
+                            <span style={{
+                              fontSize: '0.62rem',
+                              color: decision.action === 'keep' ? '#2dd4a8' : '#ef4444',
+                              textTransform: 'uppercase' as const,
+                              letterSpacing: '0.08em',
+                              fontFamily: "'DM Mono', monospace",
+                              background: decision.action === 'keep' ? 'rgba(45,212,168,0.15)' : 'rgba(239,68,68,0.15)',
+                              padding: '1px 6px',
+                              borderRadius: 3,
+                            }}>
+                              {decision.action === 'keep' ? 'kept' : 'removed'}
+                            </span>
+                          )}
+                        </div>
+                        <div style={styles.violationGenerated}>&ldquo;{v.generated}&rdquo;</div>
+                        <div style={styles.violationSuggestion}>{v.suggestion}</div>
+                        {isResolved && decision.reason && (
+                          <div style={styles.violationReason}>Reason: {decision.reason}</div>
+                        )}
+                      </div>
+                      {!isResolved && (
+                        <div style={styles.violationActions}>
+                          <button onClick={() => handleKeep(i)} style={styles.keepBtn}>
+                            Keep
+                          </button>
+                          <button onClick={() => handleRemove(i)} style={styles.removeBtn}>
+                            Remove
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    {/* Reason input for Keep */}
+                    {reasonInputIndex === i && (
+                      <div style={styles.reasonInputWrap}>
+                        <input
+                          type="text"
+                          value={reasonText}
+                          onChange={(e) => setReasonText(e.target.value)}
+                          placeholder="Why keep this? (optional, helps future generations)"
+                          style={styles.reasonInput}
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleKeep(i);
+                            if (e.key === 'Escape') handleCancelReason();
+                          }}
+                        />
+                        <button onClick={() => handleKeep(i)} style={styles.reasonSubmitBtn}>
+                          Confirm
+                        </button>
+                        <button onClick={handleCancelReason} style={styles.reasonCancelBtn}>
+                          Cancel
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <div style={styles.violationGenerated}>&ldquo;{v.generated}&rdquo;</div>
-                  <div style={styles.violationSuggestion}>{v.suggestion}</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -295,6 +414,75 @@ const styles: Record<string, React.CSSProperties> = {
   violationSuggestion: {
     fontSize: '0.74rem',
     color: '#a8a8b8',
+  },
+  violationReason: {
+    fontSize: '0.7rem',
+    color: '#70708a',
+    fontStyle: 'italic',
+    marginTop: '0.25rem',
+  },
+  violationActions: {
+    display: 'flex',
+    gap: '0.35rem',
+    marginLeft: '0.75rem',
+    flexShrink: 0,
+  },
+  keepBtn: {
+    fontSize: '0.68rem',
+    color: '#2dd4a8',
+    background: 'rgba(45,212,168,0.1)',
+    border: '1px solid rgba(45,212,168,0.3)',
+    borderRadius: 4,
+    padding: '0.25rem 0.6rem',
+    cursor: 'pointer',
+    fontFamily: "'DM Mono', monospace",
+  },
+  removeBtn: {
+    fontSize: '0.68rem',
+    color: '#ef4444',
+    background: 'rgba(239,68,68,0.1)',
+    border: '1px solid rgba(239,68,68,0.3)',
+    borderRadius: 4,
+    padding: '0.25rem 0.6rem',
+    cursor: 'pointer',
+    fontFamily: "'DM Mono', monospace",
+  },
+  reasonInputWrap: {
+    display: 'flex',
+    gap: '0.35rem',
+    marginTop: '0.5rem',
+    alignItems: 'center',
+  },
+  reasonInput: {
+    flex: 1,
+    fontSize: '0.74rem',
+    color: '#e8e8ec',
+    background: '#111113',
+    border: '1px solid #38383f',
+    borderRadius: 4,
+    padding: '0.3rem 0.6rem',
+    fontFamily: "'DM Mono', monospace",
+    outline: 'none',
+  },
+  reasonSubmitBtn: {
+    fontSize: '0.66rem',
+    color: '#2dd4a8',
+    background: 'transparent',
+    border: '1px solid rgba(45,212,168,0.3)',
+    borderRadius: 4,
+    padding: '0.25rem 0.5rem',
+    cursor: 'pointer',
+    fontFamily: "'DM Mono', monospace",
+  },
+  reasonCancelBtn: {
+    fontSize: '0.66rem',
+    color: '#70708a',
+    background: 'transparent',
+    border: '1px solid #2a2a30',
+    borderRadius: 4,
+    padding: '0.25rem 0.5rem',
+    cursor: 'pointer',
+    fontFamily: "'DM Mono', monospace",
   },
   toggleBtn: {
     fontSize: '0.7rem',

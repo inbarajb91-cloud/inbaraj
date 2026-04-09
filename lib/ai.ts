@@ -50,20 +50,29 @@ The override format:
 
 Only include fields you are changing. The system will deep-merge your overrides with the base.`;
 
-const VALIDATION_SYSTEM_PROMPT = `You are a resume fact-checker. Your job is to compare a generated resume override against a ground truth document and flag any fabricated content.
+const VALIDATION_SYSTEM_PROMPT = `You are a resume fact-checker. Your job is to compare a generated resume override against a ground truth document and flag ONLY genuinely fabricated content.
 
-The ground truth contains ALL verified facts about this candidate: their actual skills, metrics, experience bullets, highlight texts, project names, project descriptions, tools, education, companies, and job titles.
+The ground truth contains the candidate's verified facts: skills, metrics, experience bullets, highlight texts, project names, project descriptions, tools, education, companies, and job titles.
 
-For each section in the generated override, check:
-1. SKILLS: Every skill item must be a rephrasing of a skill in the ground truth. Skills that don't map to any ground truth skill are fabricated.
-2. METRICS: Every number, percentage, dollar amount, or quantitative claim must exist in the ground truth metrics. Invented metrics are fabricated.
-3. EXPERIENCE BULLETS: Every bullet must be traceable to an original bullet or highlight in the ground truth. Bullets with new claims are fabricated.
-4. HIGHLIGHTS: Every highlight text must map to an original highlight. New claims are fabricated.
-5. CUSTOM SECTIONS: Every item must be traceable to existing skills, bullets, or project descriptions.
-6. SUMMARY: Claims must be supported by ground truth. New claims are fabricated.
-7. HERO: Description claims must be supported by ground truth.
+CRITICAL: Use SEMANTIC understanding, not keyword matching. Rephrasing, paraphrasing, and reorganizing existing facts is ALLOWED and EXPECTED. The resume tailoring process deliberately rewords content to match job descriptions. Only flag content that introduces genuinely NEW claims not supported by ANY ground truth fact.
 
-Rephrasing is ALLOWED — the candidate's bullet about "20 end-to-end enterprise CMMS/SaaS rollouts" can become "20 enterprise SaaS implementations". But inventing new facts is NOT allowed.
+WHAT IS ALLOWED (do NOT flag these):
+- Rephrasing: "end-to-end enterprise CMMS/SaaS rollouts" → "complex implementations for mid-to-large clients" (same meaning, different words)
+- Combining: merging two related ground truth facts into one sentence
+- Reorganizing: grouping existing skills under new category names relevant to the JD
+- Emphasizing: highlighting a specific aspect of an existing achievement
+- Shortening: condensing a verbose bullet into a tighter version while preserving the core claim
+- Synonyms: "managing" for "spearheading", "data management" for "catalog management", "stakeholder communication" for "client workshops"
+- Implied capabilities: if someone did "end-to-end SaaS rollouts" they clearly managed "complex implementations" — this is not fabrication
+
+WHAT IS FABRICATED (DO flag these):
+- Completely new skills with no basis in ground truth (e.g., "Payroll & HR data migration" when no payroll work exists)
+- Invented metrics or numbers not in ground truth (e.g., "reduced timelines by 30%" when no such metric exists)
+- Claims about experience the candidate never had (e.g., "managed data migrations" when they managed "catalog defects")
+- New tools or technologies not listed anywhere in ground truth
+- Certifications or qualifications not in ground truth
+
+When checking, ask yourself: "Could a reasonable person read the ground truth and conclude this claim is supported?" If yes, it's allowed. If the claim introduces something genuinely new with no basis, flag it.
 
 Return ONLY a JSON object in this exact format (no markdown, no code fences):
 {
@@ -80,7 +89,7 @@ Return ONLY a JSON object in this exact format (no markdown, no code fences):
 }
 
 If everything checks out, return {"valid": true, "violations": []}.
-Be strict. When in doubt, flag it.`;
+Only flag genuine fabrication. Do NOT flag reasonable rephrasings.`;
 
 function stripCodeFences(text: string): string {
   let cleaned = text.trim();

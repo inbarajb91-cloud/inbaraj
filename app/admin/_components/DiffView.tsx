@@ -5,85 +5,41 @@ interface DiffViewProps {
   overrides: Record<string, unknown>;
 }
 
-interface DiffSpan {
-  text: string;
-  type: 'same' | 'added' | 'removed';
-}
-
-function diffWords(oldText: string, newText: string): DiffSpan[] {
-  const oldWords = oldText.split(/(\s+)/);
-  const newWords = newText.split(/(\s+)/);
-  const spans: DiffSpan[] = [];
-
-  // Simple LCS-based word diff
-  const m = oldWords.length;
-  const n = newWords.length;
-  const dp: number[][] = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
-
-  for (let i = 1; i <= m; i++) {
-    for (let j = 1; j <= n; j++) {
-      if (oldWords[i - 1] === newWords[j - 1]) {
-        dp[i][j] = dp[i - 1][j - 1] + 1;
-      } else {
-        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
-      }
-    }
-  }
-
-  // Backtrack to build diff
-  const result: DiffSpan[] = [];
-  let i = m, j = n;
-  while (i > 0 || j > 0) {
-    if (i > 0 && j > 0 && oldWords[i - 1] === newWords[j - 1]) {
-      result.unshift({ text: oldWords[i - 1], type: 'same' });
-      i--; j--;
-    } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
-      result.unshift({ text: newWords[j - 1], type: 'added' });
-      j--;
-    } else {
-      result.unshift({ text: oldWords[i - 1], type: 'removed' });
-      i--;
-    }
-  }
-
-  // Merge consecutive spans of same type
-  for (const span of result) {
-    if (spans.length > 0 && spans[spans.length - 1].type === span.type) {
-      spans[spans.length - 1].text += span.text;
-    } else {
-      spans.push({ ...span });
-    }
-  }
-
-  return spans;
-}
-
-function DiffText({ oldText, newText }: { oldText: string; newText: string }) {
-  if (oldText === newText) {
-    return <span style={styles.sameText}>{oldText}</span>;
-  }
-
-  const spans = diffWords(oldText, newText);
-  return (
-    <span>
-      {spans.map((span, i) => (
-        <span
-          key={i}
-          style={
-            span.type === 'added' ? styles.addedText :
-            span.type === 'removed' ? styles.removedText :
-            styles.sameText
-          }
-        >
-          {span.text}
-        </span>
-      ))}
-    </span>
-  );
-}
-
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return <div style={styles.sectionLabel}>{children}</div>;
+}
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return <div style={styles.fieldLabel}>{children}</div>;
+}
+
+function DiffBlock({ label, oldText, newText }: { label?: string; oldText: string; newText: string }) {
+  if (oldText === newText) {
+    return (
+      <div style={{ marginBottom: '0.75rem' }}>
+        {label && <FieldLabel>{label}</FieldLabel>}
+        <div style={styles.unchangedBlock}>
+          <p style={styles.blockText}>{newText}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ marginBottom: '0.75rem' }}>
+      {label && <FieldLabel>{label}</FieldLabel>}
+      <div style={styles.diffPair}>
+        <div style={styles.oldBlock}>
+          <div style={styles.blockLabel}>Base</div>
+          <p style={styles.blockText}>{oldText}</p>
+        </div>
+        <div style={styles.newBlock}>
+          <div style={styles.blockLabelNew}>Tailored</div>
+          <p style={styles.blockText}>{newText}</p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function DiffCard({ children, borderColor }: { children: React.ReactNode; borderColor?: string }) {
@@ -128,23 +84,18 @@ export default function DiffView({ base, overrides }: DiffViewProps) {
         <DiffCard>
           <SectionLabel>Hero</SectionLabel>
           {overHero.headline && baseHero?.headline && (
-            <div style={{ marginBottom: '0.5rem' }}>
-              <div style={styles.fieldLabel}>Headline</div>
-              <div style={styles.diffLine}>
-                <DiffText
-                  oldText={stripHtml(baseHero.headline)}
-                  newText={stripHtml(overHero.headline)}
-                />
-              </div>
-            </div>
+            <DiffBlock
+              label="Headline"
+              oldText={stripHtml(baseHero.headline)}
+              newText={stripHtml(overHero.headline)}
+            />
           )}
           {overHero.description && baseHero?.description && (
-            <div>
-              <div style={styles.fieldLabel}>Description</div>
-              <div style={styles.diffLine}>
-                <DiffText oldText={baseHero.description} newText={overHero.description} />
-              </div>
-            </div>
+            <DiffBlock
+              label="Description"
+              oldText={baseHero.description}
+              newText={overHero.description}
+            />
           )}
         </DiffCard>
       )}
@@ -153,9 +104,7 @@ export default function DiffView({ base, overrides }: DiffViewProps) {
       {overSummary && baseSummary && (
         <DiffCard>
           <SectionLabel>Summary</SectionLabel>
-          <div style={styles.diffLine}>
-            <DiffText oldText={baseSummary} newText={overSummary} />
-          </div>
+          <DiffBlock oldText={baseSummary} newText={overSummary} />
         </DiffCard>
       )}
 
@@ -166,40 +115,80 @@ export default function DiffView({ base, overrides }: DiffViewProps) {
           {overExperience.map((exp, i) => {
             const baseExp = baseExperience[i];
             return (
-              <div key={i} style={i > 0 ? { marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #2a2a30' } : {}}>
+              <div key={i} style={i > 0 ? { marginTop: '1.25rem', paddingTop: '1.25rem', borderTop: '1px solid #2a2a30' } : {}}>
                 <div style={styles.expTitle}>
                   {exp.title} {exp.company && <span style={styles.expCompany}>· {exp.company}</span>}
                 </div>
+                {/* Bullets */}
                 {exp.bullets && (
-                  <ul style={styles.bulletList}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     {exp.bullets.map((bullet, j) => {
                       const baseBullet = baseExp?.bullets?.[j] || '';
+                      if (!baseBullet) {
+                        return (
+                          <div key={j} style={styles.newBlock}>
+                            <div style={styles.blockLabelNew}>New bullet</div>
+                            <p style={styles.blockText}>{bullet}</p>
+                          </div>
+                        );
+                      }
+                      if (baseBullet === bullet) {
+                        return (
+                          <div key={j} style={styles.unchangedBlock}>
+                            <p style={styles.blockText}>{bullet}</p>
+                          </div>
+                        );
+                      }
                       return (
-                        <li key={j} style={styles.bullet}>
-                          {baseBullet ? (
-                            <DiffText oldText={baseBullet} newText={bullet} />
-                          ) : (
-                            <span style={styles.addedText}>{bullet}</span>
-                          )}
-                        </li>
+                        <div key={j} style={styles.diffPair}>
+                          <div style={styles.oldBlock}>
+                            <div style={styles.blockLabel}>Base</div>
+                            <p style={styles.blockText}>{baseBullet}</p>
+                          </div>
+                          <div style={styles.newBlock}>
+                            <div style={styles.blockLabelNew}>Tailored</div>
+                            <p style={styles.blockText}>{bullet}</p>
+                          </div>
+                        </div>
                       );
                     })}
-                  </ul>
+                  </div>
                 )}
+                {/* Highlights */}
                 {exp.highlights && exp.highlights.length > 0 && (
-                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                  <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <FieldLabel>Highlights</FieldLabel>
                     {exp.highlights.map((h, k) => {
                       const baseHighlight = baseExp?.highlights?.[k];
+                      if (!baseHighlight?.text) {
+                        return (
+                          <div key={k} style={styles.newBlock}>
+                            <div style={styles.blockLabelNew}>{h.label || 'New highlight'}</div>
+                            <p style={styles.blockText}>{h.text}</p>
+                          </div>
+                        );
+                      }
+                      if (baseHighlight.text === h.text) {
+                        return (
+                          <div key={k} style={styles.unchangedBlock}>
+                            <div style={styles.highlightLabel}>{h.label}</div>
+                            <p style={styles.blockText}>{h.text}</p>
+                          </div>
+                        );
+                      }
                       return (
-                        <div key={k} style={styles.highlight}>
-                          <div style={styles.highlightLabel}>{h.label}</div>
-                          <p style={styles.highlightText}>
-                            {baseHighlight?.text ? (
-                              <DiffText oldText={baseHighlight.text} newText={h.text || ''} />
-                            ) : (
-                              <span style={styles.addedText}>{h.text}</span>
-                            )}
-                          </p>
+                        <div key={k}>
+                          <div style={styles.highlightLabel}>{h.label || baseHighlight.label}</div>
+                          <div style={styles.diffPair}>
+                            <div style={styles.oldBlock}>
+                              <div style={styles.blockLabel}>Base</div>
+                              <p style={styles.blockText}>{baseHighlight.text}</p>
+                            </div>
+                            <div style={styles.newBlock}>
+                              <div style={styles.blockLabelNew}>Tailored</div>
+                              <p style={styles.blockText}>{h.text}</p>
+                            </div>
+                          </div>
                         </div>
                       );
                     })}
@@ -215,31 +204,50 @@ export default function DiffView({ base, overrides }: DiffViewProps) {
       {overSkills && Array.isArray(overSkills) && (
         <DiffCard>
           <SectionLabel>Skills</SectionLabel>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {overSkills.map((group, i) => {
               const baseGroup = baseSkills?.[i];
-              const baseItems = new Set(baseGroup?.items || []);
+              const baseItems = baseGroup?.items || [];
+              const newItems = group.items || [];
+              const baseSet = new Set(baseItems);
+              const titleChanged = baseGroup?.title && baseGroup.title !== group.title;
+
               return (
-                <div key={i}>
-                  <div style={styles.skillGroupTitle}>
-                    {baseGroup?.title && baseGroup.title !== group.title ? (
-                      <DiffText oldText={baseGroup.title} newText={group.title || ''} />
-                    ) : (
-                      group.title
-                    )}
-                  </div>
-                  {group.items?.map((item, j) => (
-                    <div
-                      key={j}
-                      style={{
-                        ...styles.skillItem,
-                        ...(baseItems.has(item) ? {} : { background: 'rgba(45,212,168,0.1)', borderRadius: 3, padding: '0 4px' }),
-                      }}
-                    >
-                      · {item}
-                      {!baseItems.has(item) && <span style={styles.newBadge}>new</span>}
+                <div key={i} style={styles.skillGroupCard}>
+                  {titleChanged ? (
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.4rem' }}>
+                      <span style={{ ...styles.skillGroupTitle, color: '#ef4444', textDecoration: 'line-through' }}>{baseGroup?.title}</span>
+                      <span style={styles.arrow}>→</span>
+                      <span style={{ ...styles.skillGroupTitle, color: '#2dd4a8' }}>{group.title}</span>
                     </div>
-                  ))}
+                  ) : (
+                    <div style={styles.skillGroupTitle}>{group.title}</div>
+                  )}
+                  <div style={{ display: 'flex', gap: '1.5rem' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={styles.miniLabel}>Base</div>
+                      {baseItems.map((item, j) => (
+                        <div key={j} style={{
+                          ...styles.skillItem,
+                          ...(newItems.includes(item) ? {} : { color: '#ef4444', textDecoration: 'line-through' }),
+                        }}>
+                          · {item}
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={styles.miniLabelNew}>Tailored</div>
+                      {newItems.map((item, j) => (
+                        <div key={j} style={{
+                          ...styles.skillItem,
+                          ...(!baseSet.has(item) ? { color: '#2dd4a8' } : {}),
+                        }}>
+                          · {item}
+                          {!baseSet.has(item) && <span style={styles.newBadge}>new</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               );
             })}
@@ -311,26 +319,53 @@ const styles: Record<string, React.CSSProperties> = {
     letterSpacing: '0.08em',
     marginBottom: '0.25rem',
   },
-  diffLine: {
-    fontSize: '0.84rem',
-    color: '#a8a8b8',
-    lineHeight: 1.65,
+  diffPair: {
+    display: 'flex',
+    gap: '0.5rem',
   },
-  sameText: {
-    color: '#a8a8b8',
+  oldBlock: {
+    flex: 1,
+    background: 'rgba(239,68,68,0.06)',
+    border: '1px solid rgba(239,68,68,0.15)',
+    borderRadius: 6,
+    padding: '0.5rem 0.65rem',
   },
-  addedText: {
-    color: '#2dd4a8',
-    background: 'rgba(45,212,168,0.1)',
-    borderRadius: 2,
-    padding: '0 2px',
+  newBlock: {
+    flex: 1,
+    background: 'rgba(45,212,168,0.06)',
+    border: '1px solid rgba(45,212,168,0.15)',
+    borderRadius: 6,
+    padding: '0.5rem 0.65rem',
   },
-  removedText: {
+  unchangedBlock: {
+    background: 'rgba(255,255,255,0.02)',
+    border: '1px solid #1e1e22',
+    borderRadius: 6,
+    padding: '0.5rem 0.65rem',
+  },
+  blockLabel: {
+    fontFamily: "'DM Mono', monospace",
+    fontSize: '0.58rem',
     color: '#ef4444',
-    background: 'rgba(239,68,68,0.1)',
-    textDecoration: 'line-through',
-    borderRadius: 2,
-    padding: '0 2px',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase' as const,
+    marginBottom: '0.2rem',
+    opacity: 0.7,
+  },
+  blockLabelNew: {
+    fontFamily: "'DM Mono', monospace",
+    fontSize: '0.58rem',
+    color: '#2dd4a8',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase' as const,
+    marginBottom: '0.2rem',
+    opacity: 0.7,
+  },
+  blockText: {
+    fontSize: '0.8rem',
+    color: '#c8c8d0',
+    lineHeight: 1.6,
+    margin: 0,
   },
   noChanges: {
     fontSize: '0.84rem',
@@ -342,32 +377,11 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '1rem',
     fontWeight: 300,
     color: '#e8e8ec',
-    marginBottom: '0.4rem',
+    marginBottom: '0.5rem',
   },
   expCompany: {
     fontSize: '0.85rem',
     color: '#7c6cfa',
-  },
-  bulletList: {
-    listStyle: 'none',
-    padding: 0,
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '0.3rem',
-  },
-  bullet: {
-    fontSize: '0.82rem',
-    color: '#a8a8b8',
-    lineHeight: 1.6,
-    paddingLeft: '1rem',
-    position: 'relative' as const,
-  },
-  highlight: {
-    flex: '1 1 calc(50% - 0.25rem)',
-    background: 'rgba(124,108,250,0.06)',
-    border: '1px solid rgba(124,108,250,0.15)',
-    borderRadius: 6,
-    padding: '0.6rem 0.75rem',
   },
   highlightLabel: {
     fontFamily: "'DM Mono', monospace",
@@ -377,10 +391,11 @@ const styles: Record<string, React.CSSProperties> = {
     textTransform: 'uppercase' as const,
     marginBottom: '0.25rem',
   },
-  highlightText: {
-    fontSize: '0.78rem',
-    color: '#a8a8b8',
-    lineHeight: 1.5,
+  skillGroupCard: {
+    background: 'rgba(255,255,255,0.02)',
+    border: '1px solid #1e1e22',
+    borderRadius: 6,
+    padding: '0.6rem 0.75rem',
   },
   skillGroupTitle: {
     fontFamily: "'DM Mono', monospace",
@@ -388,6 +403,28 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#2dd4a8',
     letterSpacing: '0.08em',
     marginBottom: '0.3rem',
+  },
+  arrow: {
+    color: '#70708a',
+    fontSize: '0.75rem',
+  },
+  miniLabel: {
+    fontFamily: "'DM Mono', monospace",
+    fontSize: '0.56rem',
+    color: '#ef4444',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase' as const,
+    marginBottom: '0.2rem',
+    opacity: 0.6,
+  },
+  miniLabelNew: {
+    fontFamily: "'DM Mono', monospace",
+    fontSize: '0.56rem',
+    color: '#2dd4a8',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase' as const,
+    marginBottom: '0.2rem',
+    opacity: 0.6,
   },
   skillItem: {
     fontSize: '0.8rem',
