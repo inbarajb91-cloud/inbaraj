@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ProfileTabs from './_components/ProfileTabs';
 import JDForm from './_components/JDForm';
 import ProfilePreview from './_components/ProfilePreview';
@@ -33,20 +33,196 @@ interface GeneratedProfile {
   validation?: ValidationResult;
 }
 
+type WizardPhase =
+  | { phase: 'intake'; step: 'company' | 'role' | 'jd' }
+  | { phase: 'processing' }
+  | { phase: 'review' }
+  | { phase: 'publishing' }
+  | { phase: 'published'; url: string; slug: string };
+
+interface IntakeData {
+  companyName: string;
+  roleLabel: string;
+  jobDescription: string;
+}
+
+const PROGRESS_STEPS = [
+  'Reading the job description...',
+  'Tailoring your resume...',
+  'Checking for accuracy...',
+  'Almost done...',
+];
+
+const STEP_DELAYS = [3000, 10000, 20000];
+
+const WIZARD_LABELS = ['Company', 'Role', 'JD', 'Processing', 'Review', 'Published'];
+
+function getWizardStepIndex(phase: WizardPhase): number {
+  switch (phase.phase) {
+    case 'intake': return phase.step === 'company' ? 0 : phase.step === 'role' ? 1 : 2;
+    case 'processing': return 3;
+    case 'review': return 4;
+    case 'publishing': return 5;
+    case 'published': return 5;
+  }
+}
+
+// --- Inline sub-components ---
+
+function FadeIn({ children }: { children: React.ReactNode }) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => { requestAnimationFrame(() => setVisible(true)); }, []);
+  return (
+    <div style={{
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'translateY(0)' : 'translateY(12px)',
+      transition: 'opacity 0.3s ease, transform 0.3s ease',
+    }}>
+      {children}
+    </div>
+  );
+}
+
+function WizardBreadcrumb({ phase }: { phase: WizardPhase }) {
+  const activeIndex = getWizardStepIndex(phase);
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.25rem',
+      marginBottom: '1.5rem',
+      flexWrap: 'wrap',
+    }}>
+      {WIZARD_LABELS.map((label, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          <span style={{
+            fontSize: '0.68rem',
+            fontFamily: "'DM Mono', monospace",
+            letterSpacing: '0.04em',
+            color: i < activeIndex ? '#2dd4a8' : i === activeIndex ? '#e8e8ec' : '#3a3a44',
+            transition: 'color 0.3s',
+          }}>
+            {i < activeIndex ? '\u2713 ' : ''}{label}
+          </span>
+          {i < WIZARD_LABELS.length - 1 && (
+            <span style={{ color: '#2a2a30', fontSize: '0.7rem', margin: '0 0.15rem' }}>&rsaquo;</span>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ProcessingView({ onCancel }: { onCancel: () => void }) {
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    const timers: NodeJS.Timeout[] = [];
+    let cumulative = 0;
+    STEP_DELAYS.forEach((delay, i) => {
+      cumulative += delay;
+      timers.push(setTimeout(() => setStep(i + 1), cumulative));
+    });
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  return (
+    <div style={wizardStyles.centeredCard}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', width: '100%', maxWidth: 340 }}>
+        {PROGRESS_STEPS.map((label, i) => (
+          <div key={i} style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontSize: '0.85rem',
+            fontFamily: "'DM Sans', sans-serif",
+            opacity: i <= step ? 1 : 0.3,
+            color: i < step ? '#2dd4a8' : i === step ? '#e8e8ec' : '#70708a',
+            transition: 'opacity 0.3s, color 0.3s',
+          }}>
+            <span style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.7rem', width: 16, textAlign: 'center' as const }}>
+              {i < step ? '\u2713' : i === step ? '\u25CF' : '\u25CB'}
+            </span>
+            {label}
+          </div>
+        ))}
+      </div>
+      <button onClick={onCancel} style={wizardStyles.cancelBtn}>Cancel</button>
+    </div>
+  );
+}
+
+function PublishedView({ url, isLive, onViewPage, onCreateAnother, onViewProfile }: {
+  url: string;
+  isLive: boolean;
+  onViewPage: () => void;
+  onCreateAnother: () => void;
+  onViewProfile: () => void;
+}) {
+  return (
+    <div style={wizardStyles.centeredCard}>
+      {isLive ? (
+        <span style={{ fontSize: '2rem', color: '#2dd4a8', marginBottom: '0.5rem' }}>{'\u2713'}</span>
+      ) : (
+        <div style={wizardStyles.spinner} />
+      )}
+      <h3 style={{
+        fontFamily: "'Spectral', serif",
+        fontSize: '1.3rem',
+        fontWeight: 300,
+        color: '#e8e8ec',
+        margin: 0,
+      }}>
+        {isLive ? 'Your page is live!' : 'Publishing your page...'}
+      </h3>
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener"
+        style={{
+          fontSize: '0.78rem',
+          fontFamily: "'DM Mono', monospace",
+          color: isLive ? '#2dd4a8' : '#70708a',
+          textDecoration: isLive ? 'underline' : 'none',
+          marginTop: '0.25rem',
+        }}
+      >
+        {url}
+      </a>
+      {!isLive && (
+        <p style={{ fontSize: '0.75rem', color: '#70708a', fontFamily: "'DM Mono', monospace", marginTop: '0.25rem' }}>
+          This usually takes about a minute...
+        </p>
+      )}
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.25rem' }}>
+        {isLive && (
+          <button onClick={onViewPage} style={wizardStyles.primaryBtn}>View Page</button>
+        )}
+        <button onClick={onViewProfile} style={wizardStyles.secondaryBtn}>View in Dashboard</button>
+        <button onClick={onCreateAnother} style={wizardStyles.secondaryBtn}>Create Another</button>
+      </div>
+    </div>
+  );
+}
+
+// --- Main component ---
+
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [storedPassword, setStoredPassword] = useState('');
   const [registry, setRegistry] = useState<Record<string, RegistryEntry>>({});
   const [activeTab, setActiveTab] = useState<string>('base');
-  const [generating, setGenerating] = useState(false);
   const [generated, setGenerated] = useState<GeneratedProfile | null>(null);
-  const [publishing, setPublishing] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [liveCheckUrl, setLiveCheckUrl] = useState<string | null>(null);
   const [liveCheckStatus, setLiveCheckStatus] = useState<'checking' | 'live' | null>(null);
   const [liveCheckSlug, setLiveCheckSlug] = useState<string | null>(null);
   const [violationDecisions, setViolationDecisions] = useState<Record<number, { action: 'keep' | 'remove'; reason?: string }>>({});
+
+  // Wizard state
+  const [wizardPhase, setWizardPhase] = useState<WizardPhase>({ phase: 'intake', step: 'company' });
+  const [intakeData, setIntakeData] = useState<IntakeData>({ companyName: '', roleLabel: '', jobDescription: '' });
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Restore session from sessionStorage on mount
   useEffect(() => {
@@ -101,7 +277,6 @@ export default function AdminPage() {
         if (res.ok) {
           setLiveCheckStatus('live');
           setLiveCheckSlug(null);
-          setMessage({ type: 'success', text: `Your page is live! ${liveCheckUrl}` });
           clearInterval(interval);
         }
       } catch { /* still building */ }
@@ -109,9 +284,35 @@ export default function AdminPage() {
     return () => clearInterval(interval);
   }, [liveCheckUrl, liveCheckStatus]);
 
-  const handleGenerate = async (companyName: string, jobDescription: string, roleLabel?: string) => {
-    setGenerating(true);
+  // Tab change with wizard guard
+  const handleTabChange = (tab: string) => {
+    if (activeTab === 'create' && wizardPhase.phase !== 'intake') {
+      if (!confirm('You have work in progress. Switching tabs will discard it. Continue?')) return;
+    }
+    if (tab !== 'create') {
+      resetWizard();
+    }
+    setActiveTab(tab);
+  };
+
+  const resetWizard = () => {
+    setWizardPhase({ phase: 'intake', step: 'company' });
+    setIntakeData({ companyName: '', roleLabel: '', jobDescription: '' });
+    setGenerated(null);
+    setViolationDecisions({});
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+  };
+
+  // --- Wizard handlers ---
+
+  const handleStartTailoring = async () => {
+    setWizardPhase({ phase: 'processing' });
     setMessage(null);
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
@@ -119,7 +320,12 @@ export default function AdminPage() {
           'Content-Type': 'application/json',
           'x-admin-password': storedPassword,
         },
-        body: JSON.stringify({ companyName, jobDescription, roleLabel }),
+        body: JSON.stringify({
+          companyName: intakeData.companyName,
+          jobDescription: intakeData.jobDescription,
+          roleLabel: intakeData.roleLabel || undefined,
+        }),
+        signal: controller.signal,
       });
 
       if (!res.ok) {
@@ -130,20 +336,22 @@ export default function AdminPage() {
       const data = await res.json();
       setGenerated(data);
       setViolationDecisions({});
-      setMessage({ type: 'success', text: `Your tailored resume for ${companyName} is ready!` });
+      setWizardPhase({ phase: 'review' });
     } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
       setMessage({
         type: 'error',
         text: error instanceof Error ? error.message : 'Something went wrong generating your resume. Try again?',
       });
+      setWizardPhase({ phase: 'intake', step: 'jd' });
     } finally {
-      setGenerating(false);
+      abortControllerRef.current = null;
     }
   };
 
   const handlePublish = async () => {
     if (!generated) return;
-    setPublishing(true);
+    setWizardPhase({ phase: 'publishing' });
     try {
       const res = await fetch('/api/profiles', {
         method: 'POST',
@@ -161,23 +369,17 @@ export default function AdminPage() {
 
       const data = await res.json();
       const fullUrl = `${window.location.origin}${data.url}`;
-      setMessage({
-        type: 'success',
-        text: `Publishing your resume page... This usually takes about a minute.`,
-      });
       setLiveCheckUrl(fullUrl);
       setLiveCheckSlug(data.slug);
       setLiveCheckStatus(null);
-      setGenerated(null);
-      setActiveTab(data.slug);
       loadProfiles(storedPassword);
+      setWizardPhase({ phase: 'published', url: fullUrl, slug: data.slug });
     } catch (error) {
       setMessage({
         type: 'error',
         text: error instanceof Error ? error.message : 'Something went wrong publishing your page. Try again?',
       });
-    } finally {
-      setPublishing(false);
+      setWizardPhase({ phase: 'review' });
     }
   };
 
@@ -201,6 +403,12 @@ export default function AdminPage() {
   const handleViolationDecision = (index: number, decision: { action: 'keep' | 'remove'; reason?: string }) => {
     setViolationDecisions(prev => ({ ...prev, [index]: decision }));
   };
+
+  const handleIntakeDataChange = (field: keyof IntakeData, value: string) => {
+    setIntakeData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // --- Render ---
 
   if (!authenticated) {
     return (
@@ -231,6 +439,9 @@ export default function AdminPage() {
     );
   }
 
+  // Determine if wizard is in published phase to suppress global live-check banners
+  const inWizardPublished = activeTab === 'create' && wizardPhase.phase === 'published';
+
   return (
     <div style={styles.container}>
       <header style={styles.header}>
@@ -253,7 +464,8 @@ export default function AdminPage() {
         </div>
       )}
 
-      {liveCheckStatus === 'checking' && liveCheckUrl && (
+      {/* Global live-check banners — hidden when wizard shows published phase */}
+      {!inWizardPublished && liveCheckStatus === 'checking' && liveCheckUrl && (
         <div style={{
           padding: '0.6rem 1rem',
           borderRadius: 8,
@@ -271,7 +483,7 @@ export default function AdminPage() {
           Publishing your page... this usually takes about a minute
         </div>
       )}
-      {liveCheckStatus === 'live' && liveCheckUrl && (
+      {!inWizardPublished && liveCheckStatus === 'live' && liveCheckUrl && (
         <div style={{
           padding: '0.6rem 1rem',
           borderRadius: 8,
@@ -293,10 +505,11 @@ export default function AdminPage() {
       <ProfileTabs
         registry={registry}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
       />
 
       <div style={styles.content}>
+        {/* Base resume tab */}
         {activeTab === 'base' && (
           <div>
             <div style={styles.sectionHeader}>
@@ -309,63 +522,129 @@ export default function AdminPage() {
           </div>
         )}
 
+        {/* Create tab — wizard flow */}
         {activeTab === 'create' && (
           <div>
-            <h2 style={styles.sectionTitle}>Create New Resume</h2>
-            <JDForm onGenerate={handleGenerate} generating={generating} />
-            {generated && (
-              <div style={styles.generatedSection}>
-                <div style={styles.generatedHeader}>
-                  <div>
-                    <h3 style={styles.generatedTitle}>
-                      Tailored for {generated.companyName}
-                    </h3>
-                    <p style={styles.generatedSlug}>
-                      Your page: inbaraj.info/r/{generated.slug}
-                    </p>
-                  </div>
-                  <div style={styles.generatedActions}>
-                    <button
-                      onClick={handlePublish}
-                      disabled={publishing}
-                      style={(() => {
-                        if (!generated.validation || generated.validation.valid) return styles.publishBtn;
-                        const unresolvedCount = generated.validation.violations.filter((_, i) => !violationDecisions[i]).length;
-                        return unresolvedCount === 0 ? styles.publishBtn : styles.publishBtnWarn;
-                      })()}
-                      title={(() => {
-                        if (!generated.validation || generated.validation.valid) return undefined;
-                        const unresolvedCount = generated.validation.violations.filter((_, i) => !violationDecisions[i]).length;
-                        return unresolvedCount > 0 ? `${unresolvedCount} items need your review before publishing` : undefined;
-                      })()}
-                    >
-                      {(() => {
-                        if (publishing) return 'Publishing...';
-                        if (!generated.validation || generated.validation.valid) return 'Publish';
-                        const unresolvedCount = generated.validation.violations.filter((_, i) => !violationDecisions[i]).length;
-                        return unresolvedCount > 0 ? `Publish (${unresolvedCount} to review)` : 'Publish';
-                      })()}
-                    </button>
-                    <button
-                      onClick={() => setGenerated(null)}
-                      style={styles.discardBtn}
-                    >
-                      Discard
-                    </button>
-                  </div>
-                </div>
-                <GeneratedPreview
-                  overrides={generated.overrides}
-                  validation={generated.validation}
-                  password={storedPassword}
-                  onViolationDecision={handleViolationDecision}
-                  violationDecisions={violationDecisions}
+            <WizardBreadcrumb phase={wizardPhase} />
+
+            {/* Phase 1: Intake (step-by-step) */}
+            {wizardPhase.phase === 'intake' && (
+              <FadeIn key={`intake-${wizardPhase.step}`}>
+                <JDForm
+                  step={wizardPhase.step}
+                  data={intakeData}
+                  onDataChange={handleIntakeDataChange}
+                  onNext={() => {
+                    if (wizardPhase.step === 'company') setWizardPhase({ phase: 'intake', step: 'role' });
+                    else if (wizardPhase.step === 'role') setWizardPhase({ phase: 'intake', step: 'jd' });
+                  }}
+                  onBack={() => {
+                    if (wizardPhase.step === 'role') setWizardPhase({ phase: 'intake', step: 'company' });
+                    else if (wizardPhase.step === 'jd') setWizardPhase({ phase: 'intake', step: 'role' });
+                  }}
+                  onStartTailoring={handleStartTailoring}
                 />
-              </div>
+              </FadeIn>
+            )}
+
+            {/* Phase 2: Processing */}
+            {wizardPhase.phase === 'processing' && (
+              <FadeIn>
+                <ProcessingView onCancel={() => {
+                  abortControllerRef.current?.abort();
+                  setWizardPhase({ phase: 'intake', step: 'jd' });
+                }} />
+              </FadeIn>
+            )}
+
+            {/* Phase 3: Review */}
+            {wizardPhase.phase === 'review' && generated && (
+              <FadeIn>
+                <div style={styles.generatedSection}>
+                  <div style={styles.generatedHeader}>
+                    <div>
+                      <h3 style={styles.generatedTitle}>
+                        Tailored for {generated.companyName}
+                      </h3>
+                      <p style={styles.generatedSlug}>
+                        Your page: inbaraj.info/r/{generated.slug}
+                      </p>
+                    </div>
+                    <div style={styles.generatedActions}>
+                      <button
+                        onClick={handlePublish}
+                        style={(() => {
+                          if (!generated.validation || generated.validation.valid) return styles.publishBtn;
+                          const unresolvedCount = generated.validation.violations.filter((_, i) => !violationDecisions[i]).length;
+                          return unresolvedCount === 0 ? styles.publishBtn : styles.publishBtnWarn;
+                        })()}
+                        title={(() => {
+                          if (!generated.validation || generated.validation.valid) return undefined;
+                          const unresolvedCount = generated.validation.violations.filter((_, i) => !violationDecisions[i]).length;
+                          return unresolvedCount > 0 ? `${unresolvedCount} items need your review before publishing` : undefined;
+                        })()}
+                      >
+                        {(() => {
+                          if (!generated.validation || generated.validation.valid) return 'Publish';
+                          const unresolvedCount = generated.validation.violations.filter((_, i) => !violationDecisions[i]).length;
+                          return unresolvedCount > 0 ? `Publish (${unresolvedCount} to review)` : 'Publish';
+                        })()}
+                      </button>
+                      <button
+                        onClick={() => setWizardPhase({ phase: 'intake', step: 'jd' })}
+                        style={styles.discardBtn}
+                      >
+                        Revise
+                      </button>
+                      <button
+                        onClick={resetWizard}
+                        style={styles.discardBtn}
+                      >
+                        Start Over
+                      </button>
+                    </div>
+                  </div>
+                  <GeneratedPreview
+                    overrides={generated.overrides}
+                    validation={generated.validation}
+                    password={storedPassword}
+                    onViolationDecision={handleViolationDecision}
+                    violationDecisions={violationDecisions}
+                  />
+                </div>
+              </FadeIn>
+            )}
+
+            {/* Phase 4: Publishing */}
+            {wizardPhase.phase === 'publishing' && (
+              <FadeIn>
+                <div style={styles.deployingOverlay}>
+                  <div style={styles.deployingSpinner} />
+                  <p style={styles.deployingText}>Publishing your page...</p>
+                  <p style={styles.deployingSub}>This usually takes about a minute.</p>
+                </div>
+              </FadeIn>
+            )}
+
+            {/* Phase 5: Published */}
+            {wizardPhase.phase === 'published' && (
+              <FadeIn>
+                <PublishedView
+                  url={wizardPhase.url}
+                  isLive={liveCheckStatus === 'live'}
+                  onViewPage={() => window.open(wizardPhase.url, '_blank')}
+                  onCreateAnother={resetWizard}
+                  onViewProfile={() => {
+                    setActiveTab(wizardPhase.slug);
+                    resetWizard();
+                  }}
+                />
+              </FadeIn>
             )}
           </div>
         )}
 
+        {/* Existing profile tab */}
         {activeTab !== 'base' && activeTab !== 'create' && (
           <div>
             <div style={styles.sectionHeader}>
@@ -407,6 +686,65 @@ export default function AdminPage() {
     </div>
   );
 }
+
+// --- Wizard-specific styles (for inline components) ---
+
+const wizardStyles: Record<string, React.CSSProperties> = {
+  centeredCard: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: '#111113',
+    border: '1px solid #2a2a30',
+    borderRadius: 10,
+    padding: '3rem 2rem',
+    minHeight: 320,
+  },
+  spinner: {
+    width: 32,
+    height: 32,
+    border: '3px solid #2a2a30',
+    borderTopColor: '#7c6cfa',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
+    marginBottom: '1.5rem',
+  },
+  cancelBtn: {
+    marginTop: '1.5rem',
+    padding: '0.4rem 1rem',
+    background: 'transparent',
+    border: '1px solid #38383f',
+    color: '#70708a',
+    borderRadius: 6,
+    fontSize: '0.75rem',
+    cursor: 'pointer',
+    fontFamily: "'DM Mono', monospace",
+  },
+  primaryBtn: {
+    padding: '0.55rem 1.2rem',
+    background: '#2dd4a8',
+    color: '#0a0a0b',
+    border: 'none',
+    borderRadius: 6,
+    fontSize: '0.82rem',
+    fontWeight: 500,
+    cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+  },
+  secondaryBtn: {
+    padding: '0.55rem 1rem',
+    background: 'transparent',
+    border: '1px solid #38383f',
+    color: '#a8a8b8',
+    borderRadius: 6,
+    fontSize: '0.82rem',
+    cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+  },
+};
+
+// --- Main page styles ---
 
 const styles: Record<string, React.CSSProperties> = {
   loginContainer: {
@@ -531,7 +869,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily: "'DM Mono', monospace",
   },
   generatedSection: {
-    marginTop: '1.5rem',
     background: '#111113',
     border: '1px solid #2a2a30',
     borderRadius: 10,
@@ -590,18 +927,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.8rem',
     cursor: 'pointer',
     fontFamily: "'DM Sans', sans-serif",
-  },
-  jsonPreview: {
-    background: '#18181c',
-    border: '1px solid #2a2a30',
-    borderRadius: 8,
-    padding: '1rem',
-    fontSize: '0.75rem',
-    color: '#a8a8b8',
-    fontFamily: "'DM Mono', monospace",
-    overflow: 'auto',
-    maxHeight: 400,
-    lineHeight: 1.5,
   },
   message: {
     fontSize: '0.82rem',
