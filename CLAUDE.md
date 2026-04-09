@@ -38,6 +38,7 @@ app/
 │       └── ProfilePreview.tsx     # Iframe preview of resume pages
 └── api/
     ├── generate/route.ts          # POST: Claude API resume tailoring
+    ├── scrape/route.ts            # POST: URL scraping via Apify + Claude extraction
     └── profiles/
         ├── route.ts               # GET/POST: List and create profiles
         └── [slug]/route.ts        # GET/DELETE: Individual profile ops
@@ -67,6 +68,8 @@ lib/
 ├── types.ts                       # All TypeScript interfaces
 ├── resume.ts                      # Data loading + deep merge
 ├── ai.ts                          # Claude API integration with retry
+├── apify.ts                       # Apify Website Content Crawler client
+├── scrape.ts                      # Claude-based JD extraction from scraped text
 ├── github.ts                      # GitHub Contents API client
 └── slug.ts                        # Company-name-based slug generation
 
@@ -90,6 +93,7 @@ Required in Vercel project settings (not team settings):
 |----------|---------|
 | `ADMIN_PASSWORD` | Admin dashboard login |
 | `ANTHROPIC_API_KEY` | Claude API for resume tailoring |
+| `APIFY_API_KEY` | Apify API token for URL-based JD scraping |
 | `GITHUB_TOKEN` | Fine-grained GitHub PAT with Contents read/write on this repo |
 | `GITHUB_BRANCH` | Target branch for profile commits (should be `main`) |
 

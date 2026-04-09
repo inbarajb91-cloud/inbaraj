@@ -34,7 +34,7 @@ interface GeneratedProfile {
 }
 
 type WizardPhase =
-  | { phase: 'intake'; step: 'company' | 'role' | 'jd' }
+  | { phase: 'intake'; step: 'url' | 'company' | 'role' | 'jd' | 'confirm' }
   | { phase: 'processing' }
   | { phase: 'review' }
   | { phase: 'publishing' }
@@ -55,15 +55,19 @@ const PROGRESS_STEPS = [
 
 const STEP_DELAYS = [3000, 10000, 20000];
 
-const WIZARD_LABELS = ['Company', 'Role', 'JD', 'Processing', 'Review', 'Published'];
+const WIZARD_LABELS = ['Start', 'Details', 'Processing', 'Review', 'Published'];
 
 function getWizardStepIndex(phase: WizardPhase): number {
   switch (phase.phase) {
-    case 'intake': return phase.step === 'company' ? 0 : phase.step === 'role' ? 1 : 2;
-    case 'processing': return 3;
-    case 'review': return 4;
-    case 'publishing': return 5;
-    case 'published': return 5;
+    case 'intake': {
+      if (phase.step === 'url') return 0;
+      // All detail steps (company/role/jd/confirm) map to "Details"
+      return 1;
+    }
+    case 'processing': return 2;
+    case 'review': return 3;
+    case 'publishing': return 4;
+    case 'published': return 4;
   }
 }
 
@@ -220,9 +224,14 @@ export default function AdminPage() {
   const [violationDecisions, setViolationDecisions] = useState<Record<number, { action: 'keep' | 'remove'; reason?: string }>>({});
 
   // Wizard state
-  const [wizardPhase, setWizardPhase] = useState<WizardPhase>({ phase: 'intake', step: 'company' });
+  const [wizardPhase, setWizardPhase] = useState<WizardPhase>({ phase: 'intake', step: 'url' });
   const [intakeData, setIntakeData] = useState<IntakeData>({ companyName: '', roleLabel: '', jobDescription: '' });
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // URL scraping state
+  const [scrapeState, setScrapeState] = useState<'idle' | 'scraping' | 'done' | 'error'>('idle');
+  const [scrapeError, setScrapeError] = useState<string>('');
+  const [scrapeUrlValue, setScrapeUrlValue] = useState<string>('');
 
   // Restore session from sessionStorage on mount
   useEffect(() => {
@@ -296,10 +305,13 @@ export default function AdminPage() {
   };
 
   const resetWizard = () => {
-    setWizardPhase({ phase: 'intake', step: 'company' });
+    setWizardPhase({ phase: 'intake', step: 'url' });
     setIntakeData({ companyName: '', roleLabel: '', jobDescription: '' });
     setGenerated(null);
     setViolationDecisions({});
+    setScrapeState('idle');
+    setScrapeError('');
+    setScrapeUrlValue('');
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
@@ -343,7 +355,7 @@ export default function AdminPage() {
         type: 'error',
         text: error instanceof Error ? error.message : 'Something went wrong generating your resume. Try again?',
       });
-      setWizardPhase({ phase: 'intake', step: 'jd' });
+      setWizardPhase({ phase: 'intake', step: scrapeUrlValue ? 'confirm' : 'jd' });
     } finally {
       abortControllerRef.current = null;
     }
@@ -406,6 +418,38 @@ export default function AdminPage() {
 
   const handleIntakeDataChange = (field: keyof IntakeData, value: string) => {
     setIntakeData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleScrapeUrl = async () => {
+    const url = scrapeUrlValue.trim();
+    if (!url) return;
+    setScrapeState('scraping');
+    setScrapeError('');
+    try {
+      const res = await fetch('/api/scrape', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': storedPassword,
+        },
+        body: JSON.stringify({ url }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Scraping failed');
+      }
+      const data = await res.json();
+      setIntakeData({
+        companyName: data.companyName || '',
+        roleLabel: data.roleTitle || '',
+        jobDescription: data.jobDescription || '',
+      });
+      setScrapeState('done');
+      setWizardPhase({ phase: 'intake', step: 'confirm' });
+    } catch (error) {
+      setScrapeError(error instanceof Error ? error.message : 'Couldn\'t fetch the job posting. You can enter details manually instead.');
+      setScrapeState('error');
+    }
   };
 
   // --- Render ---
@@ -539,10 +583,32 @@ export default function AdminPage() {
                     else if (wizardPhase.step === 'role') setWizardPhase({ phase: 'intake', step: 'jd' });
                   }}
                   onBack={() => {
-                    if (wizardPhase.step === 'role') setWizardPhase({ phase: 'intake', step: 'company' });
-                    else if (wizardPhase.step === 'jd') setWizardPhase({ phase: 'intake', step: 'role' });
+                    if (wizardPhase.step === 'company') {
+                      setWizardPhase({ phase: 'intake', step: 'url' });
+                    } else if (wizardPhase.step === 'role') {
+                      setWizardPhase({ phase: 'intake', step: 'company' });
+                    } else if (wizardPhase.step === 'jd') {
+                      setWizardPhase({ phase: 'intake', step: 'role' });
+                    } else if (wizardPhase.step === 'confirm') {
+                      // Going back from confirm resets to URL step
+                      setScrapeState('idle');
+                      setScrapeError('');
+                      setWizardPhase({ phase: 'intake', step: 'url' });
+                    }
                   }}
                   onStartTailoring={handleStartTailoring}
+                  onEnterManually={() => setWizardPhase({ phase: 'intake', step: 'company' })}
+                  scrapeState={scrapeState}
+                  scrapeError={scrapeError}
+                  scrapeUrl={scrapeUrlValue}
+                  onScrapeUrlChange={(val) => {
+                    setScrapeUrlValue(val);
+                    if (scrapeState !== 'idle') {
+                      setScrapeState('idle');
+                      setScrapeError('');
+                    }
+                  }}
+                  onScrapeSubmit={handleScrapeUrl}
                 />
               </FadeIn>
             )}
@@ -552,7 +618,7 @@ export default function AdminPage() {
               <FadeIn>
                 <ProcessingView onCancel={() => {
                   abortControllerRef.current?.abort();
-                  setWizardPhase({ phase: 'intake', step: 'jd' });
+                  setWizardPhase({ phase: 'intake', step: scrapeUrlValue ? 'confirm' : 'jd' });
                 }} />
               </FadeIn>
             )}
@@ -593,7 +659,7 @@ export default function AdminPage() {
                       <button
                         onClick={() => {
                           if (confirm('Going back will discard the generated resume. You\'ll need to generate again, which uses an API call. Continue?')) {
-                            setWizardPhase({ phase: 'intake', step: 'jd' });
+                            setWizardPhase({ phase: 'intake', step: scrapeUrlValue ? 'confirm' : 'jd' });
                           }
                         }}
                         style={styles.discardBtn}
