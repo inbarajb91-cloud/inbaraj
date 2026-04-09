@@ -254,20 +254,26 @@ export default function JDForm({
         const sourceName = isFromBase
           ? 'your base resume'
           : (registry[adaptSource]?.company || adaptSource);
+        const hasCompany = data.companyName.trim().length > 0;
+        const hasRole = data.roleLabel.trim().length > 0;
+        // Can start if: has instruction AND (has company OR has role for default variant)
+        const canStart = adaptInstruction.trim().length > 0 && (hasCompany || hasRole);
 
         return (
           <div style={styles.stepContainer}>
             <button onClick={onBack} style={styles.backBtn}>&larr; Back</button>
             <p style={styles.prompt}>
               {isFromBase
-                ? 'What company is this version for?'
-                : <>Adapting from <span style={styles.companyHighlight}>{sourceName}</span> — who is this new version for?</>
+                ? 'Tell me about this version'
+                : <>Adapting from <span style={styles.companyHighlight}>{sourceName}</span></>
               }
             </p>
 
             <div style={styles.confirmFields}>
               <div style={styles.field}>
-                <label style={styles.label}>Company</label>
+                <label style={styles.label}>
+                  Company {isFromBase && <span style={styles.optionalTag}>(optional)</span>}
+                </label>
                 <input
                   type="text"
                   value={data.companyName}
@@ -276,16 +282,20 @@ export default function JDForm({
                   style={styles.input}
                   autoFocus
                 />
-                <p style={styles.hint}>
-                  {isFromBase
-                    ? 'I\'ll create a tailored version at inbaraj.info/r/company-name'
-                    : 'Your new page will be at inbaraj.info/r/company-name'}
-                </p>
+                {isFromBase && !hasCompany && (
+                  <p style={styles.hint}>
+                    Leave blank to create a general-purpose variant — I&apos;ll use the role as the label
+                  </p>
+                )}
+                {hasCompany && (
+                  <p style={styles.hint}>Your page will be at inbaraj.info/r/company-name</p>
+                )}
               </div>
 
               <div style={styles.field}>
                 <label style={styles.label}>
-                  Role <span style={styles.optionalTag}>(optional)</span>
+                  Role {hasCompany && <span style={styles.optionalTag}>(optional)</span>}
+                  {isFromBase && !hasCompany && <span style={styles.requiredTag}>(required)</span>}
                 </label>
                 <input
                   type="text"
@@ -294,6 +304,11 @@ export default function JDForm({
                   placeholder="e.g. Implementation Lead, Business Analyst"
                   style={styles.input}
                 />
+                {isFromBase && !hasCompany && hasRole && (
+                  <p style={styles.hint}>
+                    Your page will be at inbaraj.info/r/d-{data.roleLabel.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}
+                  </p>
+                )}
               </div>
 
               <div style={styles.field}>
@@ -317,10 +332,10 @@ export default function JDForm({
 
             <button
               onClick={onStartAdapt}
-              disabled={!data.companyName.trim() || !adaptInstruction.trim()}
+              disabled={!canStart}
               style={{
                 ...styles.startBtn,
-                opacity: (!data.companyName.trim() || !adaptInstruction.trim()) ? 0.4 : 1,
+                opacity: !canStart ? 0.4 : 1,
               }}
             >
               Start Adapting
@@ -413,6 +428,11 @@ const styles: Record<string, React.CSSProperties> = {
   optionalTag: {
     fontSize: '0.8rem',
     color: '#70708a',
+    fontFamily: "'DM Sans', sans-serif",
+  },
+  requiredTag: {
+    fontSize: '0.8rem',
+    color: '#fbbf24',
     fontFamily: "'DM Sans', sans-serif",
   },
   companyHighlight: {

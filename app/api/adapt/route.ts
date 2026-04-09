@@ -17,16 +17,32 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { sourceSlug, companyName, roleLabel, instruction } = body;
 
-    if (!companyName || !instruction) {
+    if (!instruction) {
       return NextResponse.json(
-        { error: 'companyName and instruction are required' },
+        { error: 'instruction is required' },
+        { status: 400 }
+      );
+    }
+
+    // Need either a company name or a role label for the slug
+    if (!companyName && !roleLabel) {
+      return NextResponse.json(
+        { error: 'Either companyName or roleLabel is required' },
         { status: 400 }
       );
     }
 
     const base = loadBase();
     const groundTruth = loadGroundTruth();
-    const slug = generateSlug(companyName, roleLabel);
+
+    // Default variants (no company) get a d- prefix slug
+    const isDefaultVariant = !companyName;
+    const slug = isDefaultVariant
+      ? `d-${generateSlug(roleLabel!)}`
+      : generateSlug(companyName, roleLabel);
+    const displayName = isDefaultVariant
+      ? roleLabel!
+      : companyName;
 
     // Build the source resume: base merged with profile overrides (if any)
     let sourceResume = base;
@@ -50,7 +66,7 @@ export async function POST(request: NextRequest) {
     logGeneration({
       timestamp: new Date().toISOString(),
       slug,
-      company: companyName,
+      company: displayName,
       generationTimeMs,
       validationResult: validation,
       retryCount,
@@ -58,7 +74,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       slug,
-      companyName,
+      companyName: displayName,
       date,
       overrides,
       validation,
