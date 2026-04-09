@@ -1,0 +1,139 @@
+{
+  "meta": {
+    "company": "Uplers",
+    "created": "2026-04-09",
+    "active": true
+  },
+  "hero": {
+    "headline": "Senior Implementation <em>Lead</em> who delivers enterprise outcomes at scale",
+    "description": "20 enterprise SaaS rollouts with full account-level ownership — kickoff through structured hypercare. 5+ years translating complex requirements into scalable configurations across regulated and process-heavy industries. Expert at workflow design, stakeholder alignment, and mentoring implementation teams."
+  },
+  "experience": [
+    {
+      "period": "Nov 2021 — Present",
+      "company": "Facilio",
+      "badge": "CMMS · SaaS",
+      "title": "Lead, Product Implementation",
+      "bullets": [
+        "Owned 20 end-to-end enterprise SaaS implementations at the account level — full lifecycle responsibility from kickoff through structured hypercare and Customer Success handoff.",
+        "Led workflow and solution design across complex multi-module configurations — translating enterprise requirements into scalable SaaS implementations for facility management and manufacturing operations.",
+        "Managed account-level customer delivery and communication — facilitated steering meetings with senior stakeholders, aligned expectations, and handled escalations across UK, US, and Middle East engagements.",
+        "Mentored implementation team members through structured coaching on workflow design, delivery standards, and customer communication — building scalable practices across the implementation function."
+      ],
+      "highlights": [
+        {
+          "label": "Account-level ownership",
+          "text": "Delivered complex enterprise implementations independently — managed multi-stakeholder delivery, risk mitigation, and go-live execution without senior hand-holding. Built structured hypercare processes and clean handoff documentation for Customer Success teams.",
+          "color": "purple"
+        },
+        {
+          "label": "Workflow & solution design",
+          "text": "Conceptualized a use-case-driven implementation framework with complexity scoring and effort models — enabling scalable delivery practices and accurate scoping across the implementation team.",
+          "color": "teal"
+        },
+        {
+          "label": "Enterprise delivery excellence",
+          "text": "Travelled on-site for high-stakes implementations including Saudi Arabia ($500K engagement) and UK — delivered structured workshops, stakeholder alignment, and go-live training across regulated facility operations.",
+          "color": "purple"
+        },
+        {
+          "label": "Implementation scalability",
+          "text": "Built playbooks, templates, and checklists used across the implementation function — identified scope-change tracking mechanisms and collaborated with Sales to introduce billable Professional Services frameworks.",
+          "color": "green"
+        },
+        {
+          "label": "Complex requirements translation",
+          "text": "Scoped and delivered integrations across SSO (SAML/SCIM) and enterprise platforms including Xero, CorrigoPro, Bill.com, and SFG20 — validated API feasibility and authored integration requirement documents for engineering teams.",
+          "color": "purple"
+        },
+        {
+          "label": "Customer Success handoffs",
+          "text": "4 of 5 pilot implementations converted to full enterprise rollouts — through structured discovery, early value demonstration, and comprehensive account documentation enabling smooth post-go-live adoption.",
+          "color": "green"
+        }
+      ]
+    },
+    {
+      "period": "May 2016 — Oct 2021",
+      "company": "Amazon",
+      "badge": "E-Commerce · Ops",
+      "title": "Senior Catalog Specialist",
+      "bullets": [
+        "Owned complex operational process implementations across Amazon Fresh, Pantry, and Prime Now — delivering measurable efficiency improvements through systematic workflow design.",
+        "Designed and implemented a defect prioritisation framework using forecasting data and business metrics — delivered $230K in monthly operational savings through structured process improvement.",
+        "Coordinated cross-functional execution to resolve process gaps — reduced invalid case assignments between teams by ~50 per day through SOP standardisation and workflow optimization."
+      ],
+      "highlights": []
+    }
+  ],
+  "skills": [
+    {
+      "title": "Account-Level Implementation Leadership",
+      "color": "accent",
+      "items": [
+        "End-to-end account ownership (kickoff → hypercare)",
+        "Multi-stakeholder delivery management",
+        "Risk management & escalation handling",
+        "Customer Success handoff & documentation",
+        "Enterprise stakeholder alignment"
+      ]
+    },
+    {
+      "title": "Workflow & Solution Design",
+      "color": "teal",
+      "items": [
+        "Complex requirements translation",
+        "Multi-module configuration design",
+        "Scalable implementation frameworks",
+        "Process-heavy industry expertise",
+        "Integration scoping & validation"
+      ]
+    },
+    {
+      "title": "Team Leadership & Mentorship",
+      "color": "amber",
+      "items": [
+        "Junior Implementation Lead coaching",
+        "Delivery standards enforcement",
+        "Playbook & template development",
+        "Implementation team scalability",
+        "Cross-functional coordination"
+      ]
+    },
+    {
+      "title": "Enterprise SaaS Configuration",
+      "color": "accent",
+      "items": [
+        "Low-code/no-code platform expertise",
+        "System integration & API validation",
+        "SAML/SCIM SSO implementation",
+        "Workflow automation design",
+        "Configuration documentation"
+      ]
+    },
+    {
+      "title": "Execution & Communication",
+      "color": "teal",
+      "items": [
+        "Hands-on implementation execution",
+        "Clean documentation & handoff materials",
+        "US enterprise customer management",
+        "Project tracking & milestone management",
+        "Late-evening timezone coordination"
+      ]
+    }
+  ],
+  "customSections": [
+    {
+      "id": "industry-expertise",
+      "title": "Industry & Domain Expertise",
+      "position": "after:skills",
+      "items": [
+        "Facility Management & CMMS — 20 enterprise implementations across regulated operations",
+        "Manufacturing Operations — complex multi-module configurations for process-heavy environments",
+        "Enterprise Integration — SSO, third-party platforms, API validation and requirement documentation",
+        "Global Enterprise Delivery — UK, US, Middle East on-site and remote implementation experience"
+      ]
+    }
+  ]
+}
