@@ -51,12 +51,16 @@ Chronological history of decisions, changes, and lessons learned across sessions
 - [x] Published phase with inline live-check polling
 - [x] Tab-switch guard to warn about in-progress work
 
-### Phase 2 — URL-based JD scraping
+### Phase 2 — URL-based JD scraping (COMPLETED)
 
-- [ ] Apify integration — paste a URL instead of raw JD text
-- [ ] `APIFY_API_KEY` env var and scraper API route
-- [ ] Support LinkedIn job posts, company careers pages
-- [ ] Fallback to manual paste if scrape fails
+- [x] Apify integration — paste a URL instead of raw JD text
+- [x] `APIFY_API_KEY` env var and scraper API route
+- [x] Support LinkedIn job posts, company careers pages
+- [x] Fallback to manual paste if scrape fails
+- [x] URL-first wizard flow — URL is the first step, extracts company + role + JD
+- [x] LinkedIn: dedicated `apimaestro~linkedin-job-detail` actor (structured data via LinkedIn API)
+- [x] Generic sites: `apify~website-content-crawler` with `playwright:adaptive` + Claude extraction
+- [x] Confirm step — all extracted fields shown for review/editing before tailoring
 
 ### Phase 3 — Inline editing with AI assist
 
@@ -441,4 +445,77 @@ Added `confirm()` dialog to the Revise button warning that going back discards t
 
 ### Branch
 - `claude/continue-portfolio-dev-aU9z3`
-- PR #5 to be merged to main
+- PR #5 merged to main
+
+---
+
+## Session 6 — "Phase 2: URL-based JD scraping" (Apr 9, 2026)
+
+### Context
+Phase 1 (agentic UX) was complete. Phase 2 goal: allow pasting a job posting URL instead of raw text. The system scrapes the page and extracts company name, role title, and job description automatically.
+
+### Changes made
+
+#### Commit 1: Phase 2 backend (lib/apify.ts, lib/scrape.ts, app/api/scrape/route.ts)
+
+1. **Apify client** — `lib/apify.ts` with `scrapeUrl()` function using `apify~website-content-crawler` (initially with `cheerio` crawler type).
+2. **Claude extraction** — `lib/scrape.ts` with `extractJobDescription()` to pull clean JD text from raw scraped page content.
+3. **Scrape API route** — `POST /api/scrape` with auth, URL validation, Apify scrape → Claude extract pipeline.
+4. **JDForm URL detection** — Auto-detect URLs in the JD textarea, show "Fetch Job Description" button.
+
+#### Commit 2: URL-first wizard redesign
+
+User feedback: URL should be the FIRST step, not buried in the JD textarea. And it should extract company + role + JD — not just JD text.
+
+1. **New wizard flow** — Starts at `url` step ("Have a job posting link?"), not `company`. Manual entry via "or enter details manually" link.
+2. **Structured extraction** — `lib/scrape.ts` rewritten to return `{ companyName, roleTitle, jobDescription }` as JSON, not just text.
+3. **Confirm step** — After URL scraping, shows all three fields pre-filled and editable. User reviews before "Start Tailoring".
+4. **Updated breadcrumb** — Simplified to: Start → Details → Processing → Review → Published.
+5. **Smart back-navigation** — Cancel/Revise/error-fallback routes to `confirm` (URL path) or `jd` (manual path) based on which entry point was used.
+
+#### Commits 3-6: LinkedIn scraping fixes
+
+LinkedIn blocks generic scrapers. Went through several iterations:
+
+1. **URL normalization** — Convert LinkedIn search URLs (`?currentJobId=123`) to public `/jobs/view/123/` format.
+2. **Switched to playwright** — `cheerio` can't render JS-heavy pages. Changed to `playwright` (later `playwright:adaptive`).
+3. **Dedicated LinkedIn actor** — User showed that Claude chat uses `apimaestro/linkedin-job-detail` actor which accesses LinkedIn's data API directly. Implemented this for LinkedIn URLs — returns structured data (title, company, description) with no scraping needed.
+4. **Actor ID fix** — Apify API uses `~` not `/` as separator: `apimaestro~linkedin-job-detail`.
+5. **Crawler type fix** — Generic crawler requires `playwright:adaptive`, not bare `playwright`.
+
+### Key decisions
+
+1. **URL-first over URL-as-option** — Making URL the first step (not a toggle on the JD textarea) is much more natural. Most users have a job posting URL, not raw text.
+
+2. **Dedicated LinkedIn actor over generic scraping** — LinkedIn's anti-scraping policies make generic crawlers unreliable. The `apimaestro~linkedin-job-detail` actor uses LinkedIn's data API directly, returning perfectly structured data without scraping.
+
+3. **Two-strategy architecture** — LinkedIn URLs → dedicated actor (structured data, skip Claude). Other URLs → generic crawler + Claude extraction. Clean separation.
+
+4. **Confirm step for URL path** — After scraping, show all extracted fields for review. User can correct company name or edit the JD before proceeding. Manual path keeps the one-field-at-a-time flow.
+
+### Bugs encountered and fixed
+
+1. **LinkedIn search URLs return no content** — These are auth-walled SPAs. Fixed by extracting `currentJobId` param and converting to public `/jobs/view/` URL.
+2. **Apify 404 on LinkedIn actor** — Actor ID `apimaestro/linkedin-job-detail` created broken URL path. Fixed: `apimaestro~linkedin-job-detail`.
+3. **Apify 400 on generic crawler** — `crawlerType: 'playwright'` is no longer valid. Fixed: `playwright:adaptive`.
+
+### Lessons learned
+
+16. **LinkedIn blocks all generic scraping.** Direct fetch, headless browsers, and Apify's generic crawler all fail. Dedicated actors that use LinkedIn's API are the only reliable approach.
+
+17. **Apify actor IDs use tilde, not slash.** `apimaestro/linkedin-job-detail` in the REST API URL becomes a path separator, not an actor namespace. Must be `apimaestro~linkedin-job-detail`.
+
+18. **Apify crawler types evolve.** The `website-content-crawler` actor changed its allowed `crawlerType` values. `playwright` → `playwright:adaptive` or `playwright:firefox`.
+
+19. **URL-first UX is superior to URL-as-option.** When the most common use case is pasting a URL, make it the first thing the user sees, not a secondary toggle buried in a textarea.
+
+### New files added this session
+| File | Purpose |
+|------|---------|
+| `lib/apify.ts` | Apify client (LinkedIn + generic) |
+| `lib/scrape.ts` | Claude JD extraction from raw text |
+| `app/api/scrape/route.ts` | Scrape API endpoint |
+
+### Branch
+- `claude/continue-portfolio-development-KIi2A`
+- PR #6 merged to main

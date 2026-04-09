@@ -133,7 +133,11 @@ The "Download CV" button triggers `window.print()`. A `@media print` CSS rule hi
 | Apr 9 | Phase 1: Friendly language overhaul across 6 admin components |
 | Apr 9 | Phase 1: Wizard flow — 5-phase sequential creation experience |
 | Apr 9 | Phase 1: Step-by-step intake, processing view, published view |
-| Apr 9 | PR #5 created for Phase 1 |
+| Apr 9 | PR #5 merged to main |
+| Apr 9 | Phase 2: URL-first wizard, Apify scraping, LinkedIn dedicated actor |
+| Apr 9 | Phase 2: Confirm step for reviewing extracted data |
+| Apr 9 | Phase 2: Fixed LinkedIn actor ID, crawler type, URL normalization |
+| Apr 9 | PR #6 merged to main |
 
 ---
 
@@ -156,8 +160,14 @@ All items implemented via PR #5:
 - Cancel support during processing, Revise with cost warning
 - Published phase with inline live-check and success actions
 
-### Phase 2: URL-based JD scraping (Apify)
-Instead of pasting raw job descriptions, allow pasting a URL (LinkedIn job posting, company careers page). An Apify actor scrapes the content and extracts the JD automatically. Requires `APIFY_API_KEY` env var and a new API route.
+### Phase 2: URL-based JD scraping (COMPLETED Apr 9, 2026)
+All items implemented and merged via PR #6:
+- URL-first wizard flow: URL is the first step, extracts company + role + JD
+- LinkedIn: dedicated `apimaestro~linkedin-job-detail` actor (structured data via LinkedIn API)
+- Generic sites: `apify~website-content-crawler` with `playwright:adaptive` + Claude extraction
+- Confirm step: all extracted fields shown for review/editing before tailoring
+- Manual fallback: "or enter details manually" link preserves original Company → Role → JD flow
+- `APIFY_API_KEY` env var required in Vercel project settings
 
 ### Phase 3: Inline editing with AI assist
 Allow editing generated/published content before or after publishing:

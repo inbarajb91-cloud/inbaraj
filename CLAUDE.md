@@ -68,8 +68,8 @@ lib/
 ├── types.ts                       # All TypeScript interfaces
 ├── resume.ts                      # Data loading + deep merge
 ├── ai.ts                          # Claude API integration with retry
-├── apify.ts                       # Apify Website Content Crawler client
-├── scrape.ts                      # Claude-based JD extraction from scraped text
+├── apify.ts                       # Apify client (LinkedIn actor + generic crawler)
+├── scrape.ts                      # Claude-based structured JD extraction from scraped text
 ├── github.ts                      # GitHub Contents API client
 └── slug.ts                        # Company-name-based slug generation
 
@@ -156,6 +156,18 @@ The "create" tab in `/admin` uses a `WizardPhase` discriminated union to render 
 
 ### AbortController for generation cancellation
 `handleStartTailoring` creates an `AbortController` stored in `abortControllerRef`. The Cancel button in `ProcessingView` calls `abort()` and resets to the JD step. The catch block checks for `AbortError` to avoid showing an error message on intentional cancellation.
+
+### LinkedIn scraping requires a dedicated actor
+LinkedIn blocks all generic scraping (direct fetch, headless browsers, Apify's generic crawler). The only reliable approach is `apimaestro~linkedin-job-detail` which accesses LinkedIn's data API. It takes a `job_id` array and returns structured data (title, company, description). Generic career pages (Greenhouse, Lever, etc.) still use `apify~website-content-crawler`.
+
+### Apify actor IDs use tilde in API URLs
+Actor IDs like `apimaestro/linkedin-job-detail` must be written as `apimaestro~linkedin-job-detail` in the REST API URL. The `/` would be treated as a URL path separator, causing a 404.
+
+### Two-path wizard flow
+The intake wizard has two entry paths: URL (url → confirm) and manual (company → role → jd). Both converge at the processing phase. `scrapeUrlValue` in page.tsx tracks which path was taken so Cancel/Revise/error navigate back to the correct step (`confirm` vs `jd`).
+
+### Apify crawler type must be `playwright:adaptive`
+The `apify~website-content-crawler` actor requires `crawlerType: 'playwright:adaptive'` or `'playwright:firefox'`. Bare `'playwright'` or `'cheerio'` are rejected with a 400 error.
 
 ## Session handoff protocol
 
