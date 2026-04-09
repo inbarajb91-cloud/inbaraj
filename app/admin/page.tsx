@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import ProfileTabs from './_components/ProfileTabs';
 import JDForm from './_components/JDForm';
 import ProfilePreview from './_components/ProfilePreview';
 import GeneratedPreview from './_components/GeneratedPreview';
+import EditablePreview from './_components/EditablePreview';
 
 interface RegistryEntry {
   company: string;
@@ -233,6 +234,16 @@ export default function AdminPage() {
   const [scrapeError, setScrapeError] = useState<string>('');
   const [scrapeUrlValue, setScrapeUrlValue] = useState<string>('');
 
+  // Inline editing state (pre-publish)
+  const [editMode, setEditMode] = useState(false);
+  const [baseData, setBaseData] = useState<Record<string, unknown> | null>(null);
+
+  // Post-publish editing state
+  const [profileEditMode, setProfileEditMode] = useState(false);
+  const [profileEditOverrides, setProfileEditOverrides] = useState<Record<string, unknown> | null>(null);
+  const [profileEditDirty, setProfileEditDirty] = useState(false);
+  const [profileEditSaving, setProfileEditSaving] = useState(false);
+
   // Restore session from sessionStorage on mount
   useEffect(() => {
     const saved = sessionStorage.getItem('admin_pwd');
@@ -298,9 +309,17 @@ export default function AdminPage() {
     if (activeTab === 'create' && wizardPhase.phase !== 'intake') {
       if (!confirm('You have work in progress. Switching tabs will discard it. Continue?')) return;
     }
+    if (profileEditMode && profileEditDirty) {
+      if (!confirm('You have unsaved edits. Switching tabs will discard them. Continue?')) return;
+    }
     if (tab !== 'create') {
       resetWizard();
     }
+    // Reset profile edit state when switching tabs
+    setProfileEditMode(false);
+    setProfileEditDirty(false);
+    setProfileEditOverrides(null);
+    setEditMode(false);
     setActiveTab(tab);
   };
 
@@ -451,6 +470,92 @@ export default function AdminPage() {
       setScrapeState('error');
     }
   };
+
+  // --- Load base data for editable preview ---
+  useEffect(() => {
+    if (!storedPassword) return;
+    (async () => {
+      try {
+        const res = await fetch('/api/base', {
+          headers: { 'x-admin-password': storedPassword },
+        });
+        if (res.ok) setBaseData(await res.json());
+      } catch { /* base load failed */ }
+    })();
+  }, [storedPassword]);
+
+  // --- Pre-publish edit handlers ---
+  const handlePrePublishOverridesChange = useCallback((newOverrides: Record<string, unknown>) => {
+    if (!generated) return;
+    setGenerated({ ...generated, overrides: newOverrides });
+  }, [generated]);
+
+  // --- Post-publish edit handlers ---
+  const handleStartProfileEdit = useCallback(async (slug: string) => {
+    try {
+      const res = await fetch(`/api/profiles/${slug}`, {
+        headers: { 'x-admin-password': storedPassword },
+      });
+      if (!res.ok) throw new Error('Failed to load profile');
+      const data = await res.json();
+      // Remove meta from overrides (it's stored separately)
+      const { meta: _meta, ...overrides } = data;
+      void _meta; // meta is stored separately, we only edit overrides
+      setProfileEditOverrides(overrides);
+      setProfileEditMode(true);
+      setProfileEditDirty(false);
+    } catch {
+      setMessage({ type: 'error', text: 'Couldn\'t load profile for editing. Try again?' });
+    }
+  }, [storedPassword]);
+
+  const handleProfileEditOverridesChange = useCallback((newOverrides: Record<string, unknown>) => {
+    setProfileEditOverrides(newOverrides);
+  }, []);
+
+  const handleSaveProfileEdits = useCallback(async (slug: string) => {
+    if (!profileEditOverrides) return;
+    setProfileEditSaving(true);
+    try {
+      const res = await fetch(`/api/profiles/${slug}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': storedPassword,
+        },
+        body: JSON.stringify({ overrides: profileEditOverrides }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Save failed');
+      }
+      setProfileEditMode(false);
+      setProfileEditDirty(false);
+      setProfileEditOverrides(null);
+      setMessage({ type: 'success', text: 'Changes saved! Your page will update in about a minute.' });
+      // Start live-check polling for the updated profile
+      const fullUrl = `${window.location.origin}/r/${slug}`;
+      setLiveCheckUrl(fullUrl);
+      setLiveCheckSlug(slug);
+      setLiveCheckStatus(null);
+    } catch (error) {
+      setMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Something went wrong saving your edits. Try again?',
+      });
+    } finally {
+      setProfileEditSaving(false);
+    }
+  }, [profileEditOverrides, storedPassword]);
+
+  const handleCancelProfileEdit = useCallback(() => {
+    if (profileEditDirty) {
+      if (!confirm('You have unsaved edits. Discard them?')) return;
+    }
+    setProfileEditMode(false);
+    setProfileEditDirty(false);
+    setProfileEditOverrides(null);
+  }, [profileEditDirty]);
 
   // --- Render ---
 
@@ -638,6 +743,12 @@ export default function AdminPage() {
                     </div>
                     <div style={styles.generatedActions}>
                       <button
+                        onClick={() => setEditMode(!editMode)}
+                        style={editMode ? styles.editBtnActive : styles.editBtn}
+                      >
+                        {editMode ? 'Done Editing' : 'Edit'}
+                      </button>
+                      <button
                         onClick={handlePublish}
                         style={(() => {
                           if (!generated.validation || generated.validation.valid) return styles.publishBtn;
@@ -659,6 +770,7 @@ export default function AdminPage() {
                       <button
                         onClick={() => {
                           if (confirm('Going back will discard the generated resume. You\'ll need to generate again, which uses an API call. Continue?')) {
+                            setEditMode(false);
                             setWizardPhase({ phase: 'intake', step: scrapeUrlValue ? 'confirm' : 'jd' });
                           }
                         }}
@@ -667,20 +779,29 @@ export default function AdminPage() {
                         Revise
                       </button>
                       <button
-                        onClick={resetWizard}
+                        onClick={() => { setEditMode(false); resetWizard(); }}
                         style={styles.discardBtn}
                       >
                         Start Over
                       </button>
                     </div>
                   </div>
-                  <GeneratedPreview
-                    overrides={generated.overrides}
-                    validation={generated.validation}
-                    password={storedPassword}
-                    onViolationDecision={handleViolationDecision}
-                    violationDecisions={violationDecisions}
-                  />
+                  {editMode ? (
+                    <EditablePreview
+                      overrides={generated.overrides}
+                      base={baseData}
+                      password={storedPassword}
+                      onOverridesChange={handlePrePublishOverridesChange}
+                    />
+                  ) : (
+                    <GeneratedPreview
+                      overrides={generated.overrides}
+                      validation={generated.validation}
+                      password={storedPassword}
+                      onViolationDecision={handleViolationDecision}
+                      violationDecisions={violationDecisions}
+                    />
+                  )}
                 </div>
               </FadeIn>
             )}
@@ -734,18 +855,56 @@ export default function AdminPage() {
                   </a>
                 </p>
               </div>
-              <button
-                onClick={() => handleDelete(activeTab)}
-                style={styles.deleteBtn}
-              >
-                Remove Profile
-              </button>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {profileEditMode ? (
+                  <>
+                    <button
+                      onClick={() => handleSaveProfileEdits(activeTab)}
+                      disabled={!profileEditDirty || profileEditSaving}
+                      style={profileEditDirty && !profileEditSaving ? styles.publishBtn : styles.saveBtnDisabled}
+                    >
+                      {profileEditSaving ? 'Saving...' : 'Save Changes'}
+                    </button>
+                    <button
+                      onClick={handleCancelProfileEdit}
+                      style={styles.discardBtn}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => handleStartProfileEdit(activeTab)}
+                      style={styles.editBtn}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(activeTab)}
+                      style={styles.deleteBtn}
+                    >
+                      Remove Profile
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
             {liveCheckSlug === activeTab && liveCheckStatus === 'checking' ? (
               <div style={styles.deployingOverlay}>
                 <div style={styles.deployingSpinner} />
                 <p style={styles.deployingText}>Publishing your page...</p>
                 <p style={styles.deployingSub}>Your page is being published. It&apos;ll appear here in about a minute.</p>
+              </div>
+            ) : profileEditMode && profileEditOverrides ? (
+              <div style={styles.generatedSection}>
+                <EditablePreview
+                  overrides={profileEditOverrides}
+                  base={baseData}
+                  password={storedPassword}
+                  onOverridesChange={handleProfileEditOverridesChange}
+                  onDirtyChange={setProfileEditDirty}
+                />
               </div>
             ) : (
               <ProfilePreview slug={activeTab} password={storedPassword} />
@@ -986,6 +1145,37 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '0.8rem',
     fontWeight: 500,
     cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+  },
+  editBtn: {
+    padding: '0.5rem 1rem',
+    background: 'rgba(124,108,250,0.1)',
+    border: '1px solid rgba(124,108,250,0.3)',
+    color: '#7c6cfa',
+    borderRadius: 6,
+    fontSize: '0.8rem',
+    cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+  },
+  editBtnActive: {
+    padding: '0.5rem 1rem',
+    background: '#7c6cfa',
+    border: '1px solid #7c6cfa',
+    color: '#fff',
+    borderRadius: 6,
+    fontSize: '0.8rem',
+    cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+  },
+  saveBtnDisabled: {
+    padding: '0.5rem 1.2rem',
+    background: '#2a2a30',
+    color: '#70708a',
+    border: 'none',
+    borderRadius: 6,
+    fontSize: '0.8rem',
+    fontWeight: 500,
+    cursor: 'not-allowed',
     fontFamily: "'DM Sans', sans-serif",
   },
   discardBtn: {
