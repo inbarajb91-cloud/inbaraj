@@ -591,7 +591,11 @@ export default function AdminPage() {
                         })()}
                       </button>
                       <button
-                        onClick={() => setWizardPhase({ phase: 'intake', step: 'jd' })}
+                        onClick={() => {
+                          if (confirm('Going back will discard the generated resume. You\'ll need to generate again, which uses an API call. Continue?')) {
+                            setWizardPhase({ phase: 'intake', step: 'jd' });
+                          }
+                        }}
                         style={styles.discardBtn}
                       >
                         Revise
