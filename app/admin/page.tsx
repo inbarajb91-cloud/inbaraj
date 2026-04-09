@@ -224,6 +224,10 @@ export default function AdminPage() {
   const [intakeData, setIntakeData] = useState<IntakeData>({ companyName: '', roleLabel: '', jobDescription: '' });
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  // URL scraping state
+  const [scrapeState, setScrapeState] = useState<'idle' | 'scraping' | 'done' | 'error'>('idle');
+  const [scrapeError, setScrapeError] = useState<string>('');
+
   // Restore session from sessionStorage on mount
   useEffect(() => {
     const saved = sessionStorage.getItem('admin_pwd');
@@ -300,6 +304,8 @@ export default function AdminPage() {
     setIntakeData({ companyName: '', roleLabel: '', jobDescription: '' });
     setGenerated(null);
     setViolationDecisions({});
+    setScrapeState('idle');
+    setScrapeError('');
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
@@ -406,6 +412,36 @@ export default function AdminPage() {
 
   const handleIntakeDataChange = (field: keyof IntakeData, value: string) => {
     setIntakeData(prev => ({ ...prev, [field]: value }));
+    // Reset scrape state when user edits the JD field
+    if (field === 'jobDescription' && scrapeState !== 'idle') {
+      setScrapeState('idle');
+      setScrapeError('');
+    }
+  };
+
+  const handleScrapeUrl = async (url: string) => {
+    setScrapeState('scraping');
+    setScrapeError('');
+    try {
+      const res = await fetch('/api/scrape', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': storedPassword,
+        },
+        body: JSON.stringify({ url }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Scraping failed');
+      }
+      const data = await res.json();
+      setIntakeData(prev => ({ ...prev, jobDescription: data.jobDescription }));
+      setScrapeState('done');
+    } catch (error) {
+      setScrapeError(error instanceof Error ? error.message : 'Couldn\'t fetch the job description. You can paste it manually instead.');
+      setScrapeState('error');
+    }
   };
 
   // --- Render ---
@@ -543,6 +579,9 @@ export default function AdminPage() {
                     else if (wizardPhase.step === 'jd') setWizardPhase({ phase: 'intake', step: 'role' });
                   }}
                   onStartTailoring={handleStartTailoring}
+                  scrapeState={scrapeState}
+                  scrapeError={scrapeError}
+                  onScrapeUrl={handleScrapeUrl}
                 />
               </FadeIn>
             )}

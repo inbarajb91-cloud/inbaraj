@@ -13,9 +13,16 @@ interface JDFormProps {
   onNext: () => void;
   onBack: () => void;
   onStartTailoring: () => void;
+  scrapeState: 'idle' | 'scraping' | 'done' | 'error';
+  scrapeError?: string;
+  onScrapeUrl: (url: string) => void;
 }
 
-export default function JDForm({ step, data, onDataChange, onNext, onBack, onStartTailoring }: JDFormProps) {
+function looksLikeUrl(text: string): boolean {
+  return /^https?:\/\/\S+$/i.test(text.trim());
+}
+
+export default function JDForm({ step, data, onDataChange, onNext, onBack, onStartTailoring, scrapeState, scrapeError, onScrapeUrl }: JDFormProps) {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && step !== 'jd') {
       e.preventDefault();
@@ -78,37 +85,84 @@ export default function JDForm({ step, data, onDataChange, onNext, onBack, onSta
         </div>
       )}
 
-      {step === 'jd' && (
-        <div style={styles.stepContainer}>
-          <button onClick={onBack} style={styles.backBtn}>&larr; Back</button>
-          <p style={styles.prompt}>
-            Paste the job description for{' '}
-            <span style={styles.companyHighlight}>{data.companyName}</span>
-            {data.roleLabel ? ` (${data.roleLabel})` : ''}
-          </p>
-          <div style={styles.field}>
-            <textarea
-              value={data.jobDescription}
-              onChange={(e) => onDataChange('jobDescription', e.target.value)}
-              placeholder="Paste the full job description here..."
-              style={styles.textarea}
-              rows={14}
-              autoFocus
-            />
-            <p style={styles.hint}>I&apos;ll analyze this and tailor your resume to match.</p>
+      {step === 'jd' && (() => {
+        const isScraping = scrapeState === 'scraping';
+        const inputIsUrl = looksLikeUrl(data.jobDescription);
+        const showFetchBtn = inputIsUrl && scrapeState === 'idle';
+
+        return (
+          <div style={styles.stepContainer}>
+            <button onClick={onBack} style={styles.backBtn}>&larr; Back</button>
+            <p style={styles.prompt}>
+              Paste the job description {' '}
+              <span style={styles.optionalTag}>or a link to the posting</span>
+              {' '}for{' '}
+              <span style={styles.companyHighlight}>{data.companyName}</span>
+              {data.roleLabel ? ` (${data.roleLabel})` : ''}
+            </p>
+            <div style={styles.field}>
+              <textarea
+                value={data.jobDescription}
+                onChange={(e) => onDataChange('jobDescription', e.target.value)}
+                placeholder="Paste the full job description or a URL (e.g. LinkedIn job link)..."
+                style={{
+                  ...styles.textarea,
+                  opacity: isScraping ? 0.5 : 1,
+                }}
+                rows={14}
+                autoFocus
+                disabled={isScraping}
+              />
+
+              {/* Scraping in progress */}
+              {isScraping && (
+                <div style={styles.scrapeStatus}>
+                  <span style={styles.scrapeSpinner} />
+                  Fetching job description...
+                </div>
+              )}
+
+              {/* Scrape succeeded */}
+              {scrapeState === 'done' && (
+                <p style={styles.scrapeSuccess}>
+                  Fetched from the link — review and edit as needed.
+                </p>
+              )}
+
+              {/* Scrape error */}
+              {scrapeState === 'error' && scrapeError && (
+                <p style={styles.scrapeErrorText}>{scrapeError}</p>
+              )}
+
+              {/* Default hint (only when no scrape activity) */}
+              {scrapeState === 'idle' && !inputIsUrl && (
+                <p style={styles.hint}>I&apos;ll analyze this and tailor your resume to match.</p>
+              )}
+            </div>
+
+            {/* Fetch button — shown when input looks like a URL */}
+            {showFetchBtn && (
+              <button
+                onClick={() => onScrapeUrl(data.jobDescription.trim())}
+                style={styles.fetchBtn}
+              >
+                Fetch Job Description
+              </button>
+            )}
+
+            <button
+              onClick={onStartTailoring}
+              disabled={!data.jobDescription.trim() || isScraping || inputIsUrl}
+              style={{
+                ...styles.startBtn,
+                opacity: (!data.jobDescription.trim() || isScraping || inputIsUrl) ? 0.4 : 1,
+              }}
+            >
+              Start Tailoring
+            </button>
           </div>
-          <button
-            onClick={onStartTailoring}
-            disabled={!data.jobDescription.trim()}
-            style={{
-              ...styles.startBtn,
-              opacity: !data.jobDescription.trim() ? 0.4 : 1,
-            }}
-          >
-            Start Tailoring
-          </button>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
@@ -211,5 +265,44 @@ const styles: Record<string, React.CSSProperties> = {
   btnRow: {
     display: 'flex',
     gap: '0.5rem',
+  },
+  fetchBtn: {
+    padding: '0.6rem 1.5rem',
+    background: '#7c6cfa',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 6,
+    fontSize: '0.85rem',
+    cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+    alignSelf: 'flex-start',
+    transition: 'opacity 0.2s',
+  },
+  scrapeStatus: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    fontSize: '0.78rem',
+    color: '#7c6cfa',
+    fontFamily: "'DM Mono', monospace",
+  },
+  scrapeSpinner: {
+    display: 'inline-block',
+    width: 12,
+    height: 12,
+    border: '2px solid #2a2a30',
+    borderTopColor: '#7c6cfa',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
+  },
+  scrapeSuccess: {
+    fontSize: '0.72rem',
+    color: '#2dd4a8',
+    fontFamily: "'DM Mono', monospace",
+  },
+  scrapeErrorText: {
+    fontSize: '0.72rem',
+    color: '#ef4444',
+    fontFamily: "'DM Mono', monospace",
   },
 };
