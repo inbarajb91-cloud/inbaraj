@@ -12,11 +12,25 @@ interface RegistryEntry {
   active: boolean;
 }
 
+interface ValidationViolation {
+  section: string;
+  field: string;
+  generated: string;
+  issue: string;
+  suggestion: string;
+}
+
+interface ValidationResult {
+  valid: boolean;
+  violations: ValidationViolation[];
+}
+
 interface GeneratedProfile {
   slug: string;
   companyName: string;
   date: string;
   overrides: Record<string, unknown>;
+  validation?: ValidationResult;
 }
 
 export default function AdminPage() {
@@ -32,6 +46,7 @@ export default function AdminPage() {
   const [liveCheckUrl, setLiveCheckUrl] = useState<string | null>(null);
   const [liveCheckStatus, setLiveCheckStatus] = useState<'checking' | 'live' | null>(null);
   const [liveCheckSlug, setLiveCheckSlug] = useState<string | null>(null);
+  const [violationDecisions, setViolationDecisions] = useState<Record<number, { action: 'keep' | 'remove'; reason?: string }>>({});
 
   // Restore session from sessionStorage on mount
   useEffect(() => {
@@ -114,6 +129,7 @@ export default function AdminPage() {
 
       const data = await res.json();
       setGenerated(data);
+      setViolationDecisions({});
       setMessage({ type: 'success', text: `Generated tailored resume for ${companyName}` });
     } catch (error) {
       setMessage({
@@ -180,6 +196,10 @@ export default function AdminPage() {
     } catch {
       setMessage({ type: 'error', text: 'Delete failed' });
     }
+  };
+
+  const handleViolationDecision = (index: number, decision: { action: 'keep' | 'remove'; reason?: string }) => {
+    setViolationDecisions(prev => ({ ...prev, [index]: decision }));
   };
 
   if (!authenticated) {
@@ -308,9 +328,23 @@ export default function AdminPage() {
                     <button
                       onClick={handlePublish}
                       disabled={publishing}
-                      style={styles.publishBtn}
+                      style={(() => {
+                        if (!generated.validation || generated.validation.valid) return styles.publishBtn;
+                        const unresolvedCount = generated.validation.violations.filter((_, i) => !violationDecisions[i]).length;
+                        return unresolvedCount === 0 ? styles.publishBtn : styles.publishBtnWarn;
+                      })()}
+                      title={(() => {
+                        if (!generated.validation || generated.validation.valid) return undefined;
+                        const unresolvedCount = generated.validation.violations.filter((_, i) => !violationDecisions[i]).length;
+                        return unresolvedCount > 0 ? `${unresolvedCount} unresolved issues — review before publishing` : undefined;
+                      })()}
                     >
-                      {publishing ? 'Publishing...' : 'Publish'}
+                      {(() => {
+                        if (publishing) return 'Publishing...';
+                        if (!generated.validation || generated.validation.valid) return 'Publish';
+                        const unresolvedCount = generated.validation.violations.filter((_, i) => !violationDecisions[i]).length;
+                        return unresolvedCount > 0 ? `Publish (${unresolvedCount} unresolved)` : 'Publish';
+                      })()}
                     </button>
                     <button
                       onClick={() => setGenerated(null)}
@@ -320,7 +354,13 @@ export default function AdminPage() {
                     </button>
                   </div>
                 </div>
-                <GeneratedPreview overrides={generated.overrides} />
+                <GeneratedPreview
+                  overrides={generated.overrides}
+                  validation={generated.validation}
+                  password={storedPassword}
+                  onViolationDecision={handleViolationDecision}
+                  violationDecisions={violationDecisions}
+                />
               </div>
             )}
           </div>
@@ -522,6 +562,17 @@ const styles: Record<string, React.CSSProperties> = {
   publishBtn: {
     padding: '0.5rem 1.2rem',
     background: '#2dd4a8',
+    color: '#0a0a0b',
+    border: 'none',
+    borderRadius: 6,
+    fontSize: '0.8rem',
+    fontWeight: 500,
+    cursor: 'pointer',
+    fontFamily: "'DM Sans', sans-serif",
+  },
+  publishBtnWarn: {
+    padding: '0.5rem 1.2rem',
+    background: '#fbbf24',
     color: '#0a0a0b',
     border: 'none',
     borderRadius: 6,

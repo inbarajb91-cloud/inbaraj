@@ -1,0 +1,116 @@
+{
+  "meta": {
+    "company": "TRG Screen",
+    "created": "2026-04-09",
+    "active": true
+  },
+  "hero": {
+    "headline": "Implementation <em>specialist</em> with proven enterprise deployment expertise",
+    "description": "20 enterprise SaaS implementations across global markets with full lifecycle ownership. 5 years translating business requirements into working system configurations — from scoping through post-go-live support. Expert in client stakeholder management and cross-functional project coordination."
+  },
+  "experience": [
+    {
+      "period": "Nov 2021 — Present",
+      "company": "Facilio",
+      "badge": "CMMS · SaaS",
+      "title": "Lead, Product Implementation",
+      "bullets": [
+        "Led 20 end-to-end enterprise SaaS implementations for mid-to-large clients with full lifecycle project ownership from scoping through post-go-live support and client handoff.",
+        "Coordinated client workshops with executives and operational teams; translated business requirements into structured BRDs, system configurations, and project plans with defined timelines.",
+        "Configured and tested SaaS platforms tailored to each client's operational needs, ensuring successful deployment and user adoption.",
+        "Managed cross-functional coordination between clients and internal teams (product, engineering, design) to ensure successful implementation outcomes."
+      ],
+      "highlights": [
+        {
+          "label": "Project framework",
+          "text": "Developed a use-case-driven implementation methodology with complexity scoring and effort estimation models — enabling accurate project scoping, automated timeline calculation, and reduced requirement ambiguity.",
+          "color": "purple"
+        },
+        {
+          "label": "Process improvement",
+          "text": "Identified gaps in scope-change tracking and collaborated with Sales to implement Professional Services credit system — converting ad-hoc changes into structured, billable project units.",
+          "color": "green"
+        },
+        {
+          "label": "Global deployment",
+          "text": "Executed on-site implementations in Saudi Arabia and UK for high-value engagements — conducting requirement gathering, stakeholder workshops, and go-live training across international markets.",
+          "color": "purple"
+        },
+        {
+          "label": "Implementation success",
+          "text": "Achieved 4 of 5 pilot-to-enterprise conversions through structured discovery, early value demonstration, and stakeholder alignment — driving $350K+ in expansion revenue.",
+          "color": "green"
+        }
+      ]
+    },
+    {
+      "period": "May 2016 — Oct 2021",
+      "company": "Amazon",
+      "badge": "E-Commerce · Ops",
+      "title": "Senior Catalog Specialist",
+      "bullets": [
+        "Managed data quality and operational defect resolution across Amazon Fresh, Amazon Pantry, and Prime Now platforms — improving system reliability and operational efficiency.",
+        "Designed a systematic defect prioritisation framework using forecasts, inventory values, and usage metrics — delivering an estimated $230K in monthly operational savings.",
+        "Analyzed process gaps and streamlined workflows between support teams, reducing invalid case assignments by approximately 50 cases per day."
+      ],
+      "highlights": []
+    }
+  ],
+  "skills": [
+    {
+      "title": "Implementation & Project Management",
+      "color": "accent",
+      "items": [
+        "End-to-end SaaS implementation lifecycle",
+        "Project planning with timeline management",
+        "Client workshop facilitation",
+        "UAT design & go-live coordination",
+        "Cross-functional team coordination"
+      ]
+    },
+    {
+      "title": "Business Analysis & Requirements",
+      "color": "teal",
+      "items": [
+        "Requirements gathering & BRD creation",
+        "Solution design & system scoping",
+        "Stakeholder engagement & management",
+        "Process improvement & gap analysis",
+        "Complexity scoring & effort estimation"
+      ]
+    },
+    {
+      "title": "Client Management & Communication",
+      "color": "amber",
+      "items": [
+        "Executive stakeholder engagement",
+        "Implementation status reporting",
+        "Change management & user adoption",
+        "Post-implementation support handoff",
+        "Cross-functional team leadership"
+      ]
+    },
+    {
+      "title": "Technical & System Configuration",
+      "color": "accent",
+      "items": [
+        "SaaS platform configuration",
+        "System integration & API work",
+        "JavaScript-like UI scripting",
+        "Data analysis & process automation",
+        "Technical documentation workflows"
+      ]
+    },
+    {
+      "title": "Tools & Project Workflow",
+      "color": "teal",
+      "items": [
+        "Project tracking (Notion/Jira)",
+        "System integration tooling",
+        "API testing & configuration",
+        "Documentation & reporting workflows",
+        "Process standardization tools"
+      ]
+    }
+  ]
+}

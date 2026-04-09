@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "skills": [
+    "End-to-end SaaS implementation",
+    "Project planning & WBS",
+    "UAT design & go-live support",
+    "SOP development & standardisation",
+    "CMMS / facility tech expertise",
+    "Requirements gathering (BRD)",
+    "Solution design & scoping",
+    "Stakeholder workshop facilitation",
+    "Complexity scoring & effort models",
+    "Process improvement & gap analysis",
+    "Executive stakeholder engagement",
+    "Cross-functional team leadership",
+    "Change management & adoption",
+    "Revenue tracking & PS billing",
+    "Post-go-live relationship management",
+    "SaaS configuration & system integration",
+    "JavaScript-like UI scripting",
+    "API integrations",
+    "Supabase · React · Tailwind",
+    "Prompt engineering & LLM tooling",
+    "Notion / Jira / project tracking",
+    "Vercel · GitHub · CLI tools",
+    "AI-enhanced documentation workflows",
+    "System integration & API tooling",
+    "Postman · Primitive"
+  ],
+  "metrics": [
+    "$4.1M+",
+    "Nearly $1M",
+    "$230K",
+    "4",
+    "20",
+    "~50 per day",
+    "4 of 5",
+    "$350K+",
+    "5 years",
+    "5+"
+  ],
+  "companies": [
+    "Facilio",
+    "Amazon"
+  ],
+  "titles": [
+    "Lead, Product Implementation",
+    "Senior Catalog Specialist"
+  ],
+  "tools": [
+    "React 19",
+    "Supabase",
+    "Gemini Flash",
+    "Twilio",
+    "Vercel Edge",
+    "React",
+    "Node.js",
+    "OpenAI",
+    "Adzuna API",
+    "TypeScript",
+    "XML",
+    "RAG",
+    "NLP",
+    "Strategy blueprinting",
+    "Real-time AI",
+    "Risk management",
+    "Human-in-loop",
+    "Postman",
+    "Primitive",
+    "Xero",
+    "CorrigoPro",
+    "Equiem",
+    "Wooqer",
+    "Bill.com",
+    "SiteFotos",
+    "SFG20",
+    "SAML",
+    "SCIM",
+    "SSO"
+  ],
+  "bullets": [
+    "Spearheaded 20 end-to-end enterprise CMMS/SaaS rollouts for mid-to-large clients — full lifecycle ownership from scoping through post-go-live support.",
+    "Facilitated client workshops with executives and operational teams; translated requirements into BRDs, solution designs, and WBS-based project plans.",
+    "Engineered and tested SaaS configurations tailored to each client, driving adoption and smooth maintenance operations.",
+    "Acted as the internal voice of the customer — bridging clients with product, engineering, and design to drive continuous improvements.",
+    "Managed and resolved catalog and procurement defects for Amazon Fresh, Amazon Pantry, and Prime Now — directly improving operational efficiency.",
+    "Designed a defect prioritisation framework using product forecasts, inventory value, and glance views — yielding an estimated $230K in monthly savings.",
+    "Streamlined defect reduction by identifying SOP gaps, reducing invalid case assignments between support teams by ~50 per day."
+  ],
+  "highlights": [
+    "Conceptualized a use-case-driven implementation framework with complexity scoring and effort models — enabling pre-sales to scope accurately, auto-calculate timelines, and cut BRD/UAT ambiguity.",
+    "Identified unaccounted scope-change efforts and built a tracking mechanism. Collaborated with Sales to introduce pre-purchased Professional Services credits — converting informal changes into billable units.",
+    "Travelled on-site to Saudi Arabia for a half-million dollar engagement and to the UK for MHA — field requirement gathering, stakeholder workshops, and go-live training across UK, US, and Middle East.",
+    "4 of 5 pilots converted to full-scale enterprise rollouts — through structured discovery, early value demonstration, and deep stakeholder alignment during the pilot phase, driving $350K+ in expansion value.",
+    "Owned the end-to-end requirements lifecycle — from scoping workshops with client stakeholders to documenting BRDs with solution designs. Worked cross-functionally with integration, product, and engineering teams to tailor configurations that best fit each client\u2019s operational workflow.",
+    "Scoped and defined integration requirements across SSO (SAML/SCIM) and third-party platforms including Xero, CorrigoPro, Equiem, Wooqer, Bill.com, SiteFotos, and SFG20. Validated API feasibility via Postman and vendor documentation, determined integration patterns (polling vs webhook), and authored integration requirement documents for the engineering team."
+  ],
+  "projectNames": [
+    "FM Engine",
+    "Parabls",
+    "AI Config Assistant",
+    "FAAX"
+  ],
+  "projectDescriptions": [
+    "Zero-training facility management platform. Residents report maintenance issues via WhatsApp — informal chat messages triaged into structured professional service requests. Multi-tenant architecture.",
+    "AI-driven \u201cconversation-first\u201d job search. Zero-form onboarding via AI chat generates profiles and ATS-optimised resumes. Narrative-based fit scores and transparent application tracking.",
+    "AI-powered assistant that lets support teams query enterprise platform configurations in natural language — eliminating dependency on implementation engineers post go-live.",
+    "Bridges the gap between raw trading interfaces and disciplined strategy-driven execution. Users define structured trading blueprints — AI monitors conditions, generates setups, and drafts trades for human approval."
+  ],
+  "education": [
+    "M.Tech — Embedded Systems",
+    "B.E — Electronics & Communication"
+  ],
+  "universities": [
+    "Hindustan University, Chennai",
+    "Balaji Institute of Engineering & Technology"
+  ],
+  "locations": [
+    "Chennai, India",
+    "UK",
+    "US",
+    "Middle East",
+    "Saudi Arabia"
+  ],
+  "certifications": []
+}
