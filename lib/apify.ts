@@ -7,7 +7,7 @@
 import type { ScrapedJobData } from './scrape';
 
 const GENERIC_ACTOR_ID = 'apify~website-content-crawler';
-const LINKEDIN_ACTOR_ID = 'apimaestro/linkedin-job-detail';
+const LINKEDIN_ACTOR_ID = 'apimaestro~linkedin-job-detail';
 const APIFY_BASE = 'https://api.apify.com/v2';
 
 interface ApifyDatasetItem {
