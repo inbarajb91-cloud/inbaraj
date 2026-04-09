@@ -1,0 +1,141 @@
+{
+  "meta": {
+    "company": "Uplers",
+    "created": "2026-04-09",
+    "active": true
+  },
+  "hero": {
+    "headline": "Senior Implementation <em>Lead</em> driving enterprise SaaS delivery at scale",
+    "description": "20 complex enterprise SaaS implementations delivered end-to-end across the UK, US, and Middle East. 5+ years owning account-level delivery — from kickoff through go-live and hypercare. Expert at translating complex requirements into scalable configurations and measurable outcomes."
+  },
+  "experience": [
+    {
+      "period": "Nov 2021 — Present",
+      "company": "Facilio",
+      "badge": "CMMS · SaaS",
+      "title": "Lead, Product Implementation",
+      "bullets": [
+        "Owned 20 end-to-end enterprise CMMS/SaaS implementations at the account level — complete lifecycle ownership from kickoff through go-live and structured hypercare support.",
+        "Led workflow and solution design sessions with executives and operational teams; translated complex requirements into BRDs, scalable configurations, and WBS-based delivery plans.",
+        "Drove execution quality across accounts through rigorous SaaS configuration testing, validation readiness, and adoption-focused maintenance operations.",
+        "Managed account-level customer delivery and communication — running steering meetings, aligning senior stakeholders, and handling escalations as the internal voice of the customer."
+      ],
+      "highlights": [
+        {
+          "label": "Account-level delivery",
+          "text": "Conceptualized a use-case-driven implementation framework with complexity scoring and effort models — enabling accurate scoping, auto-calculated timelines, and streamlined validation processes across multiple modules.",
+          "color": "purple"
+        },
+        {
+          "label": "Scalable practices",
+          "text": "Built tracking mechanisms for scope-change efforts and collaborated with Sales to introduce pre-purchased Professional Services credits — converting informal changes into structured billable units.",
+          "color": "green"
+        },
+        {
+          "label": "Enterprise delivery",
+          "text": "Travelled on-site to Saudi Arabia for a half-million dollar engagement and to the UK for MHA — leading requirement gathering workshops, stakeholder alignment, and go-live training across UK, US, and Middle East markets.",
+          "color": "purple"
+        },
+        {
+          "label": "Implementation outcomes",
+          "text": "4 of 5 pilots converted to full-scale enterprise rollouts through structured discovery, early value demonstration, and deep stakeholder alignment during pilot phases, driving $350K+ in expansion value.",
+          "color": "green"
+        },
+        {
+          "label": "Workflow design",
+          "text": "Owned end-to-end requirements lifecycle — from scoping workshops with client stakeholders to documenting BRDs with solution designs. Worked cross-functionally to tailor configurations that best fit each client's operational workflow.",
+          "color": "teal"
+        },
+        {
+          "label": "Platform coordination",
+          "text": "Coordinated integration requirements across SSO (SAML/SCIM) and third-party platforms including Xero, CorrigoPro, Equiem, Wooqer, Bill.com, SiteFotos, and SFG20. Validated API feasibility and authored integration requirements for engineering teams.",
+          "color": "purple"
+        }
+      ]
+    },
+    {
+      "period": "May 2016 — Oct 2021",
+      "company": "Amazon",
+      "badge": "E-Commerce · Ops",
+      "title": "Senior Catalog Specialist",
+      "bullets": [
+        "Managed and resolved complex catalog and procurement defects for Amazon Fresh, Amazon Pantry, and Prime Now — directly improving operational efficiency across multiple product lines.",
+        "Designed a defect prioritisation framework using product forecasts, inventory value, and glance views — yielding an estimated $230K in monthly savings through improved workflow efficiency.",
+        "Streamlined defect reduction processes by identifying SOP gaps, reducing invalid case assignments between support teams by ~50 per day through improved workflow design."
+      ],
+      "highlights": []
+    }
+  ],
+  "skills": [
+    {
+      "title": "Account-Level Implementation",
+      "color": "accent",
+      "items": [
+        "End-to-end SaaS implementation ownership",
+        "Account-level delivery management",
+        "Complex workflow & solution design",
+        "Go-live & structured hypercare delivery",
+        "CMMS / facility tech expertise"
+      ]
+    },
+    {
+      "title": "Enterprise Customer Management",
+      "color": "amber",
+      "items": [
+        "Executive stakeholder engagement",
+        "Multi-stakeholder delivery coordination",
+        "Escalation management & resolution",
+        "Post-go-live relationship management",
+        "Cross-functional team leadership"
+      ]
+    },
+    {
+      "title": "Requirements & Process Design",
+      "color": "teal",
+      "items": [
+        "Requirements gathering (BRD)",
+        "Solution design & scoping",
+        "Complexity scoring & effort models",
+        "Process improvement & gap analysis",
+        "SOP development & standardisation"
+      ]
+    },
+    {
+      "title": "Technical Configuration",
+      "color": "accent",
+      "items": [
+        "SaaS configuration & system integration",
+        "JavaScript-like UI scripting",
+        "API integrations & validation",
+        "Supabase · React · Tailwind",
+        "Low-code / no-code tools"
+      ]
+    },
+    {
+      "title": "Delivery & Documentation",
+      "color": "teal",
+      "items": [
+        "Project planning & WBS",
+        "UAT design & validation readiness",
+        "Documentation hygiene standards",
+        "Implementation playbook development",
+        "AI-enhanced documentation workflows"
+      ]
+    }
+  ],
+  "summary": "Senior Implementation Lead with 5+ years owning complex enterprise SaaS implementations at the account level. Delivered 20 end-to-end rollouts across UK, US, and Middle East — from kickoff through go-live and structured hypercare. Expert at translating complex business requirements into scalable configurations, managing multi-stakeholder delivery, and building implementation practices that scale.",
+  "customSections": [
+    {
+      "id": "enterprise-delivery",
+      "title": "Enterprise Delivery Expertise",
+      "position": "after:skills",
+      "items": [
+        "20 enterprise SaaS implementations across UK, US, and Middle East markets",
+        "Half-million dollar engagement delivery with on-site stakeholder management",
+        "$4.1M+ total contract value delivered through structured implementation practices",
+        "Complex multi-module configuration and integration across third-party platforms",
+        "Process-heavy operational workflow design with CMMS and facility management focus"
+      ]
+    }
+  ]
+}

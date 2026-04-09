@@ -37,12 +37,19 @@ Chronological history of decisions, changes, and lessons learned across sessions
 - [x] Keep/Remove buttons — per-violation actions with optional reason tracking
 - [x] BA & Integration highlights — added to Facilio experience in base.json
 
-### Phase 1 — Agentic UX overhaul
+### Phase 1 — Agentic UX overhaul (COMPLETED)
 
-- [ ] Replace tech jargon with user-friendly language throughout admin
-- [ ] Conversational agent wrapper — feels like talking to an assistant
-- [ ] Progress states visible without technical detail
-- [ ] Package generation as a multi-step agent with visible workflow states
+- [x] Replace tech jargon with user-friendly language throughout admin
+- [x] Conversational agent wrapper — feels like talking to an assistant
+- [x] Progress states visible without technical detail
+- [x] Package generation as a multi-step wizard with visible workflow states
+- [x] Step-by-step intake (Company → Role → JD, one field at a time)
+- [x] FadeIn transitions between wizard phases
+- [x] Breadcrumb navigation showing progress through the flow
+- [x] Cancel support during processing (AbortController)
+- [x] Revise/Start Over from review phase with cost warning
+- [x] Published phase with inline live-check polling
+- [x] Tab-switch guard to warn about in-progress work
 
 ### Phase 2 — URL-based JD scraping
 
@@ -360,3 +367,78 @@ Added to CLAUDE.md: Always push to feature branches, no squash unless fixing err
 | `lib/logger.ts` | Structured generation logging |
 | `app/api/base/route.ts` | Base resume API endpoint |
 | `app/admin/_components/DiffView.tsx` | Side-by-side diff view |
+
+---
+
+## Session 5 — "Phase 1: Agentic UX overhaul" (Apr 9, 2026)
+
+### Context
+Phase 0 (anti-hallucination) was complete. Phase 1 goal: transform the admin dashboard from developer-facing to assistant-like UX. Two major changes: (1) friendly language everywhere, (2) wizard flow replacing the static form.
+
+### Changes made
+
+#### Commit 1: Friendly language overhaul (6 files)
+
+Replaced all technical jargon with user-friendly conversational language across the admin dashboard:
+
+1. **page.tsx** — "Resume Admin" → "Resume Studio". All toast messages, status banners, deploy overlays, and error messages rewritten. Removed references to "Vercel", "GitHub", "slug". Softened errors ("Something went wrong... Try again?").
+
+2. **JDForm.tsx** — Form hints updated ("I'll analyze it and tailor your resume to match"). Added multi-step progress indicator during generation (Reading → Tailoring → Checking → Almost done) with checkmarks.
+
+3. **GeneratedPreview.tsx** — Validation banner: "Everything looks accurate!" / "I found N things that might need a closer look". Violation types mapped to friendly labels (UNSUPPORTED_CLAIM → "May not match your experience"). "Keep" → "It's correct". View toggles: "Diff View" → "Compare Changes", "Raw JSON" → "Raw Data".
+
+4. **ProfileTabs.tsx** — "+ New Profile" → "+ Tailor for a Company". Profile count uses "resumes" instead of "profiles".
+
+5. **DiffView.tsx** — "Base" → "Original". "New bullet" → "Added". "new" badge → "added". "Custom Sections (added)" → "New Sections".
+
+6. **ProfilePreview.tsx** — No changes needed (already clean enough).
+
+#### Commit 2: Wizard flow (page.tsx + JDForm.tsx rewrite)
+
+Replaced the static 3-field form with a 5-phase sequential wizard:
+
+1. **Intake** — Step-by-step: Company Name → Role Label → Job Description. One field per screen with conversational prompts ("What company is this resume for?"). Back navigation preserves entered data.
+
+2. **Processing** — Centered card with 4-step progress indicator + Cancel button. AbortController cancels the fetch if user backs out.
+
+3. **Review** — Only the tailored result visible (no form above it). Three actions: Publish, Revise (with cost warning confirm dialog), Start Over.
+
+4. **Publishing** — Clean spinner state.
+
+5. **Published** — Success view with live-check polling inline. Shows checkmark when live. Actions: View Page, View in Dashboard, Create Another.
+
+**Supporting features:**
+- `WizardPhase` discriminated union type as state machine
+- `WizardBreadcrumb` showing progress: Company › Role › JD › Processing › Review › Published
+- `FadeIn` component for smooth transitions between phases
+- `ProcessingView` and `PublishedView` as inline components (no new files)
+- Tab-switch guard warns about in-progress work
+- Global live-check banners hidden when wizard shows its own published phase
+
+#### Commit 3: Revise confirm dialog
+
+Added `confirm()` dialog to the Revise button warning that going back discards the AI-generated content (which cost an API call).
+
+### Key decisions
+
+1. **Client-side progress over SSE** — Used timed steps instead of server-sent events. Simpler, no API changes needed, and the UX improvement is nearly identical.
+
+2. **Wizard state machine over form visibility toggle** — A proper `WizardPhase` discriminated union ensures exactly one phase renders at a time. Prevents the "form + results both visible" problem.
+
+3. **No caching of LLM output on Revise** — Considered caching the generation to restore on return, but this defeats the purpose of revision (user wants fresh content with updated JD).
+
+4. **Inline sub-components over new files** — `ProcessingView`, `PublishedView`, `WizardBreadcrumb`, and `FadeIn` are small enough to live inside `page.tsx`. Avoids file proliferation.
+
+5. **Confirm dialog on Revise, not on Start Over** — Start Over is clearly destructive (labeled accordingly). Revise is ambiguous — the user might think it means "edit the generated content" rather than "discard and regenerate". The confirm clarifies.
+
+### Lessons learned
+
+13. **One field per screen dramatically improves focus.** The 3-field form felt overwhelming. One question at a time with clear Next/Back navigation feels conversational and guided.
+
+14. **AbortController is essential for cancellable async flows.** Without it, cancelling during generation would leave the API call running and the result would arrive to a stale state.
+
+15. **Discriminated union types make state machines type-safe.** The `WizardPhase` type ensures each phase has exactly the right data (e.g., `published` phase always has `url` and `slug`).
+
+### Branch
+- `claude/continue-portfolio-dev-aU9z3`
+- PR #5 to be merged to main

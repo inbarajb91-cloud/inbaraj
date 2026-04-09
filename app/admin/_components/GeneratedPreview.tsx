@@ -75,6 +75,17 @@ export default function GeneratedPreview({
     ? validation.violations.filter((_, i) => !violationDecisions[i]).length
     : 0;
 
+  const friendlyIssueType = (issue: string): string => {
+    const map: Record<string, string> = {
+      'UNSUPPORTED_CLAIM': 'May not match your experience',
+      'FABRICATED_METRIC': 'Metric not in your resume',
+      'FABRICATED_SKILL': 'Skill not in your resume',
+      'FABRICATED_EXPERIENCE': 'Experience not in your resume',
+      'INVENTED_DETAIL': 'Detail not in your resume',
+    };
+    return map[issue] || issue.replace(/_/g, ' ').toLowerCase();
+  };
+
   const handleKeep = (index: number) => {
     if (reasonInputIndex === index) {
       // Submit the keep with reason
@@ -133,10 +144,10 @@ export default function GeneratedPreview({
               />
               <span style={{ color: validation.valid || unresolvedCount === 0 ? '#2dd4a8' : '#fbbf24', fontSize: '0.8rem' }}>
                 {validation.valid
-                  ? 'All fact checks passed'
+                  ? 'Everything looks accurate!'
                   : unresolvedCount === 0
-                    ? `All ${validation.violations.length} issues resolved`
-                    : `${unresolvedCount} of ${validation.violations.length} issue${validation.violations.length !== 1 ? 's' : ''} need review`}
+                    ? `All items reviewed — ready to publish!`
+                    : `I found ${unresolvedCount} thing${unresolvedCount !== 1 ? 's' : ''} that might need a closer look`}
               </span>
             </div>
             {!validation.valid && validation.violations.length > 0 && (
@@ -165,7 +176,7 @@ export default function GeneratedPreview({
                       <div style={{ flex: 1 }}>
                         <div style={styles.violationHeader}>
                           <span style={styles.violationSection}>{v.section}</span>
-                          <span style={styles.violationIssue}>{v.issue.replace(/_/g, ' ')}</span>
+                          <span style={styles.violationIssue}>{friendlyIssueType(v.issue)}</span>
                           {isResolved && (
                             <span style={{
                               fontSize: '0.62rem',
@@ -190,7 +201,7 @@ export default function GeneratedPreview({
                       {!isResolved && (
                         <div style={styles.violationActions}>
                           <button onClick={() => handleKeep(i)} style={styles.keepBtn}>
-                            Keep
+                            It&apos;s correct
                           </button>
                           <button onClick={() => handleRemove(i)} style={styles.removeBtn}>
                             Remove
@@ -205,7 +216,7 @@ export default function GeneratedPreview({
                           type="text"
                           value={reasonText}
                           onChange={(e) => setReasonText(e.target.value)}
-                          placeholder="Why keep this? (optional, helps future generations)"
+                          placeholder="Why is this correct? (optional — helps me learn)"
                           style={styles.reasonInput}
                           autoFocus
                           onKeyDown={(e) => {
@@ -242,13 +253,13 @@ export default function GeneratedPreview({
           disabled={!base}
           style={viewMode === 'diff' ? styles.toggleBtnActive : styles.toggleBtn}
         >
-          Diff View
+          Compare Changes
         </button>
         <button
           onClick={() => setViewMode('json')}
           style={viewMode === 'json' ? styles.toggleBtnActive : styles.toggleBtn}
         >
-          Raw JSON
+          Raw Data
         </button>
       </div>
 
@@ -400,10 +411,9 @@ const styles: Record<string, React.CSSProperties> = {
     letterSpacing: '0.08em',
   },
   violationIssue: {
-    fontSize: '0.64rem',
+    fontSize: '0.68rem',
     color: '#fbbf24',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.08em',
+    fontStyle: 'italic',
   },
   violationGenerated: {
     fontSize: '0.78rem',

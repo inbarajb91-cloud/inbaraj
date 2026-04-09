@@ -48,7 +48,7 @@ export default function ProfileTabs({ registry, activeTab, onTabChange }: Profil
             }}
           >
             <option value="" disabled>
-              {profileEntries.length} profile{profileEntries.length !== 1 ? 's' : ''} ▾
+              {profileEntries.length} resume{profileEntries.length !== 1 ? 's' : ''} ▾
             </option>
             {profileEntries.map(([slug, entry]) => (
               <option key={slug} value={slug}>
@@ -69,7 +69,7 @@ export default function ProfileTabs({ registry, activeTab, onTabChange }: Profil
           ...(activeTab === 'create' ? styles.activeCreateTab : styles.createTab),
         }}
       >
-        + New Profile
+        + Tailor for a Company
       </button>
     </div>
   );
