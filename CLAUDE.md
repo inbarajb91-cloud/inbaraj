@@ -101,6 +101,7 @@ Required in Vercel project settings (not team settings):
 - **Data flow**: `data/base.json` → `loadBase()` → components. Profile overrides are deep-merged via `mergeResume()`
 - **GitHub as database** — profile JSONs are committed to the repo via GitHub API. No external database.
 - **Static + Dynamic rendering** — base page is static (`○`), profile pages are force-dynamic (`ƒ`) to support GitHub API fallback
+- **Git workflow** — Always push changes to a feature branch, never directly to main. Do not squash commits unless there is an error to fix. Wait for user to test before merging to main.
 
 ## Gotchas
 
