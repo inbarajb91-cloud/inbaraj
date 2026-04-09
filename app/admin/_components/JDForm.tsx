@@ -249,68 +249,85 @@ export default function JDForm({
       )}
 
       {/* Step: Adapt details — company name + instruction (adapt path) */}
-      {step === 'adapt-details' && (
-        <div style={styles.stepContainer}>
-          <button onClick={onBack} style={styles.backBtn}>&larr; Back</button>
-          <p style={styles.prompt}>
-            Adapting from{' '}
-            <span style={styles.companyHighlight}>
-              {adaptSource ? registry[adaptSource]?.company || adaptSource : 'Base Resume'}
-            </span>
-          </p>
+      {step === 'adapt-details' && (() => {
+        const isFromBase = adaptSource === null;
+        const sourceName = isFromBase
+          ? 'your base resume'
+          : (registry[adaptSource]?.company || adaptSource);
 
-          <div style={styles.confirmFields}>
-            <div style={styles.field}>
-              <label style={styles.label}>New company name</label>
-              <input
-                type="text"
-                value={data.companyName}
-                onChange={(e) => onDataChange('companyName', e.target.value)}
-                placeholder="e.g. Google, Stripe, Freshworks"
-                style={styles.input}
-                autoFocus
-              />
-              <p style={styles.hint}>Your new page will be at inbaraj.info/r/company-name</p>
+        return (
+          <div style={styles.stepContainer}>
+            <button onClick={onBack} style={styles.backBtn}>&larr; Back</button>
+            <p style={styles.prompt}>
+              {isFromBase
+                ? 'What company is this version for?'
+                : <>Adapting from <span style={styles.companyHighlight}>{sourceName}</span> — who is this new version for?</>
+              }
+            </p>
+
+            <div style={styles.confirmFields}>
+              <div style={styles.field}>
+                <label style={styles.label}>Company</label>
+                <input
+                  type="text"
+                  value={data.companyName}
+                  onChange={(e) => onDataChange('companyName', e.target.value)}
+                  placeholder="e.g. Google, Stripe, Freshworks"
+                  style={styles.input}
+                  autoFocus
+                />
+                <p style={styles.hint}>
+                  {isFromBase
+                    ? 'I\'ll create a tailored version at inbaraj.info/r/company-name'
+                    : 'Your new page will be at inbaraj.info/r/company-name'}
+                </p>
+              </div>
+
+              <div style={styles.field}>
+                <label style={styles.label}>
+                  Role <span style={styles.optionalTag}>(optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={data.roleLabel}
+                  onChange={(e) => onDataChange('roleLabel', e.target.value)}
+                  placeholder="e.g. Implementation Lead, Business Analyst"
+                  style={styles.input}
+                />
+              </div>
+
+              <div style={styles.field}>
+                <label style={styles.label}>What should I change?</label>
+                <textarea
+                  value={adaptInstruction}
+                  onChange={(e) => onAdaptInstructionChange(e.target.value)}
+                  placeholder={isFromBase
+                    ? 'e.g. Emphasize data migration experience, add a domain expertise section for fintech, focus the hero on implementation leadership...'
+                    : 'e.g. Focus more on customer success, swap the skills emphasis, hide the projects section...'}
+                  style={styles.textarea}
+                  rows={6}
+                />
+                <p style={styles.hint}>
+                  Describe how this version should differ
+                  {isFromBase ? '' : ` from the ${sourceName} resume`}.
+                  I&apos;ll adapt it based on your instructions.
+                </p>
+              </div>
             </div>
 
-            <div style={styles.field}>
-              <label style={styles.label}>
-                Role <span style={styles.optionalTag}>(optional)</span>
-              </label>
-              <input
-                type="text"
-                value={data.roleLabel}
-                onChange={(e) => onDataChange('roleLabel', e.target.value)}
-                placeholder="e.g. Implementation Lead, Business Analyst"
-                style={styles.input}
-              />
-            </div>
-
-            <div style={styles.field}>
-              <label style={styles.label}>What should I change?</label>
-              <textarea
-                value={adaptInstruction}
-                onChange={(e) => onAdaptInstructionChange(e.target.value)}
-                placeholder="e.g. Focus more on data migration experience, emphasize customer success, hide the projects section, add a domain expertise section for fintech..."
-                style={styles.textarea}
-                rows={6}
-              />
-              <p style={styles.hint}>Describe the changes you want. I&apos;ll adapt the resume based on your instructions.</p>
-            </div>
+            <button
+              onClick={onStartAdapt}
+              disabled={!data.companyName.trim() || !adaptInstruction.trim()}
+              style={{
+                ...styles.startBtn,
+                opacity: (!data.companyName.trim() || !adaptInstruction.trim()) ? 0.4 : 1,
+              }}
+            >
+              Start Adapting
+            </button>
           </div>
-
-          <button
-            onClick={onStartAdapt}
-            disabled={!data.companyName.trim() || !adaptInstruction.trim()}
-            style={{
-              ...styles.startBtn,
-              opacity: (!data.companyName.trim() || !adaptInstruction.trim()) ? 0.4 : 1,
-            }}
-          >
-            Start Adapting
-          </button>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Step: Confirm extracted data (URL path) */}
       {step === 'confirm' && (
