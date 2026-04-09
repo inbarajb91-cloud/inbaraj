@@ -25,19 +25,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 1: Scrape the page via Apify
-    let pageText: string;
+    // Scrape the URL — LinkedIn uses a dedicated actor (structured data),
+    // other sites use a generic crawler (raw text needing Claude extraction)
+    let result;
     try {
-      pageText = await scrapeUrl(url);
+      result = await scrapeUrl(url);
     } catch (error) {
       return NextResponse.json(
-        { error: error instanceof Error ? error.message : 'Failed to scrape the page' },
+        { error: error instanceof Error ? error.message : 'Failed to fetch the page' },
         { status: 502 }
       );
     }
 
-    // Step 2: Extract structured job data from raw page text via Claude
-    const jobData = await extractJobData(pageText);
+    // LinkedIn: structured data returned directly, no Claude extraction needed
+    if (result.type === 'structured') {
+      return NextResponse.json({
+        companyName: result.data.companyName,
+        roleTitle: result.data.roleTitle,
+        jobDescription: result.data.jobDescription,
+        sourceUrl: url,
+      });
+    }
+
+    // Other sites: extract structured job data from raw page text via Claude
+    const jobData = await extractJobData(result.text);
 
     return NextResponse.json({
       companyName: jobData.companyName,
