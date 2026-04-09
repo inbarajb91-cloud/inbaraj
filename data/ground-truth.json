@@ -85,15 +85,30 @@
     "Acted as the internal voice of the customer — bridging clients with product, engineering, and design to drive continuous improvements.",
     "Managed and resolved catalog and procurement defects for Amazon Fresh, Amazon Pantry, and Prime Now — directly improving operational efficiency.",
     "Designed a defect prioritisation framework using product forecasts, inventory value, and glance views — yielding an estimated $230K in monthly savings.",
-    "Streamlined defect reduction by identifying SOP gaps, reducing invalid case assignments between support teams by ~50 per day."
+    "Streamlined defect reduction by identifying SOP gaps, reducing invalid case assignments between support teams by ~50 per day.",
+    "Managed 20 end-to-end enterprise software implementations for mid-to-large clients — coordinating project timelines, prioritizing tasks, and maintaining project plans from scoping through post-go-live support.",
+    "Conducted scheduled client workshops with executives and operational teams; documented requirements into BRDs and translated them into solution designs and project deliverables.",
+    "Configured and tested SaaS applications tailored to each client's requirements, ensuring systems functioned properly and driving user adoption.",
+    "Coordinated internally with product, engineering, and design teams while serving as primary client contact throughout implementation lifecycle.",
+    "Managed operational processes and resolved system defects for Amazon Fresh, Amazon Pantry, and Prime Now — ensuring data accuracy and system functionality.",
+    "Created a defect prioritisation framework using forecasting data and inventory metrics — delivering an estimated $230K in monthly operational savings.",
+    "Identified process gaps and streamlined workflows, reducing invalid case assignments between support teams by approximately 50 cases per day.",
+    "Enterprise SaaS configuration and deployment across multiple industries",
+    "Third-party financial platform integrations: Xero, Bill.com, and payment systems",
+    "Data accuracy frameworks and inventory value optimization ($230K monthly savings)",
+    "Cross-functional coordination with product, engineering, and business stakeholders"
   ],
   "highlights": [
     "Conceptualized a use-case-driven implementation framework with complexity scoring and effort models — enabling pre-sales to scope accurately, auto-calculate timelines, and cut BRD/UAT ambiguity.",
     "Identified unaccounted scope-change efforts and built a tracking mechanism. Collaborated with Sales to introduce pre-purchased Professional Services credits — converting informal changes into billable units.",
     "Travelled on-site to Saudi Arabia for a half-million dollar engagement and to the UK for MHA — field requirement gathering, stakeholder workshops, and go-live training across UK, US, and Middle East.",
     "4 of 5 pilots converted to full-scale enterprise rollouts — through structured discovery, early value demonstration, and deep stakeholder alignment during the pilot phase, driving $350K+ in expansion value.",
-    "Owned the end-to-end requirements lifecycle — from scoping workshops with client stakeholders to documenting BRDs with solution designs. Worked cross-functionally with integration, product, and engineering teams to tailor configurations that best fit each client\u2019s operational workflow.",
-    "Scoped and defined integration requirements across SSO (SAML/SCIM) and third-party platforms including Xero, CorrigoPro, Equiem, Wooqer, Bill.com, SiteFotos, and SFG20. Validated API feasibility via Postman and vendor documentation, determined integration patterns (polling vs webhook), and authored integration requirement documents for the engineering team."
+    "Owned the end-to-end requirements lifecycle — from scoping workshops with client stakeholders to documenting BRDs with solution designs. Worked cross-functionally with integration, product, and engineering teams to tailor configurations that best fit each client’s operational workflow.",
+    "Scoped and defined integration requirements across SSO (SAML/SCIM) and third-party platforms including Xero, CorrigoPro, Equiem, Wooqer, Bill.com, SiteFotos, and SFG20. Validated API feasibility via Postman and vendor documentation, determined integration patterns (polling vs webhook), and authored integration requirement documents for the engineering team.",
+    "Developed a use-case-driven implementation framework with complexity scoring and effort estimation models — enabling accurate project scoping, automated timeline calculation, and reduced ambiguity in requirements and testing phases.",
+    "4 of 5 pilots successfully converted to full enterprise deployments through structured discovery, early value demonstration, and stakeholder alignment during pilot phases — driving $350K+ in expansion revenue.",
+    "Traveled on-site to Saudi Arabia and UK for high-value client engagements — conducting requirement gathering workshops, stakeholder training, and go-live support across multiple time zones and regions.",
+    "Owned complete requirements lifecycle from client workshops to BRD documentation. Configured enterprise software systems including SSO (SAML/SCIM) and third-party integrations with platforms like Xero, CorrigoPro, and Bill.com."
   ],
   "projectNames": [
     "FM Engine",
@@ -103,7 +118,7 @@
   ],
   "projectDescriptions": [
     "Zero-training facility management platform. Residents report maintenance issues via WhatsApp — informal chat messages triaged into structured professional service requests. Multi-tenant architecture.",
-    "AI-driven \u201cconversation-first\u201d job search. Zero-form onboarding via AI chat generates profiles and ATS-optimised resumes. Narrative-based fit scores and transparent application tracking.",
+    "AI-driven “conversation-first” job search. Zero-form onboarding via AI chat generates profiles and ATS-optimised resumes. Narrative-based fit scores and transparent application tracking.",
     "AI-powered assistant that lets support teams query enterprise platform configurations in natural language — eliminating dependency on implementation engineers post go-live.",
     "Bridges the gap between raw trading interfaces and disciplined strategy-driven execution. Users define structured trading blueprints — AI monitors conditions, generates setups, and drafts trades for human approval."
   ],
