@@ -1,0 +1,115 @@
+{
+  "meta": {
+    "company": "Business Analyst",
+    "created": "2026-04-10",
+    "active": true
+  },
+  "hero": {
+    "headline": "Business Analyst & Implementation <em>lead</em> who designs what he delivers",
+    "description": "20 enterprise SaaS rollouts across the UK, US, and Middle East. 5 years translating complex business requirements into working solutions — from stakeholder workshops to technical execution. Expert at bridging business analysis and implementation delivery. Now building AI-native tools that solve the problems I've analyzed and lived through."
+  },
+  "experience": [
+    {
+      "period": "Nov 2021 — Present",
+      "company": "Facilio",
+      "badge": "CMMS · SaaS",
+      "title": "Lead, Product Implementation & Business Analysis",
+      "bullets": [
+        "Led end-to-end business analysis and implementation delivery for 20 enterprise CMMS/SaaS rollouts — from initial requirements gathering through solution design to post-go-live support.",
+        "Conducted comprehensive business analysis through executive and operational stakeholder workshops; documented requirements in BRDs with detailed solution designs and WBS-based implementation plans.",
+        "Analyzed client business processes and translated requirements into configured SaaS solutions — ensuring alignment between business needs and technical capabilities.",
+        "Served as the strategic business analyst bridging clients with product, engineering, and design teams — driving requirements-driven product improvements and feature development."
+      ],
+      "highlights": [
+        {
+          "label": "Business Analysis Framework",
+          "text": "Conceptualized and implemented a use-case-driven business analysis framework with complexity scoring and effort estimation models — enabling pre-sales to scope requirements accurately, auto-calculate implementation timelines, and eliminate BRD/UAT ambiguity through structured analysis.",
+          "color": "purple"
+        },
+        {
+          "label": "Requirements-Driven Revenue",
+          "text": "Identified unaccounted scope-change efforts through detailed business analysis and built a requirements tracking mechanism. Collaborated with Sales to introduce pre-purchased Professional Services credits — converting informal change requests into billable, trackable business requirements.",
+          "color": "green"
+        },
+        {
+          "label": "Global Business Analysis",
+          "text": "Conducted on-site business analysis and requirements gathering in Saudi Arabia for a half-million dollar engagement and in the UK for MHA — facilitating stakeholder workshops, documenting business requirements, and designing solutions across UK, US, and Middle East markets.",
+          "color": "purple"
+        },
+        {
+          "label": "Pilot Analysis & Conversion",
+          "text": "Applied structured business analysis during pilot phases — 4 of 5 pilots converted to full-scale enterprise rollouts through comprehensive discovery, requirements validation, and stakeholder alignment, driving $350K+ in expansion value from analyzed opportunities.",
+          "color": "green"
+        },
+        {
+          "label": "End-to-End Business Analysis",
+          "text": "Owned the complete business analysis lifecycle — from initial scoping workshops with client stakeholders to comprehensive BRDs with detailed solution designs. Analyzed business processes, identified gaps, and worked cross-functionally with integration, product, and engineering teams to translate requirements into operational configurations.",
+          "color": "teal"
+        },
+        {
+          "label": "Integration Requirements Analysis",
+          "text": "Conducted detailed business analysis for integration requirements across SSO (SAML/SCIM) and third-party platforms including Xero, CorrigoPro, Equiem, Wooqer, Bill.com, SiteFotos, and SFG20. Analyzed business processes, validated technical feasibility via Postman, determined optimal integration patterns, and documented comprehensive integration requirements for engineering implementation.",
+          "color": "purple"
+        }
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "title": "Business Analysis & Requirements",
+      "color": "teal",
+      "items": [
+        "Requirements gathering & documentation (BRD)",
+        "Business process analysis & modeling",
+        "Solution design & architecture scoping",
+        "Stakeholder workshop facilitation",
+        "Gap analysis & process improvement"
+      ]
+    },
+    {
+      "title": "Implementation & Delivery",
+      "color": "accent",
+      "items": [
+        "End-to-end SaaS implementation",
+        "Project planning & WBS execution",
+        "UAT design & go-live support",
+        "SOP development & standardisation",
+        "CMMS / facility tech expertise"
+      ]
+    },
+    {
+      "title": "Analysis & Planning Tools",
+      "color": "purple",
+      "items": [
+        "Complexity scoring & effort models",
+        "Use-case-driven analysis frameworks",
+        "Requirements traceability & tracking",
+        "Business process documentation",
+        "Integration requirements analysis"
+      ]
+    },
+    {
+      "title": "Client & Stakeholder Management",
+      "color": "amber",
+      "items": [
+        "Executive stakeholder engagement",
+        "Cross-functional analysis coordination",
+        "Change management & adoption strategy",
+        "Requirements validation & sign-off",
+        "Post-implementation relationship management"
+      ]
+    },
+    {
+      "title": "Technical Analysis & Integration",
+      "color": "accent",
+      "items": [
+        "SaaS configuration & system integration analysis",
+        "API requirements & feasibility analysis",
+        "JavaScript-like UI scripting",
+        "Supabase · React · Tailwind",
+        "Integration pattern design & documentation"
+      ]
+    }
+  ],
+  "summary": "Business Analyst and Implementation lead with 5+ years delivering comprehensive business analysis and 20 enterprise SaaS/CMMS rollouts across the UK, US, and Middle East. Expert at conducting stakeholder workshops, documenting detailed business requirements, and translating complex business needs into working SaaS configurations and measurable outcomes. Proven ability to bridge business analysis with technical implementation delivery. Now building AI-native tools that solve the operational and analytical challenges I've lived through firsthand."
+}
