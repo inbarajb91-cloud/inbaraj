@@ -138,6 +138,10 @@ The "Download CV" button triggers `window.print()`. A `@media print` CSS rule hi
 | Apr 9 | Phase 2: Confirm step for reviewing extracted data |
 | Apr 9 | Phase 2: Fixed LinkedIn actor ID, crawler type, URL normalization |
 | Apr 9 | PR #6 merged to main |
+| Apr 10 | Phase 3: Inline editing with AI assist on formatted preview |
+| Apr 10 | Phase 3: "Adapt from existing" third creation path |
+| Apr 10 | Phase 3: Default variants with d- prefix slugs (no company) |
+| Apr 10 | PR #7 merged to main |
 
 ---
 
@@ -169,13 +173,15 @@ All items implemented and merged via PR #6:
 - Manual fallback: "or enter details manually" link preserves original Company → Role → JD flow
 - `APIFY_API_KEY` env var required in Vercel project settings
 
-### Phase 3: Inline editing with AI assist
-Allow editing generated/published content before or after publishing:
-- **Highlight any section** on the resume preview → two options appear:
-  - **Edit manually** — inline text editor
-  - **AI assist** — describe what you want changed, agent asks clarifying questions, then updates on confirmation
-- Overlay popup on the resume preview within admin
-- Manual edits feed back into ground truth for future generations
+### Phase 3: Inline editing with AI assist (COMPLETED Apr 10, 2026)
+All items implemented and merged via PR #7:
+- Click-to-edit on formatted preview: hover highlights, inline textarea editors
+- AI assist: describe change → Claude suggests → accept/reject/retry
+- Pre-publish editing (review phase) and post-publish editing (profile tabs)
+- PATCH API for updating published profiles, ground truth auto-update
+- "Adapt from existing" third creation path: pick source + describe changes
+- Default variants: `/r/d-role-label` slugs when no company name (base adapt)
+- Three wizard entry paths: URL, Manual, Adapt from existing
 
 ### Phase 4: Security audit
 Full review of:

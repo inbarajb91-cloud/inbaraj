@@ -62,15 +62,17 @@ Chronological history of decisions, changes, and lessons learned across sessions
 - [x] Generic sites: `apify~website-content-crawler` with `playwright:adaptive` + Claude extraction
 - [x] Confirm step — all extracted fields shown for review/editing before tailoring
 
-### Phase 3 — Inline editing with AI assist
+### Phase 3 — Inline editing with AI assist (COMPLETED)
 
-- [ ] Highlight-to-edit on resume preview — select text, popup appears
-- [ ] Manual edit option — inline text editor overlay
-- [ ] AI assist option — describe change, agent asks clarifying questions, updates on confirmation
-- [ ] Manual edits feed back into ground truth for future generations
-- [ ] Works within admin iframe preview
-- [ ] Option to edit both before publishing (generated preview) and after (published profile)
-- [ ] Consider `/update` route as auth-protected in-browser editing mode (alternative to admin-only)
+- [x] Highlight-to-edit on resume preview — click text, inline editor appears
+- [x] Manual edit option — inline text editor overlay with Save/Cancel/AI Assist
+- [x] AI assist option — describe change, Claude suggests edit, accept/reject/retry
+- [x] Manual edits feed back into ground truth for future generations
+- [x] Option to edit both before publishing (generated preview) and after (published profile)
+- [x] "Adapt from existing" — third creation path: pick source resume + describe changes
+- [x] Default variants — `/r/d-role-label` when no company name (base adapt)
+- [ ] Works within admin iframe preview (deferred — editing uses formatted preview instead)
+- [ ] Consider `/update` route as auth-protected in-browser editing mode (deferred)
 
 ### Phase 4 — Security audit
 
@@ -519,3 +521,77 @@ LinkedIn blocks generic scrapers. Went through several iterations:
 ### Branch
 - `claude/continue-portfolio-development-KIi2A`
 - PR #6 merged to main
+
+---
+
+## Session 7 — "Phase 3: Inline editing with AI assist" (Apr 10, 2026)
+
+### Context
+Phases 0–2 were complete. Phase 3 goal: let users edit AI-generated resumes inline (both before and after publishing), with optional AI assistance for individual field changes. Also added a third creation path: "adapt from existing."
+
+### Changes made
+
+#### Commit 1: Phase 3 core — inline editing with AI assist (4 files)
+
+1. **EditablePreview.tsx** — New component that renders the same formatted view as GeneratedPreview but with click-to-edit functionality. Each text field shows a purple outline + ✦ AI icon on hover. Clicking opens an inline textarea editor with Save/Cancel/AI Assist buttons. AI assist opens a panel where the user describes the change, Claude suggests new text, and the user can accept/reject/retry.
+
+2. **POST /api/ai-edit** — Claude-powered single-field editing endpoint. Takes `currentText`, `instruction`, and `fieldLabel`. Returns `editedText`. Uses a focused system prompt that only modifies what the user asks for without fabrication.
+
+3. **PATCH /api/profiles/[slug]** — New method for updating published profiles. Deep merges new overrides into existing profile JSON and commits to GitHub. Also auto-updates `ground-truth.json` by extracting new text entries (bullets, skills, highlights) from the edited overrides.
+
+4. **admin/page.tsx** — Two editing contexts:
+   - **Pre-publish (review phase)**: "Edit" toggle button switches between GeneratedPreview (read-only) and EditablePreview. Edits modify `generated.overrides` in client state.
+   - **Post-publish (profile tab)**: "Edit" button loads profile data, shows EditablePreview. "Save Changes" commits via PATCH API.
+
+#### Commit 2: "Adapt from existing" — third creation path (4 files)
+
+1. **POST /api/adapt** — Takes source resume (base or profile slug) + user instruction, generates new overrides via Claude with an adaptation-specific system prompt. Includes validation against ground truth.
+
+2. **lib/ai.ts** — Added `ADAPT_SYSTEM_PROMPT` and `adaptResumeWithValidation()`. The adapt prompt allows reword/reorder/restructure based on user instructions but still prohibits fabrication.
+
+3. **JDForm.tsx** — Two new wizard steps:
+   - `select-source`: Profile picker showing Base Resume + all published profiles
+   - `adapt-details`: Company name (optional from base), role label, instruction textarea
+
+4. **admin/page.tsx** — New wizard states, `handleStartAdapt` handler, adapt-aware back-navigation for cancel/revise flows.
+
+#### Commit 3: Context-aware copy for adapt details
+
+Adjusted the adapt-details step to show different prompts and hints based on whether the source is base resume or an existing profile. Placeholders and hints adjust accordingly.
+
+#### Commit 4: Default variants with d- prefix slugs
+
+When adapting from base without a company name, the role label becomes required and the slug uses a `d-` prefix convention: `/r/d-implementation-lead`. The profiles API, registry, and all existing infrastructure work unchanged — it's just a naming convention on the slug.
+
+### Key decisions
+
+1. **Formatted preview over iframe for editing** — Editing inside an iframe requires complex postMessage communication. Using the formatted card-based preview is simpler, more reliable, and gives full React state control. The iframe remains for read-only viewing.
+
+2. **deepSet utility for path-based updates** — Each editable field is identified by a dot-separated path (e.g., `experience.0.bullets.1`). The `deepSet` function immutably updates the overrides at that path. This avoids complex per-section update logic.
+
+3. **AI assist as a panel, not a modal** — The AI assist panel renders inline above the preview, not as a modal overlay. This lets the user see both the current text and the suggestion without context-switching.
+
+4. **Ground truth auto-update on post-publish save** — When saving edits to a published profile, new text entries are automatically appended to the relevant ground truth arrays (bullets, skills, highlights). This is best-effort — failures don't block the save.
+
+5. **Adapt uses same validation pipeline** — `adaptResumeWithValidation()` follows the same generate → validate → retry loop as `tailorResumeWithValidation()`. This ensures adapted content is also checked against ground truth.
+
+6. **d- prefix convention over new route** — Default variants (no company) use `/r/d-role-label` on the existing `/r/[slug]` route. No new routes, middleware changes, or registry schema changes needed.
+
+### Lessons learned
+
+20. **Three entry paths need careful back-navigation.** With URL, manual, and adapt flows all converging at the processing/review phases, every Cancel/Revise/error handler must know which path to return to. Tracking the source (`scrapeUrlValue`, `adaptSource`) is essential.
+
+21. **Optional fields shift UI requirements.** Making company name optional when adapting from base meant the role label had to become conditionally required. The validation logic (`hasCompany || hasRole`) and dynamic hint text need to stay in sync.
+
+22. **Inline editing state is simpler than expected.** The EditablePreview manages only two states: which field is being edited (`editing`) and whether AI assist is open (`aiAssist`). The parent owns the overrides data. This separation keeps the component focused.
+
+### New files added this session
+| File | Purpose |
+|------|---------|
+| `app/admin/_components/EditablePreview.tsx` | Click-to-edit resume preview |
+| `app/api/ai-edit/route.ts` | AI-assisted single-field editing |
+| `app/api/adapt/route.ts` | Resume adaptation from existing |
+
+### Branch
+- `claude/portfolio-site-development-lUjI1`
+- PR #7 merged to main

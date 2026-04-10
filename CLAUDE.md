@@ -35,8 +35,11 @@ app/
 │       ├── ProfileTabs.tsx        # Tab bar with profile dropdown
 │       ├── JDForm.tsx             # Job description input form
 │       ├── GeneratedPreview.tsx   # Formatted preview of AI output
+│       ├── EditablePreview.tsx    # Click-to-edit preview with AI assist
 │       └── ProfilePreview.tsx     # Iframe preview of resume pages
 └── api/
+    ├── adapt/route.ts             # POST: Adapt existing resume with instructions
+    ├── ai-edit/route.ts           # POST: AI-assisted single-field editing
     ├── generate/route.ts          # POST: Claude API resume tailoring
     ├── scrape/route.ts            # POST: URL scraping via Apify + Claude extraction
     └── profiles/
@@ -163,11 +166,23 @@ LinkedIn blocks all generic scraping (direct fetch, headless browsers, Apify's g
 ### Apify actor IDs use tilde in API URLs
 Actor IDs like `apimaestro/linkedin-job-detail` must be written as `apimaestro~linkedin-job-detail` in the REST API URL. The `/` would be treated as a URL path separator, causing a 404.
 
-### Two-path wizard flow
-The intake wizard has two entry paths: URL (url → confirm) and manual (company → role → jd). Both converge at the processing phase. `scrapeUrlValue` in page.tsx tracks which path was taken so Cancel/Revise/error navigate back to the correct step (`confirm` vs `jd`).
+### Three-path wizard flow
+The intake wizard has three entry paths: URL (url → confirm), manual (company → role → jd), and adapt (select-source → adapt-details). All converge at the processing phase. `scrapeUrlValue` and `adaptSource` in page.tsx track which path was taken so Cancel/Revise/error navigate back to the correct step.
 
 ### Apify crawler type must be `playwright:adaptive`
 The `apify~website-content-crawler` actor requires `crawlerType: 'playwright:adaptive'` or `'playwright:firefox'`. Bare `'playwright'` or `'cheerio'` are rejected with a 400 error.
+
+### EditablePreview uses path-based field identification
+Each editable field in `EditablePreview.tsx` is identified by a dot-separated path like `experience.0.bullets.1`. The `deepSet` utility immutably updates the overrides object at that path. If you add new editable sections, each field needs a unique path that maps to the overrides JSON structure.
+
+### Default variant slugs use d- prefix
+When creating a resume variant from the base without a company name, the slug uses a `d-` prefix: `/r/d-implementation-lead`. This is a naming convention on the same `/r/[slug]` route — no separate route exists. The registry stores the role label in the `company` field.
+
+### Ground truth auto-update is best-effort
+The PATCH `/api/profiles/[slug]` endpoint tries to update `ground-truth.json` after saving edits, but failures are silently logged and don't block the save. Don't rely on ground truth being immediately updated after every edit.
+
+### Inline editing uses formatted preview, not iframe
+Phase 3 editing works on the card-based formatted preview (EditablePreview), not the actual rendered resume page in the iframe. The iframe remains read-only. A future `/update` route could enable WYSIWYG editing on the real page.
 
 ## Session handoff protocol
 
