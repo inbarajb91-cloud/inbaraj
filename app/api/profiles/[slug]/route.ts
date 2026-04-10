@@ -7,6 +7,87 @@ function checkAuth(request: NextRequest): boolean {
   return !!adminPassword && authHeader === adminPassword;
 }
 
+/**
+ * Extract new text entries from overrides and add them to ground truth.
+ * This ensures manual edits are available for future AI generations.
+ */
+async function updateGroundTruth(overrides: Record<string, unknown>): Promise<void> {
+  try {
+    const gtContent = await getFileContent('data/ground-truth.json');
+    if (!gtContent) return;
+
+    const gt = JSON.parse(gtContent);
+    let changed = false;
+
+    const addUnique = (arr: string[], items: string[]) => {
+      for (const item of items) {
+        if (item && !arr.includes(item)) {
+          arr.push(item);
+          changed = true;
+        }
+      }
+    };
+
+    // Extract bullets and highlights from experience overrides
+    const experience = overrides.experience as Array<{
+      bullets?: string[];
+      highlights?: Array<{ text?: string }>;
+    }> | undefined;
+    if (Array.isArray(experience)) {
+      for (const exp of experience) {
+        if (exp.bullets) addUnique(gt.bullets || [], exp.bullets);
+        if (exp.highlights) {
+          addUnique(gt.highlights || [], exp.highlights.map(h => h.text).filter(Boolean) as string[]);
+        }
+      }
+    }
+
+    // Extract skills
+    const skills = overrides.skills as Array<{ items?: string[] }> | undefined;
+    if (Array.isArray(skills)) {
+      for (const group of skills) {
+        if (group.items) addUnique(gt.skills || [], group.items);
+      }
+    }
+
+    // Extract custom section items
+    const customSections = overrides.customSections as Array<{ items?: string[] }> | undefined;
+    if (Array.isArray(customSections)) {
+      for (const section of customSections) {
+        if (section.items) addUnique(gt.bullets || [], section.items);
+      }
+    }
+
+    if (changed) {
+      await commitFile(
+        'data/ground-truth.json',
+        JSON.stringify(gt, null, 2),
+        'Update ground truth from manual edits'
+      );
+    }
+  } catch (err) {
+    // Ground truth update is best-effort; don't fail the save
+    console.error('Ground truth update failed:', err);
+  }
+}
+
+function deepMerge(target: Record<string, unknown>, source: Record<string, unknown>): Record<string, unknown> {
+  const result = { ...target };
+  for (const key of Object.keys(source)) {
+    const sourceVal = source[key];
+    const targetVal = target[key];
+    if (
+      sourceVal && typeof sourceVal === 'object' && !Array.isArray(sourceVal) &&
+      targetVal && typeof targetVal === 'object' && !Array.isArray(targetVal)
+    ) {
+      result[key] = deepMerge(targetVal as Record<string, unknown>, sourceVal as Record<string, unknown>);
+    } else {
+      result[key] = sourceVal;
+    }
+  }
+  return result;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -25,6 +106,55 @@ export async function GET(
     return NextResponse.json(JSON.parse(content));
   } catch {
     return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  if (!checkAuth(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { slug } = await params;
+
+  try {
+    // Load existing profile
+    const content = await getFileContent(`data/profiles/${slug}.json`);
+    if (!content) {
+      return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+    }
+
+    const existingProfile = JSON.parse(content) as Record<string, unknown>;
+    const body = await request.json();
+    const { overrides } = body;
+
+    if (!overrides || typeof overrides !== 'object') {
+      return NextResponse.json({ error: 'overrides object is required' }, { status: 400 });
+    }
+
+    // Deep merge the new overrides into the existing profile (preserving meta)
+    const updatedProfile = deepMerge(existingProfile, overrides);
+
+    // Commit updated profile
+    const company = (existingProfile.meta as Record<string, unknown>)?.company || slug;
+    await commitFile(
+      `data/profiles/${slug}.json`,
+      JSON.stringify(updatedProfile, null, 2),
+      `Update profile: ${company}`
+    );
+
+    // Update ground truth with any new text from manual edits
+    await updateGroundTruth(overrides);
+
+    return NextResponse.json({ success: true, slug });
+  } catch (error) {
+    console.error('Update error:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Update failed' },
+      { status: 500 }
+    );
   }
 }
 

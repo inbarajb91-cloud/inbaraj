@@ -1,5 +1,11 @@
 'use client';
 
+interface RegistryEntry {
+  company: string;
+  created: string;
+  active: boolean;
+}
+
 interface IntakeData {
   companyName: string;
   roleLabel: string;
@@ -7,23 +13,32 @@ interface IntakeData {
 }
 
 interface JDFormProps {
-  step: 'url' | 'company' | 'role' | 'jd' | 'confirm';
+  step: 'url' | 'company' | 'role' | 'jd' | 'confirm' | 'select-source' | 'adapt-details';
   data: IntakeData;
   onDataChange: (field: keyof IntakeData, value: string) => void;
   onNext: () => void;
   onBack: () => void;
   onStartTailoring: () => void;
   onEnterManually: () => void;
+  onAdaptExisting: () => void;
   scrapeState: 'idle' | 'scraping' | 'done' | 'error';
   scrapeError?: string;
   scrapeUrl: string;
   onScrapeUrlChange: (url: string) => void;
   onScrapeSubmit: () => void;
+  // Adapt-from-existing props
+  registry: Record<string, RegistryEntry>;
+  adaptSource: string | null;
+  onAdaptSourceChange: (slug: string | null) => void;
+  adaptInstruction: string;
+  onAdaptInstructionChange: (val: string) => void;
+  onStartAdapt: () => void;
 }
 
 export default function JDForm({
   step, data, onDataChange, onNext, onBack, onStartTailoring,
-  onEnterManually, scrapeState, scrapeError, scrapeUrl, onScrapeUrlChange, onScrapeSubmit,
+  onEnterManually, onAdaptExisting, scrapeState, scrapeError, scrapeUrl, onScrapeUrlChange, onScrapeSubmit,
+  registry, adaptSource, onAdaptSourceChange, adaptInstruction, onAdaptInstructionChange, onStartAdapt,
 }: JDFormProps) {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -89,9 +104,15 @@ export default function JDForm({
             </button>
           </div>
 
-          <button onClick={onEnterManually} style={styles.manualLink} disabled={isScraping}>
-            or enter details manually
-          </button>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <button onClick={onEnterManually} style={styles.manualLink} disabled={isScraping}>
+              or enter details manually
+            </button>
+            <span style={{ color: '#2a2a30', fontSize: '0.72rem' }}>|</span>
+            <button onClick={onAdaptExisting} style={styles.manualLink} disabled={isScraping}>
+              adapt an existing resume
+            </button>
+          </div>
         </div>
       )}
 
@@ -183,6 +204,146 @@ export default function JDForm({
         </div>
       )}
 
+      {/* Step: Select source resume (adapt path) */}
+      {step === 'select-source' && (
+        <div style={styles.stepContainer}>
+          <button onClick={onBack} style={styles.backBtn}>&larr; Back</button>
+          <p style={styles.prompt}>Which resume do you want to start from?</p>
+          <div style={styles.field}>
+            <div style={styles.sourceList}>
+              <button
+                onClick={() => onAdaptSourceChange(null)}
+                style={{
+                  ...styles.sourceItem,
+                  ...(adaptSource === null ? styles.sourceItemActive : {}),
+                }}
+              >
+                <span style={styles.sourceLabel}>Base Resume</span>
+                <span style={styles.sourceHint}>Your original resume at inbaraj.info</span>
+              </button>
+              {Object.entries(registry)
+                .filter(([, entry]) => entry.active)
+                .sort(([, a], [, b]) => b.created.localeCompare(a.created))
+                .map(([slug, entry]) => (
+                  <button
+                    key={slug}
+                    onClick={() => onAdaptSourceChange(slug)}
+                    style={{
+                      ...styles.sourceItem,
+                      ...(adaptSource === slug ? styles.sourceItemActive : {}),
+                    }}
+                  >
+                    <span style={styles.sourceLabel}>{entry.company}</span>
+                    <span style={styles.sourceHint}>/r/{slug} · {entry.created}</span>
+                  </button>
+                ))}
+            </div>
+          </div>
+          <button
+            onClick={onNext}
+            style={styles.nextBtn}
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      {/* Step: Adapt details — company name + instruction (adapt path) */}
+      {step === 'adapt-details' && (() => {
+        const isFromBase = adaptSource === null;
+        const sourceName = isFromBase
+          ? 'your base resume'
+          : (registry[adaptSource]?.company || adaptSource);
+        const hasCompany = data.companyName.trim().length > 0;
+        const hasRole = data.roleLabel.trim().length > 0;
+        // Can start if: has instruction AND (has company OR has role for default variant)
+        const canStart = adaptInstruction.trim().length > 0 && (hasCompany || hasRole);
+
+        return (
+          <div style={styles.stepContainer}>
+            <button onClick={onBack} style={styles.backBtn}>&larr; Back</button>
+            <p style={styles.prompt}>
+              {isFromBase
+                ? 'Tell me about this version'
+                : <>Adapting from <span style={styles.companyHighlight}>{sourceName}</span></>
+              }
+            </p>
+
+            <div style={styles.confirmFields}>
+              <div style={styles.field}>
+                <label style={styles.label}>
+                  Company {isFromBase && <span style={styles.optionalTag}>(optional)</span>}
+                </label>
+                <input
+                  type="text"
+                  value={data.companyName}
+                  onChange={(e) => onDataChange('companyName', e.target.value)}
+                  placeholder="e.g. Google, Stripe, Freshworks"
+                  style={styles.input}
+                  autoFocus
+                />
+                {isFromBase && !hasCompany && (
+                  <p style={styles.hint}>
+                    Leave blank to create a general-purpose variant — I&apos;ll use the role as the label
+                  </p>
+                )}
+                {hasCompany && (
+                  <p style={styles.hint}>Your page will be at inbaraj.info/r/company-name</p>
+                )}
+              </div>
+
+              <div style={styles.field}>
+                <label style={styles.label}>
+                  Role {hasCompany && <span style={styles.optionalTag}>(optional)</span>}
+                  {isFromBase && !hasCompany && <span style={styles.requiredTag}>(required)</span>}
+                </label>
+                <input
+                  type="text"
+                  value={data.roleLabel}
+                  onChange={(e) => onDataChange('roleLabel', e.target.value)}
+                  placeholder="e.g. Implementation Lead, Business Analyst"
+                  style={styles.input}
+                />
+                {isFromBase && !hasCompany && hasRole && (
+                  <p style={styles.hint}>
+                    Your page will be at inbaraj.info/r/d-{data.roleLabel.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}
+                  </p>
+                )}
+              </div>
+
+              <div style={styles.field}>
+                <label style={styles.label}>What should I change?</label>
+                <textarea
+                  value={adaptInstruction}
+                  onChange={(e) => onAdaptInstructionChange(e.target.value)}
+                  placeholder={isFromBase
+                    ? 'e.g. Emphasize data migration experience, add a domain expertise section for fintech, focus the hero on implementation leadership...'
+                    : 'e.g. Focus more on customer success, swap the skills emphasis, hide the projects section...'}
+                  style={styles.textarea}
+                  rows={6}
+                />
+                <p style={styles.hint}>
+                  Describe how this version should differ
+                  {isFromBase ? '' : ` from the ${sourceName} resume`}.
+                  I&apos;ll adapt it based on your instructions.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={onStartAdapt}
+              disabled={!canStart}
+              style={{
+                ...styles.startBtn,
+                opacity: !canStart ? 0.4 : 1,
+              }}
+            >
+              Start Adapting
+            </button>
+          </div>
+        );
+      })()}
+
       {/* Step: Confirm extracted data (URL path) */}
       {step === 'confirm' && (
         <div style={styles.stepContainer}>
@@ -267,6 +428,11 @@ const styles: Record<string, React.CSSProperties> = {
   optionalTag: {
     fontSize: '0.8rem',
     color: '#70708a',
+    fontFamily: "'DM Sans', sans-serif",
+  },
+  requiredTag: {
+    fontSize: '0.8rem',
+    color: '#fbbf24',
     fontFamily: "'DM Sans', sans-serif",
   },
   companyHighlight: {
@@ -388,6 +554,37 @@ const styles: Record<string, React.CSSProperties> = {
   scrapeErrorText: {
     fontSize: '0.72rem',
     color: '#ef4444',
+    fontFamily: "'DM Mono', monospace",
+  },
+  sourceList: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '0.4rem',
+  },
+  sourceItem: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '0.15rem',
+    padding: '0.7rem 1rem',
+    background: '#18181c',
+    border: '1px solid #2a2a30',
+    borderRadius: 6,
+    cursor: 'pointer',
+    textAlign: 'left' as const,
+    transition: 'border-color 0.15s, background 0.15s',
+  },
+  sourceItemActive: {
+    borderColor: '#7c6cfa',
+    background: 'rgba(124,108,250,0.08)',
+  },
+  sourceLabel: {
+    fontSize: '0.9rem',
+    color: '#e8e8ec',
+    fontFamily: "'DM Sans', sans-serif",
+  },
+  sourceHint: {
+    fontSize: '0.68rem',
+    color: '#70708a',
     fontFamily: "'DM Mono', monospace",
   },
 };
