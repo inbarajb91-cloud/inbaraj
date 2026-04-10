@@ -13,5 +13,10 @@
     "company": "Uplers",
     "created": "2026-04-09",
     "active": true
+  },
+  "d-business-analyst": {
+    "company": "Business Analyst",
+    "created": "2026-04-10",
+    "active": true
   }
 }
