@@ -1,0 +1,124 @@
+{
+  "meta": {
+    "company": "greytHR",
+    "created": "2026-04-11",
+    "active": true
+  },
+  "hero": {
+    "headline": "Implementation <em>specialist</em> who delivers seamless SaaS onboarding",
+    "description": "20 enterprise SaaS rollouts across the UK, US, and Middle East. 5 years bridging business requirements and technical execution — onsite training, implementation support, and customer success. Expert at translating complex operational workflows into working system configurations."
+  },
+  "experience": [
+    {
+      "period": "Nov 2021 — Present",
+      "company": "Facilio",
+      "badge": "CMMS · SaaS",
+      "title": "Lead, Product Implementation",
+      "bullets": [
+        "Delivered 20 end-to-end enterprise SaaS implementations for mid-to-large clients — onsite training, configuration support, and post-go-live relationship management.",
+        "Conducted client workshops with executives and operational teams; facilitated requirements gathering and translated needs into working system configurations.",
+        "Provided comprehensive training sessions on platform functionality, configuration, and best practices — tailored to diverse user groups and learning styles.",
+        "Built strong client relationships as trusted advisor — gathering feedback, addressing concerns promptly, and driving continuous adoption improvements."
+      ],
+      "highlights": [
+        {
+          "label": "Onsite delivery excellence",
+          "text": "Travelled onsite to Saudi Arabia for a half-million dollar engagement and to the UK for MHA — conducting stakeholder workshops, requirements gathering, and go-live training across multiple regions.",
+          "color": "purple"
+        },
+        {
+          "label": "Customer success impact",
+          "text": "4 of 5 pilots converted to full-scale enterprise rollouts — through structured discovery, early value demonstration, and deep stakeholder alignment during implementation phase.",
+          "color": "green"
+        },
+        {
+          "label": "Implementation framework",
+          "text": "Conceptualized a use-case-driven implementation methodology with complexity scoring and effort models — enabling accurate scoping, timeline calculation, and streamlined training delivery.",
+          "color": "purple"
+        },
+        {
+          "label": "Training & adoption",
+          "text": "Owned end-to-end client onboarding lifecycle — from initial workshops through post-implementation support. Worked cross-functionally to ensure smooth system adoption and operational workflow integration.",
+          "color": "teal"
+        },
+        {
+          "label": "System integration expertise",
+          "text": "Scoped and configured integrations across SSO (SAML/SCIM) and third-party platforms including Xero, CorrigoPro, Equiem, Wooqer, and Bill.com. Validated technical feasibility and authored integration requirement documents.",
+          "color": "purple"
+        }
+      ]
+    },
+    {
+      "period": "May 2016 — Oct 2021",
+      "company": "Amazon",
+      "badge": "E-Commerce · Ops",
+      "title": "Senior Catalog Specialist",
+      "bullets": [
+        "Managed operational processes and resolved system defects for Amazon Fresh, Amazon Pantry, and Prime Now — directly improving efficiency and user experience.",
+        "Designed process improvement frameworks using data analysis and prioritisation models — yielding an estimated $230K in monthly operational savings.",
+        "Streamlined workflows by identifying procedural gaps and standardizing operations — reducing invalid assignments between support teams by ~50 per day."
+      ],
+      "highlights": []
+    }
+  ],
+  "skills": [
+    {
+      "title": "Implementation & Training Delivery",
+      "color": "accent",
+      "items": [
+        "End-to-end SaaS implementation",
+        "Onsite training & facilitation",
+        "UAT design & go-live support",
+        "SOP development & standardisation",
+        "System configuration expertise"
+      ]
+    },
+    {
+      "title": "Business Analysis & Requirements",
+      "color": "teal",
+      "items": [
+        "Requirements gathering (BRD)",
+        "Solution design & scoping",
+        "Stakeholder workshop facilitation",
+        "Complexity scoring & effort models",
+        "Process improvement & gap analysis"
+      ]
+    },
+    {
+      "title": "Customer Success & Relationship Management",
+      "color": "amber",
+      "items": [
+        "Executive stakeholder engagement",
+        "Cross-functional team leadership",
+        "Change management & adoption",
+        "Post-implementation support",
+        "Client feedback & continuous improvement"
+      ]
+    },
+    {
+      "title": "Technical Configuration",
+      "color": "accent",
+      "items": [
+        "SaaS configuration & system integration",
+        "JavaScript-like UI scripting",
+        "API integrations",
+        "SSO (SAML/SCIM) setup",
+        "System workflow design"
+      ]
+    }
+  ],
+  "customSections": [
+    {
+      "id": "implementation-expertise",
+      "title": "Implementation Domain Expertise",
+      "position": "after:skills",
+      "items": [
+        "Enterprise SaaS platform configuration and customization",
+        "Integration with third-party systems: Xero, CorrigoPro, Equiem, Wooqer, Bill.com",
+        "SSO and SCIM authentication setup and validation",
+        "Multi-tenant system architecture and workflow design",
+        "API feasibility assessment via Postman and vendor documentation"
+      ]
+    }
+  ]
+}
