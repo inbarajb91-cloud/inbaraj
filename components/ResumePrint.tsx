@@ -300,12 +300,9 @@ export default function ResumePrint({ data }: ResumePrintProps) {
           </div>
         )}
 
-        {/* PAGE BREAK */}
-        <div style={{ pageBreakBefore: 'always', height: 0 }} />
-
         {/* PROJECTS */}
         {projects && (
-          <div style={{ marginBottom: '14px', paddingTop: '2px' }}>
+          <div style={{ marginBottom: '14px' }}>
             <div
               style={{
                 fontFamily: "'DM Mono', monospace",
