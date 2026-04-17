@@ -1,0 +1,115 @@
+{
+  "meta": {
+    "company": "Implementation Engineer",
+    "created": "2026-04-17",
+    "active": true
+  },
+  "hero": {
+    "headline": "Implementation <em>engineer</em> who builds what he deploys",
+    "description": "20 enterprise SaaS rollouts across the UK, US, and Middle East. 5 years bridging business requirements and technical execution — engineering configurations and integrations on-site and remote. Now building AI-native tools that solve the problems I've lived through."
+  },
+  "experience": [
+    {
+      "period": "Nov 2021 — Present",
+      "company": "Facilio",
+      "badge": "CMMS · SaaS",
+      "title": "Implementation Engineer",
+      "bullets": [
+        "Engineered 20 end-to-end enterprise CMMS/SaaS configurations for mid-to-large clients — full technical ownership from requirements analysis through post-go-live support.",
+        "Designed and tested SaaS configurations tailored to each client's operational workflow, ensuring smooth adoption and maintenance operations.",
+        "Collaborated with clients to gather technical requirements and translate them into working system configurations and integration specifications.",
+        "Worked cross-functionally with product, engineering, and design teams to implement client-specific customizations and drive technical improvements."
+      ],
+      "highlights": [
+        {
+          "label": "Technical framework",
+          "text": "Engineered a use-case-driven implementation framework with complexity scoring and effort models — enabling technical teams to scope configurations accurately, auto-calculate development timelines, and reduce implementation ambiguity.",
+          "color": "purple"
+        },
+        {
+          "label": "Configuration expertise",
+          "text": "Identified scope-change technical requirements and built tracking mechanisms for configuration efforts. Collaborated with Sales to quantify Professional Services credits for technical customizations.",
+          "color": "green"
+        },
+        {
+          "label": "Global implementation",
+          "text": "Travelled on-site to Saudi Arabia and UK for technical implementations — field requirement gathering, system configuration, and technical training across UK, US, and Middle East deployments.",
+          "color": "purple"
+        },
+        {
+          "label": "Technical conversion success",
+          "text": "4 of 5 pilots converted to full-scale enterprise implementations through technical proof-of-concepts, configuration demonstrations, and deep system integration during pilot phases, driving $350K+ in technical expansion value.",
+          "color": "green"
+        },
+        {
+          "label": "Requirements Engineering",
+          "text": "Owned technical requirements analysis — from configuration workshops with client stakeholders to documenting technical specifications with solution architectures. Worked with integration, product, and engineering teams to implement configurations that fit each client's operational workflow.",
+          "color": "teal"
+        },
+        {
+          "label": "Integration Engineering",
+          "text": "Scoped and engineered integration requirements across SSO (SAML/SCIM) and third-party platforms including Xero, CorrigoPro, Equiem, Wooqer, Bill.com, SiteFotos, and SFG20. Validated API feasibility via Postman and vendor documentation, determined integration patterns (polling vs webhook), and implemented integration configurations for client deployments.",
+          "color": "purple"
+        }
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "title": "Implementation Engineering",
+      "color": "accent",
+      "items": [
+        "End-to-end SaaS configuration engineering",
+        "System integration & API engineering",
+        "Technical requirements analysis",
+        "Configuration testing & validation",
+        "CMMS / facility tech implementation"
+      ]
+    },
+    {
+      "title": "Technical Analysis",
+      "color": "teal",
+      "items": [
+        "Technical requirements documentation",
+        "Configuration design & architecture",
+        "Integration scoping & feasibility",
+        "Complexity scoring & effort models",
+        "System configuration & customization"
+      ]
+    },
+    {
+      "title": "Implementation Delivery",
+      "color": "amber",
+      "items": [
+        "Technical stakeholder collaboration",
+        "Cross-functional engineering coordination",
+        "Configuration deployment & go-live",
+        "Technical training & knowledge transfer",
+        "Post-implementation technical support"
+      ]
+    },
+    {
+      "title": "Technical",
+      "color": "accent",
+      "items": [
+        "SaaS configuration & system integration",
+        "JavaScript-like UI scripting",
+        "API integrations",
+        "Supabase · React · Tailwind",
+        "Prompt engineering & LLM tooling"
+      ]
+    },
+    {
+      "title": "Tools & Engineering Workflow",
+      "color": "teal",
+      "items": [
+        "Notion / Jira / project tracking",
+        "Vercel · GitHub · CLI tools",
+        "AI-enhanced documentation workflows",
+        "System integration & API tooling",
+        "Postman · Primitive"
+      ]
+    }
+  ],
+  "summary": "Implementation engineer with 5+ years delivering 20 enterprise SaaS/CMMS configurations across the UK, US, and Middle East — full technical lifecycle ownership from requirements analysis through post-go-live support. Expert at engineering complex business requirements into working SaaS configurations and measurable technical outcomes. Now building AI-native tools that solve the operational problems I've implemented solutions for firsthand."
+}

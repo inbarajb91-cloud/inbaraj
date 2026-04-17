@@ -1,0 +1,138 @@
+{
+  "meta": {
+    "company": "Open Destinations",
+    "created": "2026-04-11",
+    "active": true
+  },
+  "hero": {
+    "headline": "Implementation <em>consultant</em> who bridges requirements and delivery",
+    "description": "20 enterprise SaaS implementations across the UK, US, and Middle East. 5 years translating business requirements into working configurations — from stakeholder workshops to go-live support. Expert at analyzing client workflows and delivering functional solutions."
+  },
+  "experience": [
+    {
+      "period": "Nov 2021 — Present",
+      "company": "Facilio",
+      "badge": "CMMS · SaaS",
+      "title": "Lead, Product Implementation",
+      "bullets": [
+        "Facilitated client workshops with executives and operational teams; translated requirements into BRDs, solution designs, and WBS-based project plans.",
+        "Analyzed and documented client business processes and workflows to produce functional specifications for system configurations.",
+        "Spearheaded 20 end-to-end enterprise CMMS/SaaS rollouts for mid-to-large clients — full lifecycle ownership from scoping through post-go-live support.",
+        "Engineered and tested SaaS configurations tailored to each client, driving adoption and smooth maintenance operations."
+      ],
+      "highlights": [
+        {
+          "label": "Business Analysis",
+          "text": "Owned the end-to-end requirements lifecycle — from scoping workshops with client stakeholders to documenting BRDs with solution designs. Worked cross-functionally with integration, product, and engineering teams to tailor configurations that best fit each client's operational workflow.",
+          "color": "teal"
+        },
+        {
+          "label": "Key initiative",
+          "text": "Conceptualized a use-case-driven implementation framework with complexity scoring and effort models — enabling pre-sales to scope accurately, auto-calculate timelines, and cut BRD/UAT ambiguity.",
+          "color": "purple"
+        },
+        {
+          "label": "Integration & Configuration",
+          "text": "Scoped and defined integration requirements across SSO (SAML/SCIM) and third-party platforms including Xero, CorrigoPro, Equiem, Wooqer, Bill.com, SiteFotos, and SFG20. Validated API feasibility via Postman and vendor documentation, determined integration patterns (polling vs webhook), and authored integration requirement documents for the engineering team.",
+          "color": "purple"
+        },
+        {
+          "label": "Global delivery",
+          "text": "Travelled on-site to Saudi Arabia for a half-million dollar engagement and to the UK for MHA — field requirement gathering, stakeholder workshops, and go-live training across UK, US, and Middle East.",
+          "color": "purple"
+        },
+        {
+          "label": "Pilot → Enterprise conversions",
+          "text": "4 of 5 pilots converted to full-scale enterprise rollouts — through structured discovery, early value demonstration, and deep stakeholder alignment during the pilot phase, driving $350K+ in expansion value.",
+          "color": "green"
+        },
+        {
+          "label": "Revenue impact",
+          "text": "Identified unaccounted scope-change efforts and built a tracking mechanism. Collaborated with Sales to introduce pre-purchased Professional Services credits — converting informal changes into billable units.",
+          "color": "green"
+        }
+      ]
+    },
+    {
+      "period": "May 2016 — Oct 2021",
+      "company": "Amazon",
+      "badge": "E-Commerce · Ops",
+      "title": "Senior Catalog Specialist",
+      "bullets": [
+        "Designed a defect prioritisation framework using product forecasts, inventory value, and glance views — yielding an estimated $230K in monthly savings.",
+        "Managed and resolved catalog and procurement defects for Amazon Fresh, Amazon Pantry, and Prime Now — directly improving operational efficiency.",
+        "Streamlined defect reduction by identifying SOP gaps, reducing invalid case assignments between support teams by ~50 per day."
+      ],
+      "highlights": []
+    }
+  ],
+  "skills": [
+    {
+      "title": "Business Analysis & Requirements",
+      "color": "teal",
+      "items": [
+        "Requirements gathering (BRD)",
+        "Solution design & scoping",
+        "Stakeholder workshop facilitation",
+        "Process improvement & gap analysis",
+        "Complexity scoring & effort models"
+      ]
+    },
+    {
+      "title": "Implementation & Configuration",
+      "color": "accent",
+      "items": [
+        "End-to-end SaaS implementation",
+        "SaaS configuration & system integration",
+        "UAT design & go-live support",
+        "Project planning & WBS",
+        "SOP development & standardisation"
+      ]
+    },
+    {
+      "title": "Client Engagement & Training",
+      "color": "amber",
+      "items": [
+        "Executive stakeholder engagement",
+        "Cross-functional team leadership",
+        "Change management & adoption",
+        "Post-go-live relationship management",
+        "Revenue tracking & PS billing"
+      ]
+    },
+    {
+      "title": "Technical & Integration",
+      "color": "accent",
+      "items": [
+        "API integrations",
+        "JavaScript-like UI scripting",
+        "Postman · Primitive",
+        "System integration & API tooling",
+        "Prompt engineering & LLM tooling"
+      ]
+    },
+    {
+      "title": "Tools & Documentation",
+      "color": "teal",
+      "items": [
+        "Notion / Jira / project tracking",
+        "AI-enhanced documentation workflows",
+        "Vercel · GitHub · CLI tools",
+        "Supabase · React · Tailwind"
+      ]
+    }
+  ],
+  "customSections": [
+    {
+      "id": "domain-expertise",
+      "title": "Domain Expertise",
+      "position": "after:skills",
+      "items": [
+        "Enterprise SaaS rollouts - 20 implementations across UK, US, Middle East",
+        "CMMS / facility tech expertise - comprehensive system knowledge",
+        "Cross-industry experience - Amazon e-commerce operations, enterprise facility management",
+        "Integration experience - SSO (SAML/SCIM), Xero, CorrigoPro, Equiem, Wooqer, Bill.com"
+      ]
+    }
+  ]
+}
