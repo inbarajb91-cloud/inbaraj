@@ -1,4 +1,5 @@
 import { ResumeData } from '@/lib/types';
+import { sanitizeInlineHtml } from '@/lib/sanitize';
 
 interface HeroProps {
   data: ResumeData;
@@ -12,7 +13,7 @@ export default function Hero({ data }: HeroProps) {
       <div className="hero-grid">
         <div>
           <div className="hero-tag">{hero.tag}</div>
-          <h1 dangerouslySetInnerHTML={{ __html: hero.headline }} />
+          <h1 dangerouslySetInnerHTML={{ __html: sanitizeInlineHtml(hero.headline) }} />
           <p className="hero-desc">{hero.description}</p>
           <div className="hero-badges">
             {hero.badges.map((badge, i) => (

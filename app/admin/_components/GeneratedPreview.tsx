@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import DiffView from './DiffView';
+import { sanitizeInlineHtml } from '@/lib/sanitize';
 
 interface ValidationViolation {
   section: string;
@@ -282,7 +283,7 @@ export default function GeneratedPreview({
               {hero.headline && (
                 <div
                   style={styles.headline}
-                  dangerouslySetInnerHTML={{ __html: hero.headline }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeInlineHtml(hero.headline) }}
                 />
               )}
               {hero.description && (

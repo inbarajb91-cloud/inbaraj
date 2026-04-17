@@ -1,4 +1,5 @@
 import { ResumeData } from '@/lib/types';
+import { sanitizeInlineHtml } from '@/lib/sanitize';
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
 import Experience from '@/components/Experience';
@@ -74,7 +75,7 @@ export default function ResumeLayout({ data, isolated }: ResumeLayoutProps) {
 
       {renderCustomSections('after-contact')}
 
-      <footer dangerouslySetInnerHTML={{ __html: data.footer }} />
+      <footer dangerouslySetInnerHTML={{ __html: sanitizeInlineHtml(data.footer) }} />
 
       <ScrollReveal />
       <FabDownloadButton />

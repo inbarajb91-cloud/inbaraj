@@ -1,4 +1,5 @@
 import { ResumeData } from '@/lib/types';
+import { sanitizeInlineHtml } from '@/lib/sanitize';
 
 interface ResumePrintProps {
   data: ResumeData;
@@ -445,7 +446,7 @@ export default function ResumePrint({ data }: ResumePrintProps) {
                   </div>
                   <div
                     style={{ fontSize: '9pt', color: '#4a4844', lineHeight: 1.9 }}
-                    dangerouslySetInnerHTML={{ __html: group.items.join('<br>') }}
+                    dangerouslySetInnerHTML={{ __html: group.items.map((s) => sanitizeInlineHtml(s)).join('<br>') }}
                   />
                 </div>
               ))}
