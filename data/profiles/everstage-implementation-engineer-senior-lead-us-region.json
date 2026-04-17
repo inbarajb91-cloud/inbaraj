@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "company": "Everstage",
+    "created": "2026-04-17",
+    "active": true
+  },
+  "hero": {
+    "headline": "Implementation <em>lead</em> specializing in enterprise SaaS solutions",
+    "description": "20 enterprise SaaS rollouts across the UK, US, and Middle East. 5+ years translating complex business requirements into working configurations and measurable outcomes. Expert at stakeholder engagement, solution design, and end-to-end delivery for mid-to-large enterprise clients."
+  },
+  "experience": [
+    {
+      "period": "Nov 2021 — Present",
+      "company": "Facilio",
+      "badge": "CMMS · SaaS",
+      "title": "Lead, Product Implementation",
+      "bullets": [
+        "Led 20 end-to-end enterprise SaaS implementations for mid-to-large clients — full lifecycle ownership from requirements mapping through configuration deployment and post-go-live support.",
+        "Engaged with customer stakeholders through executive workshops and operational team sessions; translated business processes into solution designs, BRDs, and implementation timelines.",
+        "Configured and tested SaaS instances tailored to each client's unique operational workflows, ensuring adoption and seamless business process integration.",
+        "Served as primary customer advocate internally — collaborating with product, engineering, and design teams to address client requirements and drive platform improvements."
+      ],
+      "highlights": [
+        {
+          "label": "Process mapping expertise",
+          "text": "Developed use-case-driven implementation framework with complexity scoring models — enabling accurate scoping, automated timeline calculation, and streamlined requirements documentation for enterprise rollouts.",
+          "color": "purple"
+        },
+        {
+          "label": "Enterprise delivery",
+          "text": "Managed complex implementations across global regions — on-site delivery in Saudi Arabia and UK for high-value engagements, handling stakeholder workshops, requirements gathering, and go-live training.",
+          "color": "purple"
+        },
+        {
+          "label": "Solution design & configuration",
+          "text": "Owned comprehensive solution architecture — from stakeholder requirement sessions to technical configuration deployment. Collaborated cross-functionally to tailor platform configurations matching each client's operational processes.",
+          "color": "teal"
+        },
+        {
+          "label": "Integration scoping",
+          "text": "Defined integration requirements across SSO systems and third-party platforms. Evaluated API feasibility, determined integration patterns, and authored detailed requirement specifications for engineering implementation.",
+          "color": "purple"
+        }
+      ]
+    },
+    {
+      "period": "May 2016 — Oct 2021",
+      "company": "Amazon",
+      "badge": "E-Commerce · Ops",
+      "title": "Senior Catalog Specialist",
+      "bullets": [
+        "Managed complex operational processes for Amazon Fresh, Amazon Pantry, and Prime Now — analyzing business workflows and implementing process improvements for enhanced efficiency.",
+        "Designed prioritisation frameworks using business forecasts and operational metrics — delivering significant process optimization and operational cost reduction.",
+        "Streamlined operational workflows by identifying process gaps and implementing standardized procedures — reducing workflow inefficiencies across support teams."
+      ],
+      "highlights": []
+    }
+  ],
+  "skills": [
+    {
+      "title": "Implementation & Configuration",
+      "color": "accent",
+      "items": [
+        "End-to-end SaaS implementation",
+        "Enterprise configuration & deployment",
+        "System integration planning",
+        "UAT design & go-live support",
+        "Process mapping & workflow design"
+      ]
+    },
+    {
+      "title": "Customer Engagement & Solutions",
+      "color": "teal",
+      "items": [
+        "Requirements gathering & BRD documentation",
+        "Solution design & scoping",
+        "Stakeholder workshop facilitation",
+        "Complex business process analysis",
+        "Implementation planning & timeline management"
+      ]
+    },
+    {
+      "title": "Enterprise Account Management",
+      "color": "amber",
+      "items": [
+        "Executive stakeholder engagement",
+        "Cross-functional team coordination",
+        "Change management & user adoption",
+        "Post-implementation relationship management",
+        "Global delivery & on-site support"
+      ]
+    },
+    {
+      "title": "Technical Integration",
+      "color": "accent",
+      "items": [
+        "API integrations & system connectivity",
+        "SaaS configuration & customization",
+        "Integration requirement documentation",
+        "Technical feasibility assessment",
+        "Platform configuration testing"
+      ]
+    }
+  ],
+  "summary": "Implementation lead with 5+ years delivering enterprise SaaS solutions for mid-to-large clients across global markets. Expert at requirements mapping, solution design, and complex system configuration. Proven track record of 20 successful implementations with full lifecycle ownership from scoping through post-go-live support. Strong background in stakeholder engagement, process optimization, and cross-functional team collaboration.",
+  "customSections": [
+    {
+      "id": "enterprise-delivery",
+      "title": "Enterprise Implementation Expertise",
+      "position": "after:skills",
+      "items": [
+        "20 enterprise SaaS rollouts across UK, US, and Middle East regions",
+        "Complex integration planning across SSO and third-party platforms",
+        "On-site delivery experience in Saudi Arabia and UK markets",
+        "4 of 5 pilot implementations converted to full enterprise rollouts",
+        "Cross-functional collaboration with product, engineering, and design teams"
+      ]
+    }
+  ]
+}
