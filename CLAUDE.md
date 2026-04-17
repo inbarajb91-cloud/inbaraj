@@ -189,6 +189,27 @@ For multi-card rows in `ResumePrint.tsx` (experience highlights, projects, skill
 
 Do NOT add forced page breaks (`pageBreakBefore: 'always'`) between sections. They cause huge mid-page gaps when the previous section overflows by a small amount. Trust natural pagination.
 
+### `GITHUB_BRANCH` must match Vercel's deploy branch
+The admin dashboard commits profile JSONs via the GitHub Contents API to whatever branch `GITHUB_BRANCH` names. If this env var drifts from the branch Vercel auto-deploys from (should be `main`), every published profile lands on a stale branch and never reaches production. This happened once — 5 profiles stranded for ~8 days. Check the env var first whenever a publish "succeeds" but the `/r/<slug>` URL 404s or lags.
+
+### Shared auth lives in `lib/auth.ts`
+All API routes go through `requireAuth(request)` — don't duplicate the header check. It returns a 401 `NextResponse` on failure or `null` on success. Supports both bcrypt-hashed and plaintext `ADMIN_PASSWORD` (auto-detected by `$2a$/$2b$/$2y$` prefix). Uses `crypto.timingSafeEqual` for plaintext and `bcrypt.compare` for hashed — both timing-safe.
+
+### Rate limiting is in-memory and per-instance
+`lib/rate-limit.ts` uses a module-level `Map`. Each Vercel serverless instance has its own map, so a distributed attacker can exceed the per-instance limit by cold-starting new instances. Fine for deterring casual abuse; swap in `@upstash/ratelimit` + Upstash Redis if you need strictness. Limits are declared inline at each route — don't hide them in a central config.
+
+### HTML sanitization allowlist is intentionally tiny
+`lib/sanitize.ts#sanitizeInlineHtml()` allows only `<em>` and `<br>`. This is a conscious choice, not an oversight — expanding the allowlist re-opens the prompt-injection XSS vector that Phase 4 closed. If a new field needs richer formatting (e.g. `<strong>`), weigh the XSS surface against the UX gain before adding tags to the allowlist.
+
+### Every `dangerouslySetInnerHTML` must use `sanitizeInlineHtml`
+If you add a new one, wrap it: `{ __html: sanitizeInlineHtml(value) }`. Six existing sites are already wrapped (Hero, CustomSection, ResumePrint skills, ResumeLayout footer, EditablePreview, GeneratedPreview). An unwrapped use on AI-generated data is a security regression.
+
+### Slug regex `/^[a-z0-9-]{1,120}$/` is enforced in three places
+`middleware.ts` (cookie write + redirect), `/api/profiles` (POST), `/api/profiles/[slug]` (GET/PATCH/DELETE). Keep them in sync. Don't allow underscores, dots, or any other characters — the character set is narrow because slugs appear in cookies, URLs, filenames, and commit paths.
+
+### Rotate `ADMIN_PASSWORD` to bcrypt with the helper script
+`node scripts/hash-password.mjs "your-password"` outputs a `$2b$12$…` hash. Paste into the Vercel env var, redeploy. Plaintext-compat path stays in place so there's no outage during rotation. Never commit a plaintext admin password to the repo or paste it into chat.
+
 ## Session handoff protocol
 
 When the user says **"session completed"** (or similar), follow this checklist before ending:
