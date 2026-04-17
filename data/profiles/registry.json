@@ -13,5 +13,30 @@
     "company": "Uplers",
     "created": "2026-04-09",
     "active": true
+  },
+  "d-business-analyst": {
+    "company": "Business Analyst",
+    "created": "2026-04-10",
+    "active": true
+  },
+  "greythr-specialist-product-implementation": {
+    "company": "greytHR",
+    "created": "2026-04-11",
+    "active": true
+  },
+  "open-destinations-implementation-consultant": {
+    "company": "Open Destinations",
+    "created": "2026-04-11",
+    "active": true
+  },
+  "d-implementation-engineer": {
+    "company": "Implementation Engineer",
+    "created": "2026-04-17",
+    "active": true
+  },
+  "everstage-implementation-engineer-senior-lead-us-region": {
+    "company": "Everstage",
+    "created": "2026-04-17",
+    "active": true
   }
 }
