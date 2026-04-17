@@ -24,6 +24,7 @@ Chronological history of decisions, changes, and lessons learned across sessions
 - [x] **Calendly embed fix** — Stopped double-wrapping the full URL
 - [x] **Session persistence** — `sessionStorage` survives refresh, cleared on tab close
 - [x] **Documentation** — `CLAUDE.md`, `memory.md`, `context.md` with gotchas and roadmap
+- [x] **PDF alignment fix** — 2-column grid for experience highlights + adaptive page flow (no forced mid-page gap)
 
 ### Phase 0 — Anti-hallucination agent (COMPLETED)
 
@@ -595,3 +596,52 @@ When adapting from base without a company name, the role label becomes required 
 ### Branch
 - `claude/portfolio-site-development-lUjI1`
 - PR #7 merged to main
+
+---
+
+## Session 8 — "Fix PDF alignment" (Apr 17, 2026)
+
+### Context
+User reported the downloaded CV PDF had alignment issues on page 2: the experience highlight cards (6 cards for the Facilio role) were being split mid-content across pages, showing empty column stubs with just vertical borders on page 2. After the first fix, a follow-up report showed a huge empty middle on page 2 — only two highlight card tails at the top, then a large gap, then Projects starting at the bottom.
+
+### Changes made
+
+#### Commit 1 — `31b8b01` — Switch highlights to 2-col grid (PR #8)
+
+1. **ResumePrint.tsx highlights layout** — Changed from a single flex row with `flex: 1` across all 6 cards to a 2-column CSS grid (`gridTemplateColumns: '1fr 1fr'`). This mirrors the web layout in `globals.css:113`.
+
+2. **`breakInside: avoid` + `pageBreakInside: avoid`** added to each:
+   - highlight card
+   - project card
+   - skill column
+   - education card
+
+   This prevents individual cards from splitting across pages.
+
+#### Commit 2 — `560a3e1` — Remove forced page break (PR #9)
+
+3. **Removed `pageBreakBefore: 'always'`** between Experience and Projects in `ResumePrint.tsx`. Also removed the `paddingTop: '2px'` on the Projects wrapper (leftover from the forced-break layout).
+
+### Root causes
+
+**Cut-across-pages issue** — Flex items with `flex: 1` all match the height of the tallest sibling. With 6 highlight cards and heavy content, the row was ~350px tall. When that row hit a page boundary, Chromium's print engine split the cards horizontally, rendering the top half on page 1 and the bottom half on page 2 with just the borders visible for cards that had nothing left to render.
+
+**Huge mid-page gap** — With the 2-col grid, each grid row is 2 cards wide and much shorter. Cards 1–4 fit on page 1 but cards 5–6 naturally pushed to page 2 (thanks to `breakInside: avoid`). The hardcoded `pageBreakBefore: always` on the empty div before Projects then forced Projects to page 3, leaving a huge blank region in the middle of page 2.
+
+### Key decisions
+
+1. **CSS grid over flex for print layouts** — Grid rows can wrap naturally and each card respects `breakInside: avoid` independently. Flex with `flex: 1` forces all siblings to the same height, which makes row-level breaks impossible without splitting.
+
+2. **Trust browser pagination over forced page breaks** — Hardcoded `pageBreakBefore: always` is brittle: it's optimal when the previous section fills exactly one page, disastrous when it doesn't. Let the browser paginate and rely on `breakInside: avoid` on individual cards to prevent the only ugly outcome (mid-card splits).
+
+### Lessons learned
+
+23. **Flex rows don't respect `breakInside: avoid` per-child.** Because flex siblings must align, if the row is too tall, the whole row gets guillotined at the page boundary — children can't individually "jump" to the next page. Use grid if you need per-card break control.
+
+24. **`pageBreakBefore: always` is a footgun in variable-length documents.** It's fine when the previous section has known length. In any layout where section heights depend on user content, it will eventually produce empty pages or mid-page gaps. Prefer natural flow + per-card `breakInside: avoid`.
+
+25. **Print-only CSS (`breakInside`) works in React inline styles.** Both `breakInside` and its legacy alias `pageBreakInside` are respected by Chromium's print engine. Writing them as camelCase in a React `style` prop works; no special handling needed.
+
+### Branches
+- `claude/fix-pdf-alignment-d026H` → PR #8 merged to main (`dc6dc2f`)
+- `claude/fix-pdf-mid-page-gap` → PR #9 merged to main (`ed0a2cf`)

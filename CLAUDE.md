@@ -184,6 +184,11 @@ The PATCH `/api/profiles/[slug]` endpoint tries to update `ground-truth.json` af
 ### Inline editing uses formatted preview, not iframe
 Phase 3 editing works on the card-based formatted preview (EditablePreview), not the actual rendered resume page in the iframe. The iframe remains read-only. A future `/update` route could enable WYSIWYG editing on the real page.
 
+### PDF pagination — use grid + `breakInside: avoid`, not forced page breaks
+For multi-card rows in `ResumePrint.tsx` (experience highlights, projects, skills, education): use **CSS grid** (not flex with `flex: 1`) and apply `breakInside: 'avoid'` + `pageBreakInside: 'avoid'` to each card. Flex rows can't break — the whole row gets sliced at the page boundary, leaving empty column stubs on the next page. Grid rows break naturally and `breakInside: avoid` on individual cards prevents mid-card splits.
+
+Do NOT add forced page breaks (`pageBreakBefore: 'always'`) between sections. They cause huge mid-page gaps when the previous section overflows by a small amount. Trust natural pagination.
+
 ## Session handoff protocol
 
 When the user says **"session completed"** (or similar), follow this checklist before ending:

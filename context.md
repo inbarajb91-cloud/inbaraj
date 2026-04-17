@@ -142,6 +142,8 @@ The "Download CV" button triggers `window.print()`. A `@media print` CSS rule hi
 | Apr 10 | Phase 3: "Adapt from existing" third creation path |
 | Apr 10 | Phase 3: Default variants with d- prefix slugs (no company) |
 | Apr 10 | PR #7 merged to main |
+| Apr 17 | PDF fix: experience highlights switched to 2-col grid, per-card `breakInside: avoid` (PR #8) |
+| Apr 17 | PDF fix: removed forced `pageBreakBefore` between Experience and Projects to eliminate mid-page gap (PR #9) |
 
 ---
 
