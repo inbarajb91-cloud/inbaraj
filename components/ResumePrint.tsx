@@ -248,7 +248,14 @@ export default function ResumePrint({ data }: ResumePrintProps) {
                 ))}
 
                 {item.highlights.length > 0 && (
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '8px',
+                      marginTop: '10px',
+                    }}
+                  >
                     {item.highlights.map((hl, j) => {
                       const hlColor =
                         hl.color === 'green' || hl.color === 'teal'
@@ -260,11 +267,12 @@ export default function ResumePrint({ data }: ResumePrintProps) {
                         <div
                           key={j}
                           style={{
-                            flex: 1,
                             background: hlColor.bg,
                             borderRadius: '4px',
                             padding: '8px 10px',
                             borderLeft: `3px solid ${hlColor.border}`,
+                            breakInside: 'avoid',
+                            pageBreakInside: 'avoid',
                           }}
                         >
                           <div
@@ -326,6 +334,8 @@ export default function ResumePrint({ data }: ResumePrintProps) {
                       padding: '10px 12px',
                       borderTop: `2px solid ${pc.border}`,
                       boxSizing: 'border-box',
+                      breakInside: 'avoid',
+                      pageBreakInside: 'avoid',
                     }}
                   >
                     <div style={{ marginBottom: '4px' }}>
@@ -422,7 +432,7 @@ export default function ResumePrint({ data }: ResumePrintProps) {
             </div>
             <div style={{ display: 'flex', gap: '12px' }}>
               {skills.map((group, i) => (
-                <div key={i} style={{ flex: 1 }}>
+                <div key={i} style={{ flex: 1, breakInside: 'avoid', pageBreakInside: 'avoid' }}>
                   <div
                     style={{
                       fontFamily: "'DM Mono', monospace",
@@ -512,6 +522,8 @@ export default function ResumePrint({ data }: ResumePrintProps) {
                   border: '1px solid #dedad4',
                   borderRadius: '4px',
                   borderLeft: '3px solid #4535d4',
+                  breakInside: 'avoid',
+                  pageBreakInside: 'avoid',
                 }}
               >
                 <div style={{ fontSize: '10pt', color: '#1c1a18', fontWeight: 400, marginBottom: '3px' }}>
