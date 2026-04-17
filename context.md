@@ -144,6 +144,9 @@ The "Download CV" button triggers `window.print()`. A `@media print` CSS rule hi
 | Apr 10 | PR #7 merged to main |
 | Apr 17 | PDF fix: experience highlights switched to 2-col grid, per-card `breakInside: avoid` (PR #8) |
 | Apr 17 | PDF fix: removed forced `pageBreakBefore` between Experience and Projects to eliminate mid-page gap (PR #9) |
+| Apr 17 | Rescue: 5 stranded profiles + ground-truth updates restored after `GITHUB_BRANCH` misconfiguration fix (PR #10) |
+| Apr 17 | Phase 4: security hardening — bcrypt auth, rate limiting, HTML sanitization, cookie flags, SSRF block (PR #11) |
+| Apr 17 | Public-repo docs — README, docs/ folder (getting-started, customizing, admin-guide, architecture, security), LICENSE, .env.example |
 
 ---
 
@@ -185,14 +188,25 @@ All items implemented and merged via PR #7:
 - Default variants: `/r/d-role-label` slugs when no company name (base adapt)
 - Three wizard entry paths: URL, Manual, Adapt from existing
 
-### Phase 4: Security audit
-Full review of:
-- API route authentication (currently header-based password — needs hashing + rate limiting)
-- XSS vectors in `dangerouslySetInnerHTML` usage
-- GitHub token permissions (should be minimal scope)
-- Cookie security (httpOnly, sameSite, secure flags)
-- Input sanitization on all API endpoints
-- CSRF protection on mutating API routes
+### Phase 4: Security audit (COMPLETED Apr 17, 2026)
+All code items implemented and merged via PR #11:
+- Shared `requireAuth` helper across 7 routes, timing-safe compare, bcrypt + plaintext support
+- In-memory per-IP rate limiting on every endpoint (429 with Retry-After headers)
+- `sanitizeInlineHtml()` allowlist (em/br only) applied to all 6 dangerouslySetInnerHTML sites — closes prompt-injection XSS
+- `profile_lock` cookie: httpOnly + secure (prod) + sameSite lax + slug regex validated
+- Input validation: slug regex, size caps (JD 20k, overrides 200k, etc.), type checks, date format
+- URL scheme allowlist + private/loopback IP block on scrape endpoint (SSRF)
+- CSRF not applicable (header-based auth, not cookie-based)
+- Helper script `scripts/hash-password.mjs` to rotate ADMIN_PASSWORD to bcrypt
+- Remaining manual ops: tighten GitHub PAT scope in GitHub UI, rotate admin password in Vercel
+
+### Future: public-repo template (Apr 17, 2026)
+Path chosen: fork this repo into a separate public template (`resume-studio` or similar) rather than scrubbing personal data in place. Keeps the live site repo private. Documentation (`README.md`, `docs/`, `LICENSE`, `.env.example`) is now in place so the fork can be made with minimal editing. Remaining work to go public:
+- Scrub personal data: replace `data/base.json` with a template, clear `data/profiles/*`, clear personal references (Calendly URL, email, phone)
+- Make `lib/github.ts#OWNER` and `REPO` env-var-driven instead of hardcoded
+- Add "Deploy to Vercel" button + env var preset
+- First-run onboarding UX (detect missing vars, guide through setup)
+- Remove legacy `index.html`
 
 ### Architecture note: "No backend"
 The current system runs entirely on Vercel's serverless infrastructure:

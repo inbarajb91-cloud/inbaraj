@@ -75,15 +75,29 @@ Chronological history of decisions, changes, and lessons learned across sessions
 - [ ] Works within admin iframe preview (deferred — editing uses formatted preview instead)
 - [ ] Consider `/update` route as auth-protected in-browser editing mode (deferred)
 
-### Phase 4 — Security audit
+### Phase 4 — Security audit (COMPLETED)
 
-- [ ] Hash admin password (bcrypt or similar) instead of plain comparison
-- [ ] Rate limiting on generate/publish endpoints
-- [ ] Audit `dangerouslySetInnerHTML` for XSS vectors
-- [ ] Tighten GitHub token to minimal permissions
-- [ ] Input sanitization on all API endpoints
-- [ ] CSRF protection on mutating routes
-- [ ] Cookie flags: `httpOnly`, `secure`, proper `sameSite`
+- [x] Hash admin password (bcrypt) — backward-compat with plaintext env var
+- [x] Rate limiting on all mutating endpoints (in-memory per-IP token bucket)
+- [x] Audit `dangerouslySetInnerHTML` — allowlist sanitizer (em/br only) on all 6 surfaces
+- [x] Shared `requireAuth` helper — timing-safe compare, replaces 7 duplicated checks
+- [x] Cookie flags: `httpOnly`, `secure` (prod), slug regex validated
+- [x] Input validation — slug format, size caps, URL scheme allowlist, SSRF block
+- [x] Helper script `scripts/hash-password.mjs` for rotating ADMIN_PASSWORD
+- [x] CSRF — not applicable (header-based auth, not cookie-based)
+- [ ] Tighten GitHub PAT scope (manual, GitHub UI) — documented in docs/security.md
+- [ ] Swap in-memory rate limiter for Upstash Redis (optional, production strictness)
+
+### Documentation for public repo (COMPLETED)
+
+- [x] README.md with tech stack, quick start, docs links
+- [x] docs/getting-started.md — fork, env vars, Vercel deploy
+- [x] docs/customizing-your-resume.md — base.json schema field-by-field
+- [x] docs/admin-guide.md — wizard, three creation paths, post-publish editing
+- [x] docs/architecture.md — data flow, request flows, file map
+- [x] docs/security.md — threat model, Phase 4 hardening, ops checklist
+- [x] LICENSE (MIT)
+- [x] .env.example with all required variables documented
 
 ---
 
@@ -645,3 +659,95 @@ User reported the downloaded CV PDF had alignment issues on page 2: the experien
 ### Branches
 - `claude/fix-pdf-alignment-d026H` → PR #8 merged to main (`dc6dc2f`)
 - `claude/fix-pdf-mid-page-gap` → PR #9 merged to main (`ed0a2cf`)
+
+---
+
+## Session 9 — "Profile rescue + Phase 4 security + public-repo docs" (Apr 17, 2026)
+
+### Context
+User started by asking why `claude/continue-portfolio-dev-aU9z3` was 13 commits ahead of main. Investigation uncovered a misconfigured Vercel env var, then this session completed Phase 4 security hardening and documented the repo for public use.
+
+### What happened
+
+#### 1. Stranded profile rescue (PR #10, commit `86fcd16`)
+
+**Root cause**: Vercel env var `GITHUB_BRANCH` was set to the feature branch `claude/continue-portfolio-dev-aU9z3` instead of `main`. Every profile published from the admin since Apr 9 was committed to that branch and never reached production.
+
+**Lost data** (5 profiles + updates):
+- `d-business-analyst`, `greythr-specialist-product-implementation`,
+  `open-destinations-implementation-consultant`, `d-implementation-engineer`,
+  `everstage-implementation-engineer-senior-lead-us-region`
+- TRG Screen description update
+- `ground-truth.json` accumulated manual edits
+
+**Rescue approach**: aU9z3's registry was already a strict superset of main's (Uplers preserved), so `git checkout origin/claude/continue-portfolio-dev-aU9z3 -- data/` was enough. Single squashed commit rather than cherry-picking 12 individual commits (which would have conflicted on every registry update).
+
+**User action**: fixed `GITHUB_BRANCH=main` in Vercel before the rescue merge.
+
+#### 2. Phase 4 security hardening (PR #11, commit `b5ed592`)
+
+**New libs**:
+- `lib/auth.ts` — shared `requireAuth()` replacing duplicated checks in 7 routes. Supports bcrypt-hashed or plaintext `ADMIN_PASSWORD` (backward compatible). Uses `crypto.timingSafeEqual` / `bcrypt.compare`.
+- `lib/rate-limit.ts` — in-memory per-IP token bucket. 10-60/min depending on endpoint. Returns 429 with `Retry-After` headers.
+- `lib/sanitize.ts` — `sanitizeInlineHtml()`: allowlist of `<em>` and `<br>` only, everything else escaped.
+- `scripts/hash-password.mjs` — CLI helper to bcrypt-hash a password for the env var.
+
+**Applied across**:
+- All 7 API routes → shared auth + rate limit + size caps + type checks
+- `/api/scrape` → URL scheme allowlist + private/loopback IP block (SSRF)
+- `/api/profiles/*` → slug regex validation
+- `middleware.ts` → `profile_lock` cookie now `httpOnly`, `secure` (prod), slug-validated
+- 6 `dangerouslySetInnerHTML` sites → wrapped in `sanitizeInlineHtml()`
+
+**Not covered and why**:
+- **CSRF** — auth is header-based (`x-admin-password`), not cookie-based. Browsers don't attach custom headers on cross-origin requests without explicit client code. CSRF doesn't apply.
+- **GitHub PAT scope tightening** — manual in GitHub UI, documented in `docs/security.md`.
+- **Strict cross-instance rate limiting** — would need Upstash Redis. Documented as upgrade path.
+
+#### 3. Public-repo documentation
+
+User requested full documentation so the project can be made public. Added:
+- `README.md` — overview, tech stack, quick start
+- `docs/getting-started.md` — fork, env vars, Vercel deploy
+- `docs/customizing-your-resume.md` — `base.json` schema field-by-field
+- `docs/admin-guide.md` — wizard flow, three creation paths, post-publish editing
+- `docs/architecture.md` — data flow, file map, extension points
+- `docs/security.md` — threat model, Phase 4 details, ops checklist
+- `LICENSE` (MIT)
+- `.env.example` with every required variable commented
+
+### Key decisions
+
+1. **Squash the rescue into one commit, not cherry-pick 12**. Cherry-picking would have conflicted on every registry update because aU9z3 never received Uplers's neighbor commits in the same order. Single commit with a detailed message preserves enough history for audit.
+
+2. **Backward-compat password auth** — checking for `$2a$/$2b$/$2y$` prefix to decide bcrypt vs. plaintext means rotation doesn't require a simultaneous code + env-var change. Deploy the code, then rotate the env var, without an outage window.
+
+3. **In-memory rate limiter, not Upstash** — for a single-user admin panel, cross-instance abuse is unlikely. In-memory gives 95% of the benefit with zero new dependencies or env vars. Document the Upstash upgrade path for anyone who needs strictness.
+
+4. **Allowlist HTML, not DOMPurify** — the needed tags are `<em>` and `<br>`. A 15-line custom sanitizer is easier to audit than a 1MB dependency, and the regex approach is sufficient when the allowlist is this narrow.
+
+5. **Path 2 for public repo (future)** — rather than scrubbing personal data in place, the plan is to fork `inbarajb91-cloud/inbaraj` into a separate template repo. Keeps the live site repo private and untouched; the template starts clean.
+
+### User ops still pending
+
+- Rotate `ADMIN_PASSWORD` to a bcrypt hash in Vercel
+- Tighten GitHub PAT scope in GitHub UI
+- Verify in production that a new profile publishes to `main` and `profile_lock` cookie has `HttpOnly` + `Secure` flags
+- Delete stale remote branches `claude/continue-portfolio-dev-aU9z3` and `claude/profile-resume-customization-zG0Gk` after confirmation (latter should also be audited for any Rippling/ZakApps data not on main)
+
+### Lessons learned
+
+26. **Branch-level env var misconfigurations can strand user data for weeks.** The admin UI showed successful publishes, the profiles worked via GitHub API fallback on specific URLs (so they looked fine when checked), and nothing on main surfaced the mismatch. Monitor what branch your writes land on — especially when the branch name looks exactly like a routine Claude Code feature branch.
+
+27. **Aliased registry state can hide a data rescue opportunity.** Because the GitHub API read also used the (misconfigured) branch, the stranded profiles were still reachable in production via the fallback — they just weren't in main's build. If the env var had only affected writes, the profiles would have 404'd and the bug would have been caught the day it started.
+
+28. **Cherry-pick vs. squash on rescue is a tradeoff, not a principle.** Cherry-picking gives per-commit authorship/timestamps, but if the base branches diverge in conflicting-file regions, you pay for every commit's conflict resolution. Squash gives a clean commit with a narrative message — lose the granular history, gain predictability. For 12 conflicting commits, squash won here.
+
+29. **Header-based auth sidesteps CSRF.** `x-admin-password` in a custom header isn't attached automatically by browsers on cross-origin requests — the attacker would need to set it in client JS, which the same-origin policy blocks. Cookie auth is more convenient but pulls in CSRF protection as a mandatory follow-up. Tradeoff worth understanding when picking an auth shape.
+
+### Branches and PRs
+- `claude/portfolio-improvements-rpxl6` (this branch)
+- PR #10 — rescue, merged to main (`3bcdad2`)
+- PR #11 — security, merged to main (`874beaa`)
+- Docs PR — this commit, to be opened after doc wrapup
+
