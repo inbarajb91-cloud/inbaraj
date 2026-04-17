@@ -28,5 +28,10 @@
     "company": "Open Destinations",
     "created": "2026-04-11",
     "active": true
+  },
+  "d-implementation-engineer": {
+    "company": "Implementation Engineer",
+    "created": "2026-04-17",
+    "active": true
   }
 }
