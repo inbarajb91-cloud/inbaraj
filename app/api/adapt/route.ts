@@ -4,47 +4,58 @@ import { loadGroundTruth } from '@/lib/ground-truth';
 import { generateSlug } from '@/lib/slug';
 import { logGeneration } from '@/lib/logger';
 import { adaptResumeWithValidation } from '@/lib/ai';
+import { requireAuth } from '@/lib/auth';
+import { rateLimit } from '@/lib/rate-limit';
+
+const MAX_INSTRUCTION_CHARS = 5_000;
+const MAX_NAME_CHARS = 200;
+const SLUG_PATTERN = /^[a-z0-9-]{1,120}$/;
 
 export async function POST(request: NextRequest) {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  const authHeader = request.headers.get('x-admin-password');
+  const limited = rateLimit(request, { name: 'adapt', limit: 10, windowMs: 60_000 });
+  if (limited) return limited;
 
-  if (!adminPassword || authHeader !== adminPassword) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const unauthorized = await requireAuth(request);
+  if (unauthorized) return unauthorized;
 
   try {
     const body = await request.json();
     const { sourceSlug, companyName, roleLabel, instruction } = body;
 
-    if (!instruction) {
-      return NextResponse.json(
-        { error: 'instruction is required' },
-        { status: 400 }
-      );
+    if (typeof instruction !== 'string' || instruction.length === 0) {
+      return NextResponse.json({ error: 'instruction is required' }, { status: 400 });
+    }
+    if (instruction.length > MAX_INSTRUCTION_CHARS) {
+      return NextResponse.json({ error: 'instruction too long' }, { status: 413 });
     }
 
-    // Need either a company name or a role label for the slug
-    if (!companyName && !roleLabel) {
+    const hasCompany = typeof companyName === 'string' && companyName.length > 0;
+    const hasRole = typeof roleLabel === 'string' && roleLabel.length > 0;
+    if (!hasCompany && !hasRole) {
       return NextResponse.json(
         { error: 'Either companyName or roleLabel is required' },
         { status: 400 }
       );
     }
+    if (hasCompany && companyName.length > MAX_NAME_CHARS) {
+      return NextResponse.json({ error: 'companyName too long' }, { status: 413 });
+    }
+    if (hasRole && roleLabel.length > MAX_NAME_CHARS) {
+      return NextResponse.json({ error: 'roleLabel too long' }, { status: 413 });
+    }
+    if (sourceSlug !== undefined && (typeof sourceSlug !== 'string' || !SLUG_PATTERN.test(sourceSlug))) {
+      return NextResponse.json({ error: 'Invalid sourceSlug' }, { status: 400 });
+    }
 
     const base = loadBase();
     const groundTruth = loadGroundTruth();
 
-    // Default variants (no company) get a d- prefix slug
-    const isDefaultVariant = !companyName;
+    const isDefaultVariant = !hasCompany;
     const slug = isDefaultVariant
       ? `d-${generateSlug(roleLabel!)}`
       : generateSlug(companyName, roleLabel);
-    const displayName = isDefaultVariant
-      ? roleLabel!
-      : companyName;
+    const displayName = isDefaultVariant ? roleLabel! : companyName;
 
-    // Build the source resume: base merged with profile overrides (if any)
     let sourceResume = base;
     if (sourceSlug) {
       const profile = await loadProfile(sourceSlug);

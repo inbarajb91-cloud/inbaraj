@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { sanitizeInlineHtml } from '@/lib/sanitize';
 
 // --- Types ---
 
@@ -112,7 +113,7 @@ function EditableField({
       title="Click to edit"
     >
       {isHtml ? (
-        <span dangerouslySetInnerHTML={{ __html: value }} />
+        <span dangerouslySetInnerHTML={{ __html: sanitizeInlineHtml(value) }} />
       ) : (
         value
       )}

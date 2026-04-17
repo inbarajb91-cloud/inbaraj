@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFileContent, commitFile } from '@/lib/github';
+import { requireAuth } from '@/lib/auth';
+import { rateLimit } from '@/lib/rate-limit';
 
-function checkAuth(request: NextRequest): boolean {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  const authHeader = request.headers.get('x-admin-password');
-  return !!adminPassword && authHeader === adminPassword;
-}
+const SLUG_PATTERN = /^[a-z0-9-]{1,120}$/;
+const MAX_OVERRIDES_BYTES = 200_000;
 
-/**
- * Extract new text entries from overrides and add them to ground truth.
- * This ensures manual edits are available for future AI generations.
- */
 async function updateGroundTruth(overrides: Record<string, unknown>): Promise<void> {
   try {
     const gtContent = await getFileContent('data/ground-truth.json');
@@ -28,7 +23,6 @@ async function updateGroundTruth(overrides: Record<string, unknown>): Promise<vo
       }
     };
 
-    // Extract bullets and highlights from experience overrides
     const experience = overrides.experience as Array<{
       bullets?: string[];
       highlights?: Array<{ text?: string }>;
@@ -42,7 +36,6 @@ async function updateGroundTruth(overrides: Record<string, unknown>): Promise<vo
       }
     }
 
-    // Extract skills
     const skills = overrides.skills as Array<{ items?: string[] }> | undefined;
     if (Array.isArray(skills)) {
       for (const group of skills) {
@@ -50,7 +43,6 @@ async function updateGroundTruth(overrides: Record<string, unknown>): Promise<vo
       }
     }
 
-    // Extract custom section items
     const customSections = overrides.customSections as Array<{ items?: string[] }> | undefined;
     if (Array.isArray(customSections)) {
       for (const section of customSections) {
@@ -66,7 +58,6 @@ async function updateGroundTruth(overrides: Record<string, unknown>): Promise<vo
       );
     }
   } catch (err) {
-    // Ground truth update is best-effort; don't fail the save
     console.error('Ground truth update failed:', err);
   }
 }
@@ -88,15 +79,26 @@ function deepMerge(target: Record<string, unknown>, source: Record<string, unkno
   return result;
 }
 
+function validateSlug(slug: string): NextResponse | null {
+  if (!SLUG_PATTERN.test(slug)) {
+    return NextResponse.json({ error: 'Invalid slug' }, { status: 400 });
+  }
+  return null;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  if (!checkAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const limited = rateLimit(request, { name: 'profile-read', limit: 60, windowMs: 60_000 });
+  if (limited) return limited;
+
+  const unauthorized = await requireAuth(request);
+  if (unauthorized) return unauthorized;
 
   const { slug } = await params;
+  const invalid = validateSlug(slug);
+  if (invalid) return invalid;
 
   try {
     const content = await getFileContent(`data/profiles/${slug}.json`);
@@ -113,14 +115,17 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  if (!checkAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const limited = rateLimit(request, { name: 'profile-write', limit: 20, windowMs: 60_000 });
+  if (limited) return limited;
+
+  const unauthorized = await requireAuth(request);
+  if (unauthorized) return unauthorized;
 
   const { slug } = await params;
+  const invalid = validateSlug(slug);
+  if (invalid) return invalid;
 
   try {
-    // Load existing profile
     const content = await getFileContent(`data/profiles/${slug}.json`);
     if (!content) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
@@ -130,14 +135,15 @@ export async function PATCH(
     const body = await request.json();
     const { overrides } = body;
 
-    if (!overrides || typeof overrides !== 'object') {
+    if (!overrides || typeof overrides !== 'object' || Array.isArray(overrides)) {
       return NextResponse.json({ error: 'overrides object is required' }, { status: 400 });
     }
+    if (JSON.stringify(overrides).length > MAX_OVERRIDES_BYTES) {
+      return NextResponse.json({ error: 'overrides too large' }, { status: 413 });
+    }
 
-    // Deep merge the new overrides into the existing profile (preserving meta)
     const updatedProfile = deepMerge(existingProfile, overrides);
 
-    // Commit updated profile
     const company = (existingProfile.meta as Record<string, unknown>)?.company || slug;
     await commitFile(
       `data/profiles/${slug}.json`,
@@ -145,7 +151,6 @@ export async function PATCH(
       `Update profile: ${company}`
     );
 
-    // Update ground truth with any new text from manual edits
     await updateGroundTruth(overrides);
 
     return NextResponse.json({ success: true, slug });
@@ -162,14 +167,17 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  if (!checkAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const limited = rateLimit(request, { name: 'profile-delete', limit: 10, windowMs: 60_000 });
+  if (limited) return limited;
+
+  const unauthorized = await requireAuth(request);
+  if (unauthorized) return unauthorized;
 
   const { slug } = await params;
+  const invalid = validateSlug(slug);
+  if (invalid) return invalid;
 
   try {
-    // Update registry to remove the profile
     const registryContent = await getFileContent('data/profiles/registry.json');
     const registry = registryContent ? JSON.parse(registryContent) : {};
     const company = registry[slug]?.company || slug;

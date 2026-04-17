@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { requireAuth } from '@/lib/auth';
+import { rateLimit } from '@/lib/rate-limit';
 
-function checkAuth(request: NextRequest): boolean {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  const authHeader = request.headers.get('x-admin-password');
-  return !!adminPassword && authHeader === adminPassword;
-}
+const MAX_TEXT_CHARS = 4_000;
+const MAX_INSTRUCTION_CHARS = 1_000;
 
 function stripCodeFences(text: string): string {
   let cleaned = text.trim();
   if (cleaned.startsWith('```')) {
     cleaned = cleaned.replace(/^```(?:\w+)?\s*\n?/, '').replace(/\n?```\s*$/, '');
   }
-  // Strip surrounding quotes if present
   if (
     (cleaned.startsWith('"') && cleaned.endsWith('"')) ||
     (cleaned.startsWith("'") && cleaned.endsWith("'"))
@@ -31,9 +29,11 @@ const SYSTEM_PROMPT = `You are a resume editing assistant. The user wants to mod
 5. Return ONLY the updated text. No explanation, no JSON wrapping, no surrounding quotes, no markdown.`;
 
 export async function POST(request: NextRequest) {
-  if (!checkAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const limited = rateLimit(request, { name: 'ai-edit', limit: 30, windowMs: 60_000 });
+  if (limited) return limited;
+
+  const unauthorized = await requireAuth(request);
+  if (unauthorized) return unauthorized;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -43,11 +43,23 @@ export async function POST(request: NextRequest) {
   try {
     const { currentText, instruction, fieldLabel } = await request.json();
 
-    if (!currentText || !instruction) {
+    if (typeof currentText !== 'string' || typeof instruction !== 'string') {
       return NextResponse.json(
         { error: 'currentText and instruction are required' },
         { status: 400 }
       );
+    }
+    if (currentText.length === 0 || instruction.length === 0) {
+      return NextResponse.json(
+        { error: 'currentText and instruction are required' },
+        { status: 400 }
+      );
+    }
+    if (currentText.length > MAX_TEXT_CHARS || instruction.length > MAX_INSTRUCTION_CHARS) {
+      return NextResponse.json({ error: 'Input too large' }, { status: 413 });
+    }
+    if (fieldLabel !== undefined && (typeof fieldLabel !== 'string' || fieldLabel.length > 200)) {
+      return NextResponse.json({ error: 'Invalid fieldLabel' }, { status: 400 });
     }
 
     const client = new Anthropic({ apiKey });
